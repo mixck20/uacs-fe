@@ -73,6 +73,39 @@
   gap: 1.5rem;
 }
 
+.no-records-message {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  background: #f8fafc;
+  border-radius: 1rem;
+  border: 2px dashed #e2e8f0;
+  color: #64748b;
+}
+
+.no-records-message svg {
+  color: #cbd5e1;
+  margin-bottom: 1.5rem;
+}
+
+.no-records-message h3 {
+  color: #1e293b;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.no-records-message p {
+  color: #64748b;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
 .record-card {
   background: white;
   border-radius: 1rem;

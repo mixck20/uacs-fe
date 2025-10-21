@@ -44,42 +44,10 @@ const UserHealthRecord = ({ user, onLogout }) => {
         </div>
 
         <div className="records-grid">
-          <div className="record-card">
-            <div className="record-icon">
-              <FaFileAlt />
-            </div>
-            <div className="record-info">
-              <h3>General Check-up Report</h3>
-              <p className="date">October 1, 2025</p>
-              <p className="doctor">Dr. Smith</p>
-            </div>
-            <div className="record-actions">
-              <button className="action-btn">
-                <FaDownload /> Download
-              </button>
-              <button className="action-btn">
-                <FaShare /> Share
-              </button>
-            </div>
-          </div>
-
-          <div className="record-card secure">
-            <div className="record-icon">
-              <FaLock />
-            </div>
-            <div className="record-info">
-              <h3>Lab Test Results</h3>
-              <p className="date">September 15, 2025</p>
-              <p className="type">Blood Work Analysis</p>
-            </div>
-            <div className="record-actions">
-              <button className="action-btn">
-                <FaDownload /> Download
-              </button>
-              <button className="action-btn">
-                <FaShare /> Share
-              </button>
-            </div>
+          <div className="no-records-message">
+            <FaFileAlt size={48} />
+            <h3>No Records Available</h3>
+            <p>Your health records will appear here once they are added by the clinic staff.</p>
           </div>
         </div>
 
