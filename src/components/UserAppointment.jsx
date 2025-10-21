@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaCalendar, FaVideo, FaFileAlt, FaClock, FaStethoscope, FaTimes } from "react-icons/fa";
-import UserNavbar from "./UserNavbar";
+import UserPortalLayout from "./UserPortalLayout";
 import "./UserAppointment.css";
 
 const UserAppointment = ({ user, appointments, onLogout }) => {
@@ -13,8 +13,7 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
   const appointmentsList = appointments || [];
 
   return (
-    <div className="user-portal">
-      <UserNavbar user={user} onLogout={onLogout} />
+    <UserPortalLayout user={user} onLogout={onLogout}>
       <div className="user-appointment-page">
         <div className="page-header">
           <h1>Appointments</h1>
@@ -241,7 +240,7 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
           </div>
         )}
       </div>
-    </div>
+    </UserPortalLayout>
   );
 };
 

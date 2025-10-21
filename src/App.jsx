@@ -10,6 +10,7 @@ import ClinicDashboard from "./components/ClinicDashboard";
 import UserDashboard from "./components/UserDashboard";
 import UserAppointment from "./components/UserAppointment";
 import UserHealthRecord from "./components/UserHealthRecord";
+import UserFeedback from "./components/UserFeedback";
 import Patients from "./components/Patients";
 import Inventory from "./components/Inventory";
 import Appointment from "./components/Appointment";
@@ -242,6 +243,12 @@ function App() {
                   } />
                   <Route path="/records" element={
                     <UserHealthRecord 
+                      user={JSON.parse(localStorage.getItem('user') || '{"firstName":"User"}')}
+                      onLogout={handleLogout}
+                    />
+                  } />
+                  <Route path="/feedback" element={
+                    <UserFeedback
                       user={JSON.parse(localStorage.getItem('user') || '{"firstName":"User"}')}
                       onLogout={handleLogout}
                     />

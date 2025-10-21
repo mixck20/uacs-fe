@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { FaCalendar, FaBell, FaFileMedical, FaHistory, FaUserMd, FaComments } from "react-icons/fa";
 import { getRelativeTime, formatDate } from "../utils/timeUtils";
-import UserNavbar from "./UserNavbar";
+import UserPortalLayout from "./UserPortalLayout";
 import "./UserDashboard.css";
 
 const UserDashboard = ({ user, appointments, announcements, medicalRecords, onLogout }) => {
@@ -20,9 +20,7 @@ const UserDashboard = ({ user, appointments, announcements, medicalRecords, onLo
   const recentAnnouncements = announcements?.slice(0, 3) || [];
 
   return (
-    <div className="user-portal">
-      <UserNavbar user={user} onLogout={onLogout} />
-      
+    <UserPortalLayout user={user} onLogout={onLogout}>
       {/* Main Content */}
       <main className="dashboard-content">
         <div className="welcome-section">
@@ -121,7 +119,7 @@ const UserDashboard = ({ user, appointments, announcements, medicalRecords, onLo
           </div>
         </div>
       </main>
-    </div>
+    </UserPortalLayout>
   );
 };
 
