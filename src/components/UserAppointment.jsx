@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaCalendar, FaVideo, FaFileAlt, FaClock, FaStethoscope, FaTimes } from "react-icons/fa";
 import "./UserAppointment.css";
 
-const UserAppointmentPage = ({ user }) => {
+const UserAppointment = ({ user, appointments, onLogout }) => {
   const [activeTab, setActiveTab] = useState('schedule');
   const [appointmentType, setAppointmentType] = useState('clinic');
   const currentDate = new Date('2025-10-16 13:28:07');

@@ -226,9 +226,35 @@ function App() {
             ['student', 'faculty'].includes(userRole) ? (
               <div className="app-container">
                 <Routes>
-                  <Route path="/dashboard" element={<UserDashboard user={user} appointments={appointments} onLogout={handleLogout} />} />
-                  <Route path="/appointments" element={<UserAppointment user={user} appointments={appointments} onLogout={handleLogout} />} />
-                  <Route path="/records" element={<UserHealthRecord user={user} appointments={appointments} onLogout={handleLogout} />} />
+                  <Route path="/dashboard" element={
+                    <UserDashboard 
+                      user={{
+                        firstName: localStorage.getItem('user'),
+                        role: userRole
+                      }} 
+                      appointments={appointments} 
+                      onLogout={handleLogout} 
+                    />
+                  } />
+                  <Route path="/appointments" element={
+                    <UserAppointment 
+                      user={{
+                        firstName: localStorage.getItem('user'),
+                        role: userRole
+                      }}
+                      appointments={appointments} 
+                      onLogout={handleLogout}
+                    />
+                  } />
+                  <Route path="/records" element={
+                    <UserHealthRecord 
+                      user={{
+                        firstName: localStorage.getItem('user'),
+                        role: userRole
+                      }}
+                      onLogout={handleLogout}
+                    />
+                  } />
                   <Route path="/" element={<Navigate to="/dashboard" />} />
                   <Route path="*" element={<Navigate to="/dashboard" />} />
                 </Routes>
