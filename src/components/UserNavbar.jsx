@@ -26,7 +26,6 @@ const UserNavbar = ({ user, onLogout }) => {
       <div className="nav-right">
         <button className="nav-notification">
           <FaBell />
-          <span className="notification-badge">2</span>
         </button>
         
         <div className="nav-user">

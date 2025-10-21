@@ -12,7 +12,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
         <div className="page-header">
           <h1>Health Records</h1>
           <p className="user-info">
-            User: {user?.fullName || 'mixck20'} | {new Date('2025-10-16 13:22:02').toLocaleString()}
+            {user?.fullName || user?.firstName || 'User'} {user?.role && `(${user.role})`}
           </p>
         </div>
 

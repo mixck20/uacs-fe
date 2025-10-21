@@ -25,9 +25,6 @@ const UserDashboard = ({ user, appointments, announcements, medicalRecords, onLo
       <main className="dashboard-content">
         <div className="welcome-section">
           <h1>Welcome back, {user?.firstName || "User"}</h1>
-          <p className="current-time">
-            {new Date('2025-10-16 13:20:55').toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })}
-          </p>
         </div>
 
         {/* Quick Actions */}

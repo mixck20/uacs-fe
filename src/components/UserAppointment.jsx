@@ -17,9 +17,6 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
       <div className="user-appointment-page">
         <div className="page-header">
           <h1>Appointments</h1>
-          <p className="user-info">
-            Welcome, {user?.fullName || user?.firstName || 'User'}
-          </p>
         </div>
 
         <div className="tabs">
