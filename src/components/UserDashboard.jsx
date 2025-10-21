@@ -24,7 +24,7 @@ const UserDashboard = ({ user, appointments, announcements, medicalRecords, onLo
       {/* Main Content */}
       <main className="dashboard-content">
         <div className="welcome-section">
-          <h1>Welcome back, {user?.firstName || "User"}</h1>
+          <h1>Hello, {user?.firstName || "User"}</h1>
         </div>
 
         {/* Quick Actions */}
