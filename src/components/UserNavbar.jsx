@@ -1,8 +1,10 @@
 import React from "react";
+import { Link, useLocation } from "react-router-dom";
 import { FaUser, FaBell, FaSignOutAlt } from "react-icons/fa";
 import "./UserNavbar.css";
 
 const UserNavbar = ({ user, onLogout }) => {
+  const location = useLocation();
   const name = user?.firstName ? `${user.firstName} ${user.lastName}` : "User";
   const userRole = user?.role || "Student/Faculty";
 
@@ -14,11 +16,11 @@ const UserNavbar = ({ user, onLogout }) => {
 
       <div className="nav-center">
         <div className="nav-links">
-          <a href="#dashboard" className="nav-link active">Dashboard</a>
-          <a href="#appointments" className="nav-link">Appointments</a>
-          <a href="#records" className="nav-link">Health Records</a>
-          <a href="#certificates" className="nav-link">Certificates</a>
-          <a href="#feedback" className="nav-link">Feedback</a>
+          <Link to="/dashboard" className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}>Dashboard</Link>
+          <Link to="/appointments" className={`nav-link ${location.pathname === '/appointments' ? 'active' : ''}`}>Appointments</Link>
+          <Link to="/records" className={`nav-link ${location.pathname === '/records' ? 'active' : ''}`}>Health Records</Link>
+          <Link to="/certificates" className={`nav-link ${location.pathname === '/certificates' ? 'active' : ''}`}>Certificates</Link>
+          <Link to="/feedback" className={`nav-link ${location.pathname === '/feedback' ? 'active' : ''}`}>Feedback</Link>
         </div>
       </div>
 

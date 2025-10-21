@@ -8,6 +8,8 @@ import SignupSuccess from "./components/SignupSuccess";
 import VerifyEmail from "./components/VerifyEmail";
 import ClinicDashboard from "./components/ClinicDashboard";
 import UserDashboard from "./components/UserDashboard";
+import UserAppointment from "./components/UserAppointment";
+import UserHealthRecord from "./components/UserHealthRecord";
 import Patients from "./components/Patients";
 import Inventory from "./components/Inventory";
 import Appointment from "./components/Appointment";
@@ -221,9 +223,21 @@ function App() {
         <Route path="/*" element={
           !isLoggedIn ? 
             <Navigate to="/login" /> :
-            <div className="app-container">
-              {getActiveComponent()}
-            </div>
+            ['student', 'faculty'].includes(userRole) ? (
+              <div className="app-container">
+                <Routes>
+                  <Route path="/dashboard" element={<UserDashboard user={user} appointments={appointments} onLogout={handleLogout} />} />
+                  <Route path="/appointments" element={<UserAppointment user={user} appointments={appointments} onLogout={handleLogout} />} />
+                  <Route path="/records" element={<UserHealthRecord user={user} appointments={appointments} onLogout={handleLogout} />} />
+                  <Route path="/" element={<Navigate to="/dashboard" />} />
+                  <Route path="*" element={<Navigate to="/dashboard" />} />
+                </Routes>
+              </div>
+            ) : (
+              <div className="app-container">
+                {getActiveComponent()}
+              </div>
+            )
         } />
       </Routes>
     </Router>
