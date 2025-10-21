@@ -19,6 +19,7 @@ const UserNavbar = ({ user, onLogout }) => {
           <Link to="/dashboard" className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}>Dashboard</Link>
           <Link to="/appointments" className={`nav-link ${location.pathname === '/appointments' ? 'active' : ''}`}>Appointments</Link>
           <Link to="/records" className={`nav-link ${location.pathname === '/records' ? 'active' : ''}`}>Health Records</Link>
+          <Link to="/feedback" className={`nav-link ${location.pathname === '/feedback' ? 'active' : ''}`}>Feedback</Link>
         </div>
       </div>
 

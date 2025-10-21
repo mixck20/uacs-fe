@@ -54,22 +54,51 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
               >
                 <FaVideo /> Online Consultation
               </button>
+              <button 
+                className={`type-btn ${appointmentType === 'certificate' ? 'active' : ''}`}
+                onClick={() => setAppointmentType('certificate')}
+              >
+                <FaFileAlt /> Request Med Certificate
+              </button>
             </div>
 
             <form className="appointment-form">
               <div className="form-section">
-                <h3>Appointment Details</h3>
+                <h3>{appointmentType === 'certificate' ? 'Medical Certificate Request' : 'Appointment Details'}</h3>
                 
-                <div className="form-group">
-                  <label>Reason for Visit</label>
-                  <select required>
-                    <option value="">Select reason</option>
-                    <option value="checkup">General Check-up</option>
-                    <option value="followup">Follow-up Visit</option>
-                    <option value="urgent">Urgent Care</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
+                {appointmentType === 'certificate' ? (
+                  <>
+                    <div className="form-group">
+                      <label>Certificate Type</label>
+                      <select required>
+                        <option value="">Select type</option>
+                        <option value="medical">Medical Certificate</option>
+                        <option value="fitness">Fitness Certificate</option>
+                        <option value="excuse">Excuse Letter</option>
+                      </select>
+                    </div>
+                    
+                    <div className="form-group">
+                      <label>Purpose</label>
+                      <input 
+                        type="text"
+                        placeholder="State the purpose of the certificate"
+                        required
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="form-group">
+                    <label>Reason for Visit</label>
+                    <select required>
+                      <option value="">Select reason</option>
+                      <option value="checkup">General Check-up</option>
+                      <option value="followup">Follow-up Visit</option>
+                      <option value="urgent">Urgent Care</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                )}
 
                 <div className="form-row">
                   <div className="form-group">
@@ -111,7 +140,7 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                 )}
 
                 <button type="submit" className="submit-btn">
-                  Book Appointment
+                  {appointmentType === 'certificate' ? 'Request Certificate' : 'Book Appointment'}
                 </button>
               </div>
             </form>
