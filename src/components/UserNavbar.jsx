@@ -1,12 +1,51 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaUser, FaBell, FaSignOutAlt } from "react-icons/fa";
+import { FaUser, FaBell, FaSignOutAlt, FaCheckCircle } from "react-icons/fa";
 import "./UserNavbar.css";
 
 const UserNavbar = ({ user, onLogout }) => {
   const location = useLocation();
   const name = user?.firstName ? `${user.firstName} ${user.lastName}` : "User";
   const userRole = user?.role || "Student/Faculty";
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    // Check if there's a verification notification
+    const verifiedEmail = localStorage.getItem('verifiedEmail');
+    const verificationTime = localStorage.getItem('verificationTime');
+    
+    if (verifiedEmail && verificationTime) {
+      const newNotification = {
+        id: 'email-verification',
+        type: 'success',
+        icon: <FaCheckCircle className="notification-icon success" />,
+        title: 'Email Verified',
+        message: `Your email (${verifiedEmail}) has been successfully verified.`,
+        time: verificationTime
+      };
+
+      setNotifications(prev => {
+        // Only add if not already present
+        if (!prev.find(n => n.id === 'email-verification')) {
+          return [...prev, newNotification];
+        }
+        return prev;
+      });
+    }
+  }, []);
+
+  const handleNotificationClick = () => {
+    setShowNotifications(!showNotifications);
+  };
+
+  const clearNotification = (id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+    if (id === 'email-verification') {
+      localStorage.removeItem('verifiedEmail');
+      localStorage.removeItem('verificationTime');
+    }
+  };
 
   return (
     <nav className="portal-navbar">
@@ -24,9 +63,35 @@ const UserNavbar = ({ user, onLogout }) => {
       </div>
 
       <div className="nav-right">
-        <button className="nav-notification">
-          <FaBell />
-        </button>
+        <div className="notification-wrapper">
+          <button className="nav-notification" onClick={handleNotificationClick}>
+            <FaBell />
+            {notifications.length > 0 && (
+              <span className="notification-badge">{notifications.length}</span>
+            )}
+          </button>
+          
+          {showNotifications && notifications.length > 0 && (
+            <div className="notifications-dropdown">
+              {notifications.map(notification => (
+                <div key={notification.id} className="notification-item">
+                  {notification.icon}
+                  <div className="notification-content">
+                    <div className="notification-title">{notification.title}</div>
+                    <div className="notification-message">{notification.message}</div>
+                    <div className="notification-time">{notification.time}</div>
+                  </div>
+                  <button 
+                    className="notification-close"
+                    onClick={() => clearNotification(notification.id)}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         
         <div className="nav-user">
           <div className="user-icon">

@@ -45,6 +45,7 @@ const VerifyEmail = () => {
         // Store the verified email in localStorage
         if (data.email) {
           localStorage.setItem('verifiedEmail', data.email);
+          localStorage.setItem('verificationTime', new Date().toLocaleString());
         }
         
         // Auto-redirect to login after 3 seconds
