@@ -8,27 +8,8 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
   const currentDate = new Date('2025-10-16 13:28:07');
   const [showDetails, setShowDetails] = useState(null);
 
-  // Mock data for appointments
-  const appointments = [
-    {
-      id: 1,
-      type: 'Clinic Visit',
-      date: '2025-10-20',
-      time: '10:00',
-      reason: 'General Check-up',
-      status: 'Pending',
-      notes: 'Awaiting confirmation from clinic'
-    },
-    {
-      id: 2,
-      type: 'Medical Certificate',
-      date: '2025-10-15',
-      time: '14:30',
-      reason: 'For academic purposes',
-      status: 'Confirmed',
-      notes: 'Please bring your student ID'
-    }
-  ];
+  // Use appointments from props, or fallback to empty array if not provided
+  const appointmentsList = appointments || [];
 
   return (
     <div className="user-appointment-page">
@@ -175,7 +156,7 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
       {activeTab === 'history' && (
         <div className="history-section">
           <div className="appointments-grid">
-            {appointments.map(appointment => (
+            {appointmentsList.map(appointment => (
               <div key={appointment.id} className={`appointment-card ${appointment.status.toLowerCase()}`}>
                 <div className="appointment-card-header">
                   <div className="appointment-type">
