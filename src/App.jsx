@@ -230,6 +230,7 @@ function App() {
                     <UserDashboard 
                       user={{
                         firstName: localStorage.getItem('user'),
+                        fullName: localStorage.getItem('user'),
                         role: userRole
                       }} 
                       appointments={appointments} 
@@ -240,6 +241,7 @@ function App() {
                     <UserAppointment 
                       user={{
                         firstName: localStorage.getItem('user'),
+                        fullName: localStorage.getItem('user'),
                         role: userRole
                       }}
                       appointments={appointments} 
@@ -250,6 +252,7 @@ function App() {
                     <UserHealthRecord 
                       user={{
                         firstName: localStorage.getItem('user'),
+                        fullName: localStorage.getItem('user'),
                         role: userRole
                       }}
                       onLogout={handleLogout}

@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { Link } from "react-router-dom";
 import { FaCalendar, FaBell, FaFileMedical, FaHistory, FaUserMd, FaComments } from "react-icons/fa";
 import { getRelativeTime, formatDate } from "../utils/timeUtils";
 import UserNavbar from "./UserNavbar";
@@ -50,7 +51,7 @@ const UserDashboard = ({ user, appointments, announcements, medicalRecords, onLo
           <div className="dashboard-card">
             <div className="card-header">
               <h2><FaCalendar /> Upcoming Appointments</h2>
-              <a href="#appointments" className="view-all">View All</a>
+              <Link to="/appointments" className="view-all">View All</Link>
             </div>
             <div className="card-content">
               {upcomingAppointments.length > 0 ? (
@@ -71,7 +72,7 @@ const UserDashboard = ({ user, appointments, announcements, medicalRecords, onLo
           <div className="dashboard-card">
             <div className="card-header">
               <h2><FaBell /> Clinic Announcements</h2>
-              <a href="#announcements" className="view-all">View All</a>
+              <Link to="/announcements" className="view-all">View All</Link>
             </div>
             <div className="card-content">
               {recentAnnouncements.map(announcement => (
@@ -88,7 +89,7 @@ const UserDashboard = ({ user, appointments, announcements, medicalRecords, onLo
           <div className="dashboard-card">
             <div className="card-header">
               <h2><FaHistory /> Medical History</h2>
-              <a href="#records" className="view-all">View All</a>
+              <Link to="/records" className="view-all">View All</Link>
             </div>
             <div className="card-content">
               {medicalRecords?.length > 0 ? (
