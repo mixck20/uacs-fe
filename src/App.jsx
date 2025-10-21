@@ -228,33 +228,21 @@ function App() {
                 <Routes>
                   <Route path="/dashboard" element={
                     <UserDashboard 
-                      user={{
-                        firstName: localStorage.getItem('user'),
-                        fullName: localStorage.getItem('user'),
-                        role: userRole
-                      }} 
+                      user={JSON.parse(localStorage.getItem('user') || '{"firstName":"User"}')}
                       appointments={appointments} 
                       onLogout={handleLogout} 
                     />
                   } />
                   <Route path="/appointments" element={
                     <UserAppointment 
-                      user={{
-                        firstName: localStorage.getItem('user'),
-                        fullName: localStorage.getItem('user'),
-                        role: userRole
-                      }}
+                      user={JSON.parse(localStorage.getItem('user') || '{"firstName":"User"}')}
                       appointments={appointments} 
                       onLogout={handleLogout}
                     />
                   } />
                   <Route path="/records" element={
                     <UserHealthRecord 
-                      user={{
-                        firstName: localStorage.getItem('user'),
-                        fullName: localStorage.getItem('user'),
-                        role: userRole
-                      }}
+                      user={JSON.parse(localStorage.getItem('user') || '{"firstName":"User"}')}
                       onLogout={handleLogout}
                     />
                   } />
