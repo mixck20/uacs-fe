@@ -1,0 +1,89 @@
+.clinic-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 6vw;
+  height: 90px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(229, 29, 94, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.clinic-brand {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #e51d5e;
+  letter-spacing: 0.5px;
+  min-width: 220px;
+}
+
+.clinic-nav-links {
+  display: flex;
+  gap: 2rem;
+  margin: 0 auto;
+  padding: 0 3rem;
+}
+
+.clinic-nav-link {
+  text-decoration: none;
+  color: #666;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.clinic-nav-link:hover,
+.clinic-nav-link.active {
+  color: #e51d5e;
+  background: #ffeaf4;
+}
+
+.clinic-logout-btn {
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-radius: 6px;
+  background: #e51d5e;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+  min-width: 100px;
+}
+
+.clinic-logout-btn:hover {
+  background: #ca1852;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .clinic-navbar {
+    flex-direction: column;
+    height: auto;
+    padding: 1rem;
+  }
+
+  .clinic-nav-links {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    padding: 0;
+  }
+
+  .clinic-nav-link {
+    text-align: center;
+    width: 100%;
+  }
+
+  .clinic-logout-btn {
+    width: 100%;
+    margin-top: 1rem;
+  }
+}

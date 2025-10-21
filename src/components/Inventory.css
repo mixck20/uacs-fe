@@ -1,0 +1,411 @@
+.clinic-container {
+  min-height: 100vh;
+  background: #f8f8fc;
+  font-family: "Poppins", Arial, sans-serif;
+}
+
+.clinic-content {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.inventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+
+.inventory-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #e51d5e;
+}
+
+.inventory-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.inventory-btn {
+  padding: 8px 22px;
+  background: #e51d5e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s;
+  font-size: 1rem;
+}
+
+.inventory-btn:hover {
+  background: #ca3572;
+}
+
+.inventory-controls {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 1.3rem;
+}
+
+/* Medicine Statistics Summary */
+.inventory-stats-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.stat-item {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  text-align: center;
+  flex: 1;
+  min-width: 120px;
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(229, 29, 94, 0.12);
+}
+
+.stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.stat-number.available {
+  color: #28a745;
+}
+
+.stat-number.shortage {
+  color: #ff6b6b;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Medical Shortage and Available Medicines Summary Cards */
+.inventory-summary-cards {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.inventory-summary-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  flex: 1;
+  min-width: 350px;
+  transition: all 0.3s ease;
+}
+
+.inventory-summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(229, 29, 94, 0.15);
+}
+
+.summary-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.summary-card-header h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.shortage-count {
+  background: #ff6b6b;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-width: 30px;
+  text-align: center;
+}
+
+.available-count {
+  background: #28a745;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-width: 30px;
+  text-align: center;
+}
+
+.summary-card-content {
+  min-height: 120px;
+}
+
+.shortage-list,
+.available-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.shortage-item,
+.available-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.shortage-item:last-child,
+.available-item:last-child {
+  border-bottom: none;
+}
+
+.item-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.item-quantity {
+  background: #f8f9fa;
+  color: #666;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.more-items {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 12px 0;
+  font-size: 0.9rem;
+}
+
+.no-shortage,
+.no-available {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 40px 0;
+  margin: 0;
+}
+
+.inventory-search {
+  padding: 8px 14px;
+  border: 1.5px solid #e51d5e;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 230px;
+  background: #fff;
+}
+
+.inventory-filter {
+  padding: 8px 14px;
+  border: 1.5px solid #e51d5e;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fff;
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 1.06rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.inventory-table th, 
+.inventory-table td {
+  padding: 16px 12px;
+  text-align: left;
+  border-bottom: 1.5px solid #f2e7ef;
+}
+
+.inventory-table th {
+  color: #e51d5e;
+  font-weight: 700;
+  background: #fff;
+  letter-spacing: 0.5px;
+}
+
+.low-stock {
+  background: #ffe9ee !important;
+  color: #e51d5e;
+  font-weight: 700;
+}
+
+.inventory-adjust {
+  background: #fff;
+  color: #e51d5e;
+  border: 1.5px solid #e51d5e;
+  border-radius: 6px;
+  padding: 2px 9px;
+  margin: 0 2px;
+  font-size: 1.12rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.inventory-adjust:hover {
+  background: #e51d5e;
+  color: #fff;
+}
+
+.inventory-modal {
+  position: fixed;
+  left: 0; 
+  top: 0; 
+  right: 0; 
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+}
+
+.inventory-modal-content {
+  background: #fff;
+  padding: 2.5rem 3rem;
+  border-radius: 18px;
+  box-shadow: 0 3px 32px rgba(0, 0, 0, 0.15);
+  min-width: 400px;
+  max-width: 96vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.inventory-modal-content h2 {
+  color: #e51d5e;
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 1.8rem;
+}
+
+.inventory-modal-content input,
+.inventory-modal-content select {
+  display: block;
+  width: 100%;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  border: 2px solid #e1e8ed;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.inventory-modal-content input:focus,
+.inventory-modal-content select:focus {
+  border-color: #e51d5e;
+  box-shadow: 0 0 0 3px rgba(229, 29, 94, 0.1);
+  outline: none;
+}
+
+.inventory-modal-content label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: 600;
+}
+
+.inventory-modal-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  justify-content: flex-end;
+}
+
+.inventory-modal-actions .inventory-btn {
+  min-width: 100px;
+  padding: 12px 24px;
+}
+
+@media (max-width: 800px) {
+  .clinic-content {
+    padding: 1rem;
+  }
+  
+  .inventory-modal-content {
+    padding: 2rem 1.5rem;
+    min-width: 90vw;
+    margin: 20px;
+  }
+  
+  .inventory-summary-cards {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .inventory-summary-card {
+    min-width: 100%;
+  }
+  
+  .inventory-stats-summary {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .stat-item {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .inventory-modal-content {
+    padding: 1.5rem 1rem;
+    min-width: 95vw;
+  }
+  
+  .inventory-modal-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .inventory-modal-actions .inventory-btn {
+    width: 100%;
+  }
+  
+  .inventory-controls {
+    flex-direction: column;
+  }
+  
+  .inventory-search,
+  .inventory-filter {
+    width: 100%;
+  }
+}
