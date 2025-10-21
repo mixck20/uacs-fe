@@ -9,20 +9,44 @@ const UserNavbar = ({ user, onLogout }) => {
   const userRole = user?.role || "Student/Faculty";
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const notificationRef = React.useRef(null);
+
+  useEffect(() => {
+    // Add click outside handler
+    const handleClickOutside = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     // Check if there's a verification notification
     const verifiedEmail = localStorage.getItem('verifiedEmail');
     const verificationTime = localStorage.getItem('verificationTime');
     
-    if (verifiedEmail && verificationTime) {
+    // For testing - ensure we have a notification
+    if (!verifiedEmail) {
+      localStorage.setItem('verifiedEmail', 'test@example.com');
+      localStorage.setItem('verificationTime', new Date().toLocaleString());
+    }
+    
+    const testEmail = localStorage.getItem('verifiedEmail');
+    const testTime = localStorage.getItem('verificationTime');
+    
+    if (testEmail && testTime) {
       const newNotification = {
         id: 'email-verification',
         type: 'success',
         icon: <FaCheckCircle className="notification-icon success" />,
         title: 'Email Verified',
-        message: `Your email (${verifiedEmail}) has been successfully verified.`,
-        time: verificationTime
+        message: `Your email (${testEmail}) has been successfully verified.`,
+        time: testTime
       };
 
       setNotifications(prev => {
@@ -63,7 +87,7 @@ const UserNavbar = ({ user, onLogout }) => {
       </div>
 
       <div className="nav-right">
-        <div className="notification-wrapper">
+        <div className="notification-wrapper" ref={notificationRef}>
           <button className="nav-notification" onClick={handleNotificationClick}>
             <FaBell />
             {notifications.length > 0 && (
