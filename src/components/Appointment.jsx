@@ -165,7 +165,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
   async function updateAppointmentStatus(id, newStatus) {
     try {
       const appointment = appointments.find(apt => apt.id === id);
-      const payload = { status: newStatus.toLowerCase() };
+      const payload = { status: newStatus }; // Keep original case for enum validation
       
       // For online consultations being confirmed
       if (newStatus === 'Confirmed' && appointment.type === 'Online Consultation') {
@@ -321,16 +321,16 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
            </div>
          )}
 
-        {/* Online Consultation Manager */}
-        <div className="online-consultation-manager">
-          <h3><FaVideo /> Online Consultations</h3>
+        {/* All Appointments Section */}
+        <div className="appointments-section">
+          <h2><FaUser /> Appointment & Consultation Requests</h2>
           
           <div className="consultation-filters">
             <button 
               className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
               onClick={() => setActiveFilter('all')}
             >
-              All Requests
+              All Appointments
             </button>
             <button 
               className={`filter-btn ${activeFilter === 'pending' ? 'active' : ''}`}
@@ -339,89 +339,24 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               Pending
             </button>
             <button 
+              className={`filter-btn ${activeFilter === 'online' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('online')}
+            >
+              Online Consultations
+            </button>
+            <button 
+              className={`filter-btn ${activeFilter === 'inPerson' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('inPerson')}
+            >
+              In-Person Visits
+            </button>
+            <button 
               className={`filter-btn ${activeFilter === 'today' ? 'active' : ''}`}
               onClick={() => setActiveFilter('today')}
             >
-              Today's Consultations
+              Today's Appointments
             </button>
           </div>
-
-          <div className="consultation-requests">
-            {appointments
-              .filter(apt => apt.type === 'Online Consultation')
-              .filter(apt => {
-                if (activeFilter === 'pending') return apt.status === 'Pending';
-                if (activeFilter === 'today') {
-                  const today = new Date().toDateString();
-                  const aptDate = new Date(apt.date).toDateString();
-                  return aptDate === today;
-                }
-                return true;
-              })
-              .map(appointment => (
-                <div key={appointment.id} className="consultation-card">
-                  <div className="consultation-info">
-                    <h4>{appointment.patientName}</h4>
-                    <div className="consultation-detail">
-                      <FaCalendar />
-                      {new Date(appointment.date).toLocaleDateString()}
-                    </div>
-                    <div className="consultation-detail">
-                      <FaClock />
-                      {appointment.time}
-                    </div>
-                    <div className="consultation-detail">
-                      <FaStethoscope />
-                      {appointment.reason}
-                    </div>
-                    <div className={`consultation-status status-${appointment.status.toLowerCase()}`}>
-                      {appointment.status}
-                    </div>
-                  </div>
-                  
-                  <div className="consultation-actions">
-                    {appointment.status === 'Pending' && (
-                      <>
-                        <button 
-                          className="consultation-btn btn-approve"
-                          onClick={() => handleConfirmConsultation(appointment)}
-                        >
-                          <FaCheck /> Approve
-                        </button>
-                        <button 
-                          className="consultation-btn btn-reject"
-                          onClick={() => handleRejectConsultation(appointment)}
-                        >
-                          <FaTimes /> Reject
-                        </button>
-                      </>
-                    )}
-                    
-                    {appointment.status === 'Confirmed' && (
-                      <>
-                        <button 
-                          className="consultation-btn btn-meet"
-                          onClick={() => handleStartMeeting(appointment)}
-                        >
-                          <FaVideo /> Start Meet
-                        </button>
-                        <button 
-                          className="consultation-btn btn-chat"
-                          onClick={() => handleOpenChat(appointment)}
-                        >
-                          <FaCommentDots /> Chat
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-
-        {/* Regular Appointments Section */}
-        <div className="appointments-section">
-          <h2>In-Person Appointments</h2>
           <table className="appointments-table">
             <thead>
               <tr>
@@ -434,12 +369,46 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               </tr>
             </thead>
             <tbody>
-              {appointments.length === 0 ? (
+              {appointments
+                .filter(apt => {
+                  switch (activeFilter) {
+                    case 'pending':
+                      return apt.status === 'Pending';
+                    case 'online':
+                      return apt.type === 'Online Consultation';
+                    case 'inPerson':
+                      return apt.type === 'In-Person-Consultation' || apt.type === 'Clinic Visit';
+                    case 'today':
+                      const today = new Date().toDateString();
+                      const aptDate = new Date(apt.date).toDateString();
+                      return aptDate === today;
+                    default:
+                      return true;
+                  }
+                })
+                .length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="no-data">No appointments scheduled</td>
+                  <td colSpan={6} className="no-data">No appointments found</td>
                 </tr>
               ) : (
-                appointments.map(appointment => (
+                appointments
+                .filter(apt => {
+                  switch (activeFilter) {
+                    case 'pending':
+                      return apt.status === 'Pending';
+                    case 'online':
+                      return apt.type === 'Online Consultation';
+                    case 'inPerson':
+                      return apt.type === 'In-Person-Consultation' || apt.type === 'Clinic Visit';
+                    case 'today':
+                      const today = new Date().toDateString();
+                      const aptDate = new Date(apt.date).toDateString();
+                      return aptDate === today;
+                    default:
+                      return true;
+                  }
+                })
+                .map(appointment => (
                   <tr key={appointment.id} className={`appointment-row ${appointment.status.toLowerCase()}`}>
                     <td>{appointment.patientName}</td>
                     <td>
@@ -511,68 +480,6 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               )}
             </tbody>
           </table>
-        </div>
-
-                 {/* Student Requests Section */}
-         <div className="student-requests-section">
-           <h2><FaUser /> Appointment & Consultation Requests</h2>
-          <div className="student-requests-grid">
-            {studentRequests.map(request => (
-              <div key={request.id} className={`student-request-card ${request.status.toLowerCase()}`}>
-                <div className="request-header">
-                  <div className="request-info">
-                    <h4>{request.studentName}</h4>
-                    <span className="student-id">ID: {request.studentId}</span>
-                    <span className="request-source">{request.source}</span>
-                  </div>
-                  <div className="request-status">
-                    <span className={`status-badge ${request.status.toLowerCase()}`}>
-                      {request.status}
-                    </span>
-                  </div>
-                </div>
-                <div className="request-details">
-                  <p><strong>Type:</strong> {request.requestType}</p>
-                  <p><strong>Reason:</strong> {request.reason}</p>
-                  <p><strong>Time:</strong> {new Date(request.timestamp).toLocaleString()}</p>
-                </div>
-                <div className="request-actions">
-                                     {request.status === "Pending" && (
-                     <>
-                       <button 
-                         className="action-btn confirm"
-                         onClick={() => updateStudentRequestStatus(request.id, "Confirmed")}
-                       >
-                         <FaCheck /> Confirm
-                       </button>
-                       <button 
-                         className="action-btn reject"
-                         onClick={() => updateStudentRequestStatus(request.id, "Rejected")}
-                       >
-                         <FaTimes /> Reject
-                       </button>
-                     </>
-                   )}
-                   {request.status === "Confirmed" && (
-                     <>
-                       <button 
-                         className="action-btn chat"
-                         onClick={() => openChat(request)}
-                       >
-                         <FaCommentDots /> Open Chat
-                       </button>
-                       <button 
-                         className="action-btn complete"
-                         onClick={() => updateStudentRequestStatus(request.id, "Completed")}
-                       >
-                         <FaCheck /> Complete
-                       </button>
-                     </>
-                   )}
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
 
                  {/* Chat Interface */}
