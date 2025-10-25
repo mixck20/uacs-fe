@@ -27,6 +27,37 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === 'preferredDate') {
+      const selectedDate = new Date(value);
+      const dayOfWeek = selectedDate.getDay();
+      
+      // Check if selected day is a weekend (0 = Sunday, 6 = Saturday)
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        Swal.fire({
+          title: "Invalid Date",
+          text: "Please select a weekday (Monday to Friday)",
+          icon: "warning"
+        });
+        return;
+      }
+    }
+
+    if (name === 'preferredTime') {
+      const timeValue = value;
+      const [hours] = timeValue.split(':').map(Number);
+      
+      // Check if time is within clinic hours (9 AM to 5 PM)
+      if (hours < 9 || hours >= 17) {
+        Swal.fire({
+          title: "Invalid Time",
+          text: "Please select a time between 9:00 AM and 5:00 PM",
+          icon: "warning"
+        });
+        return;
+      }
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -37,11 +68,31 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
     e.preventDefault();
     setLoading(true);
 
+    if (!formData.preferredDate || !formData.preferredTime || !formData.type) {
+      Swal.fire({
+        title: "Missing Information",
+        text: "Please fill in all required fields",
+        icon: "warning"
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
+      // Map the form data to match backend expectations
       const appointmentData = {
-        ...formData,
+        patientId: user._id, // Add the patient's ID from user prop
+        date: formData.preferredDate,
+        time: formData.preferredTime,
+        reason: appointmentType === 'certificate' ? formData.purpose : formData.notes || formData.type,
+        type: appointmentType === 'online' 
+          ? 'Online Consultation' 
+          : appointmentType === 'certificate'
+          ? 'Medical Certificate'
+          : 'Clinic Visit',
         isOnline: appointmentType === 'online',
-        type: appointmentType === 'online' ? 'Online Consultation' : 'Clinic Visit',
+        certificateType: formData.certificateType,
+        notes: formData.notes
       };
 
       const response = await AppointmentsAPI.create(appointmentData);
@@ -50,6 +101,8 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
         title: 'Success!',
         text: appointmentType === 'online' 
           ? 'Your online consultation request has been submitted. You will receive the Google Meet link once confirmed.' 
+          : appointmentType === 'certificate'
+          ? 'Your medical certificate request has been submitted.'
           : 'Your appointment has been booked successfully!',
         icon: 'success'
       });
@@ -187,19 +240,19 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                   </div>
                   <div className="form-group">
                     <label>Preferred Time</label>
-                    <select
+                    <input
+                      type="time"
                       name="preferredTime"
                       value={formData.preferredTime}
                       onChange={handleFormChange}
+                      min="09:00"
+                      max="17:00"
+                      step="900" // 15-minute intervals
                       required
-                    >
-                      <option value="">Select time</option>
-                      <option value="09:00">09:00 AM</option>
-                      <option value="10:00">10:00 AM</option>
-                      <option value="11:00">11:00 AM</option>
-                      <option value="14:00">02:00 PM</option>
-                      <option value="15:00">03:00 PM</option>
-                    </select>
+                    />
+                    <small className="time-note">
+                      Clinic hours: 9:00 AM - 5:00 PM, Monday to Friday
+                    </small>
                   </div>
                 </div>
 

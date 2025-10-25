@@ -403,6 +403,20 @@
   outline: none;
 }
 
+.form-row input[type="time"] {
+  height: 42px;
+  padding: 0 10px;
+  color: #333;
+}
+
+.time-note {
+  display: block;
+  margin-top: 5px;
+  color: #666;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
 textarea {
   width: 100%;
   padding: 14px 16px;

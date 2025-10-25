@@ -537,8 +537,14 @@ function Appointment({ setActivePage, activePage, patients, onLogout }) {
                     name="time"
                     value={form.time}
                     onChange={handleFormChange}
+                    min="09:00"
+                    max="17:00"
+                    step="900"
                     required
                   />
+                  <small className="time-note">
+                    Clinic hours: 9:00 AM - 5:00 PM
+                  </small>
                 </div>
                 <div className="form-row">
                   <label className="checkbox-label">
