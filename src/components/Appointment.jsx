@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ClinicNavbar from "./ClinicNavbar";
 import "./Appointment.css";
-import { FaCalendarPlus, FaPhone, FaCheck, FaTimes, FaComments, FaUser, FaClock, FaVideo, FaMicrophone, FaCalendar, FaFilter, FaStethoscope } from "react-icons/fa";
+import { FaCalendarPlus, FaPhone, FaCheck, FaTimes, FaCommentDots, FaUser, FaClock, FaVideo, FaMicrophone, FaCalendar, FaFilter, FaStethoscope } from "react-icons/fa";
 import { AppointmentsAPI } from "../api";
 import Swal from "sweetalert2";
 
@@ -409,7 +409,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
                           className="consultation-btn btn-chat"
                           onClick={() => handleOpenChat(appointment)}
                         >
-                          <FaComments /> Chat
+                          <FaCommentDots /> Chat
                         </button>
                       </>
                     )}
@@ -463,7 +463,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
                                   className="chat-link"
                                   onClick={() => openChat(appointment)}
                                 >
-                                  <FaComments /> Chat
+                                  <FaCommentDots /> Chat
                                 </button>
                               </div>
                             )}
@@ -559,7 +559,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
                          className="action-btn chat"
                          onClick={() => openChat(request)}
                        >
-                         <FaComments /> Open Chat
+                         <FaCommentDots /> Open Chat
                        </button>
                        <button 
                          className="action-btn complete"
@@ -580,7 +580,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
            <div className="chat-modal">
              <div className="chat-modal-content">
                <div className="chat-header">
-                 <h3><FaComments /> Chat with {selectedRequest.studentName}</h3>
+                 <h3><FaCommentDots /> Chat with {selectedRequest.studentName}</h3>
                  <button className="close-btn" onClick={() => setShowChat(false)}><FaTimes /></button>
                </div>
               <div className="chat-messages">
