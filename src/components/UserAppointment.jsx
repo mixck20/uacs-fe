@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaCalendar, FaVideo, FaFileAlt, FaClock, FaStethoscope, FaTimes } from "react-icons/fa";
+import { FaCalendar, FaVideo, FaFileAlt, FaClock, FaStethoscope, FaTimes, FaCommentDots } from "react-icons/fa";
 import UserPortalLayout from "./UserPortalLayout";
 import "./UserAppointment.css";
 import { AppointmentsAPI } from '../api';
@@ -289,7 +289,7 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                         You will receive the meeting link once your appointment is confirmed.
                       </p>
                       <p className="mt-2">
-                        <FaComments /> A chat feature will be enabled before the consultation 
+                        <FaCommentDots /> A chat feature will be enabled before the consultation 
                         for any pre-consultation questions or concerns.
                       </p>
                       <p className="mt-2 text-sm">
@@ -369,7 +369,7 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                           
                           {appointment.consultationDetails?.chatEnabled && (
                             <div className="chat-status">
-                              <FaComments />
+                              <FaCommentDots />
                               Pre-consultation chat is available
                             </div>
                           )}
@@ -394,7 +394,7 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                           className="chat-btn"
                           onClick={() => window.open('/chat/' + appointment._id, '_blank')}
                         >
-                          <FaComments /> Open Chat
+                          <FaCommentDots /> Open Chat
                         </button>
                       )}
                     </div>
