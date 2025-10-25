@@ -2,7 +2,8 @@
  * Base API configuration
  */
 const API_CONFIG = {
-  baseUrl: 'https://uacs-be.vercel.app',
+  // Use environment variable or fallback to local development URL
+  baseUrl: process.env.REACT_APP_API_URL || 'http://localhost:3001',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -188,22 +189,48 @@ export const AppointmentsAPI = {
   },
 
   create: async (appointmentData) => {
-    // Handle online consultation specific data
-    if (appointmentData.type === 'Consultation' && appointmentData.consultationType === 'Online') {
+    // Add requiresMeetLink flag for online consultations
+    if (appointmentData.isOnline || appointmentData.consultationType === 'Online') {
       appointmentData.requiresMeetLink = true;
     }
     
-    return await apiFetch('/api/appointments', {
+    const response = await apiFetch('/api/appointments', {
       method: 'POST',
       body: JSON.stringify(appointmentData)
     });
+
+    // If it's an online consultation and we got a Meet link, include it in the response
+    if (response.meetLink) {
+      return {
+        ...response,
+        data: {
+          ...response.data,
+          meetLink: response.meetLink
+        }
+      };
+    }
+    
+    return response;
   },
 
   update: async (id, appointmentData) => {
-    return await apiFetch(`/api/appointments/${id}`, {
+    const response = await apiFetch(`/api/appointments/${id}`, {
       method: 'PUT',
       body: JSON.stringify(appointmentData)
     });
+
+    // If we get a Meet link in the response, include it in the returned data
+    if (response.meetLink) {
+      return {
+        ...response,
+        data: {
+          ...response.data,
+          meetLink: response.meetLink
+        }
+      };
+    }
+
+    return response;
   },
 
   delete: async (id) => {

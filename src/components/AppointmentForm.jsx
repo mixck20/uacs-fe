@@ -14,6 +14,7 @@ const AppointmentForm = ({ onSuccess }) => {
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,17 +22,31 @@ const AppointmentForm = ({ onSuccess }) => {
       ...prev,
       [name]: value
     }));
+
+    // Reset success message when form is modified
+    if (successMessage) {
+      setSuccessMessage('');
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    setSuccessMessage('');
 
     try {
       const response = await AppointmentsAPI.create(formData);
       if (response) {
+        // Show success message with Meet link for online consultations
+        if (formData.type === 'Consultation' && formData.consultationType === 'Online' && response.meetLink) {
+          setSuccessMessage(`Appointment created successfully! Google Meet link: ${response.meetLink}`);
+        } else {
+          setSuccessMessage('Appointment created successfully!');
+        }
+
         onSuccess?.(response);
+        
         // Reset form
         setFormData({
           patientId: '',
@@ -51,12 +66,20 @@ const AppointmentForm = ({ onSuccess }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-4">
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error}
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+          <span className="block sm:inline">{error}</span>
         </div>
       )}
+
+      {successMessage && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+          <span className="block sm:inline">{successMessage}</span>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
 
       <div>
         <label className="block text-sm font-medium text-gray-700">
@@ -131,7 +154,12 @@ const AppointmentForm = ({ onSuccess }) => {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           >
             <option value="In-Person">In-Person</option>
-            <option value="Online">Online</option>
+            <option value="Online">Online (via Google Meet)</option>
+            {formData.consultationType === 'Online' && (
+              <p className="text-sm text-gray-600 italic mt-2">
+                A Google Meet link will be generated automatically after creating the appointment.
+              </p>
+            )}
           </select>
         </div>
       )}

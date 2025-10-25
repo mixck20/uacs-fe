@@ -21,7 +21,8 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
     reason: "",
     status: "Pending",
     isOnline: false,
-    meetLink: null
+    meetLink: null,
+    consultationType: "In-Person" // Added for consultation type tracking
   });
 
   const [consultationForm, setConsultationForm] = useState({
@@ -85,19 +86,62 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
     setConsultationForm({ ...consultationForm, [e.target.name]: e.target.value });
   }
 
-  function handleAddAppointment(e) {
+  async function handleAddAppointment(e) {
     e.preventDefault();
     if (form.patientId && form.date && form.time) {
-      const newAppointment = {
-        id: Date.now(),
-        ...form,
-        createdAt: new Date().toISOString()
-      };
-      setAppointments([...appointments, newAppointment]);
-      setForm({ patientId: "", patientName: "", appointmentType: "Check-up", date: "", time: "", reason: "", status: "Pending" });
-      setShowForm(false);
+      try {
+        const appointmentData = {
+          patientId: form.patientId,
+          date: form.date,
+          time: form.time,
+          reason: form.reason,
+          type: form.appointmentType,
+          isOnline: form.isOnline,
+          consultationType: form.isOnline ? "Online" : "In-Person"
+        };
+
+        const response = await AppointmentsAPI.create(appointmentData);
+        const newAppointment = {
+          id: response.data._id,
+          patientName: form.patientName,
+          ...appointmentData,
+          status: "Pending",
+          meetLink: response.data.meetLink
+        };
+
+        setAppointments([...appointments, newAppointment]);
+        setForm({ 
+          patientId: "", 
+          patientName: "", 
+          appointmentType: "Checkup", 
+          date: "", 
+          time: "", 
+          reason: "", 
+          status: "Pending",
+          isOnline: false,
+          meetLink: null,
+          consultationType: "In-Person"
+        });
+        setShowForm(false);
+
+        Swal.fire({
+          title: "Appointment Created",
+          text: "The appointment has been scheduled successfully",
+          icon: "success"
+        });
+      } catch (err) {
+        Swal.fire({
+          title: "Failed to Create Appointment",
+          text: err.message,
+          icon: "error"
+        });
+      }
     } else {
-      alert("Please fill all required fields.");
+      Swal.fire({
+        title: "Missing Information",
+        text: "Please fill all required fields.",
+        icon: "warning"
+      });
     }
   }
 
@@ -136,10 +180,32 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
   async function updateAppointmentStatus(id, newStatus) {
     try {
       const payload = { status: newStatus.toLowerCase() };
-      await AppointmentsAPI.update(id, payload);
+      const response = await AppointmentsAPI.update(id, payload);
+      
+      // If the appointment is confirmed and it's an online consultation, it should have a Meet link
+      const updatedAppointment = response.data;
+      
       setAppointments(appointments.map(apt => 
-        apt.id === id ? { ...apt, status: newStatus } : apt
+        apt.id === id ? { 
+          ...apt, 
+          status: newStatus,
+          meetLink: updatedAppointment.meetLink || apt.meetLink
+        } : apt
       ));
+
+      if (newStatus === "Confirmed" && updatedAppointment.meetLink) {
+        Swal.fire({
+          title: "Online Consultation Confirmed",
+          text: "A Google Meet link has been generated for this consultation",
+          icon: "success",
+          confirmButtonText: "Copy Meet Link",
+        }).then((result) => {
+          if (result.isConfirmed && updatedAppointment.meetLink) {
+            navigator.clipboard.writeText(updatedAppointment.meetLink);
+            Swal.fire("Meet Link Copied!", "", "success");
+          }
+        });
+      }
     } catch (err) {
       Swal.fire({ title: "Failed to update status", text: err.message, icon: "error" });
     }
