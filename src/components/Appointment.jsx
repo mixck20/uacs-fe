@@ -20,10 +20,17 @@ function Appointment({ setActivePage, activePage, patients, onLogout }) {
   const [appointments, setAppointments] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [showMeetForm, setShowMeetForm] = useState(false);
+  const [showConsultation, setShowConsultation] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [currentCall, setCurrentCall] = useState(null);
   const [chatMessage, setChatMessage] = useState('');
   const [showChat, setShowChat] = useState(false);
+  const [consultationForm, setConsultationForm] = useState({
+    patientId: '',
+    patientName: '',
+    consultationType: 'Video Call',
+    reason: ''
+  });
   const [form, setForm] = useState({
     patientId: "",
     patientName: "",
@@ -105,7 +112,8 @@ function Appointment({ setActivePage, activePage, patients, onLogout }) {
         date: form.date,
         time: form.time,
         reason: form.reason,
-        type: form.type
+        type: form.appointmentType || form.type,
+        isOnline: form.isOnline
       };
 
       const response = await AppointmentsAPI.create(appointmentData);
@@ -132,6 +140,65 @@ function Appointment({ setActivePage, activePage, patients, onLogout }) {
     } catch (err) {
       Swal.fire({
         title: "Failed to Create Appointment",
+        text: err.message,
+        icon: "error"
+      });
+    }
+  }
+
+  function handleConsultationFormChange(e) {
+    const { name, value } = e.target;
+    setConsultationForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
+
+  async function handleStartConsultation(e) {
+    e.preventDefault();
+    const { patientId, consultationType, reason } = consultationForm;
+    
+    if (!patientId || !consultationType || !reason) {
+      Swal.fire({
+        title: "Missing Information",
+        text: "Please fill all required fields for the consultation",
+        icon: "warning"
+      });
+      return;
+    }
+
+    try {
+      const appointmentData = {
+        patientId,
+        type: "Online Consultation",
+        isOnline: true,
+        reason,
+        date: new Date().toISOString().split('T')[0],
+        time: new Date().toTimeString().split(' ')[0].substring(0, 5),
+        consultationType
+      };
+
+      const response = await AppointmentsAPI.create(appointmentData);
+
+      if (response) {
+        setShowConsultation(false);
+        setConsultationForm({
+          patientId: '',
+          patientName: '',
+          consultationType: 'Video Call',
+          reason: ''
+        });
+        await loadAppointments();
+
+        Swal.fire({
+          title: "Consultation Started",
+          text: "The online consultation has been initialized successfully",
+          icon: "success"
+        });
+      }
+    } catch (err) {
+      Swal.fire({
+        title: "Failed to Start Consultation",
         text: err.message,
         icon: "error"
       });
@@ -387,143 +454,7 @@ function Appointment({ setActivePage, activePage, patients, onLogout }) {
           </>
         )}
 
-        {/* Appointments Table */}
-        <div className="appointments-section">
-          <h2>Appointments</h2>
-          <table className="appointments-table">
-            <thead>
-              <tr>
-                <th>Patient</th>
-                <th>Type</th>
-                <th>Date & Time</th>
-                <th>Reason</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {appointments.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="no-data">No appointments scheduled</td>
-                </tr>
-              ) : (
-                appointments.map(appointment => (
-                  <tr key={appointment.id} className={`appointment-row ${appointment.status.toLowerCase()}`}>
-                    <td>{appointment.patientName}</td>
-                    <td>
-                      {appointment.appointmentType}
-                      {appointment.meetLink && (
-                        <a 
-                          href={appointment.meetLink} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="meet-link"
-                        >
-                          <FaVideo /> Join Meet
-                        </a>
-                      )}
-                    </td>
-                    <td>{new Date(appointment.date + 'T' + appointment.time).toLocaleString()}</td>
-                    <td>{appointment.reason}</td>
-                    <td>
-                      <span className={`status-badge ${appointment.status.toLowerCase()}`}>
-                        {appointment.status}
-                      </span>
-                    </td>
-                    <td className="appointment-actions-cell">
-                                             {appointment.status === "Pending" && (
-                         <>
-                           <button 
-                             className="action-btn confirm"
-                             onClick={() => updateAppointmentStatus(appointment.id, "Confirmed")}
-                           >
-                             <FaCheck /> Confirm
-                           </button>
-                           <button 
-                             className="action-btn reject"
-                             onClick={() => updateAppointmentStatus(appointment.id, "Cancelled")}
-                           >
-                             <FaTimes /> Cancel
-                           </button>
-                         </>
-                       )}
-                       {appointment.status === "Confirmed" && (
-                         <button 
-                           className="action-btn complete"
-                           onClick={() => updateAppointmentStatus(appointment.id, "Completed")}
-                         >
-                           <FaCheck /> Complete
-                         </button>
-                       )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
 
-                 {/* Student Requests Section */}
-         <div className="student-requests-section">
-           <h2><FaUser /> Appointment & Consultation Requests</h2>
-          <div className="student-requests-grid">
-            {studentRequests.map(request => (
-              <div key={request.id} className={`student-request-card ${request.status.toLowerCase()}`}>
-                <div className="request-header">
-                  <div className="request-info">
-                    <h4>{request.studentName}</h4>
-                    <span className="student-id">ID: {request.studentId}</span>
-                    <span className="request-source">{request.source}</span>
-                  </div>
-                  <div className="request-status">
-                    <span className={`status-badge ${request.status.toLowerCase()}`}>
-                      {request.status}
-                    </span>
-                  </div>
-                </div>
-                <div className="request-details">
-                  <p><strong>Type:</strong> {request.requestType}</p>
-                  <p><strong>Reason:</strong> {request.reason}</p>
-                  <p><strong>Time:</strong> {new Date(request.timestamp).toLocaleString()}</p>
-                </div>
-                <div className="request-actions">
-                                     {request.status === "Pending" && (
-                     <>
-                       <button 
-                         className="action-btn confirm"
-                         onClick={() => updateStudentRequestStatus(request.id, "Confirmed")}
-                       >
-                         <FaCheck /> Confirm
-                       </button>
-                       <button 
-                         className="action-btn reject"
-                         onClick={() => updateStudentRequestStatus(request.id, "Rejected")}
-                       >
-                         <FaTimes /> Reject
-                       </button>
-                     </>
-                   )}
-                   {request.status === "Confirmed" && (
-                     <>
-                       <button 
-                         className="action-btn chat"
-                         onClick={() => openChat(request)}
-                       >
-                         <FaComments /> Open Chat
-                       </button>
-                       <button 
-                         className="action-btn complete"
-                         onClick={() => updateStudentRequestStatus(request.id, "Completed")}
-                       >
-                         <FaCheck /> Complete
-                       </button>
-                     </>
-                   )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
                  {/* Chat Interface */}
          {showChat && selectedRequest && (
