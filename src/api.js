@@ -213,23 +213,46 @@ export const AppointmentsAPI = {
   },
 
   update: async (id, appointmentData) => {
-    const response = await apiFetch(`/api/appointments/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(appointmentData)
-    });
-
-    // If we get a Meet link in the response, include it in the returned data
-    if (response.meetLink) {
-      return {
-        ...response,
-        data: {
-          ...response.data,
-          meetLink: response.meetLink
-        }
+    try {
+      // Ensure we're sending the correct data for Meet link creation
+      const payload = {
+        ...appointmentData,
+        requiresGoogleMeet: appointmentData.requiresGoogleMeet || appointmentData.type === 'Online Consultation',
+        meetDetails: appointmentData.requiresGoogleMeet ? {
+          date: appointmentData.date,
+          time: appointmentData.time,
+          duration: appointmentData.duration || 30
+        } : undefined
       };
-    }
 
-    return response;
+      const response = await apiFetch(`/api/appointments/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+      });
+
+      // Handle various response formats
+      if (response.meetLink) {
+        return {
+          ...response,
+          meetLink: response.meetLink
+        };
+      } else if (response.data?.meetLink) {
+        return {
+          ...response,
+          meetLink: response.data.meetLink
+        };
+      } else if (response.consultationDetails?.meetLink) {
+        return {
+          ...response,
+          meetLink: response.consultationDetails.meetLink
+        };
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Appointment update error:', error);
+      throw new Error(error.message || 'Failed to update appointment');
+    }
   },
 
   delete: async (id) => {

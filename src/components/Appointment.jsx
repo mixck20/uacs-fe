@@ -17,44 +17,95 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
   // Handler for confirming online consultations
   const handleConfirmConsultation = async (appointment) => {
     try {
-      Swal.fire({
+      const result = await Swal.fire({
         title: 'Confirm Online Consultation',
         text: 'This will create a Google Meet link and enable chat for the patient.',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Yes, Confirm',
         cancelButtonText: 'Cancel'
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          const response = await AppointmentsAPI.update(appointment.id, {
-            status: 'Confirmed',
-            requiresGoogleMeet: true
-          });
-
-          if (response.meetLink) {
-            setAppointments(appointments.map(apt =>
-              apt.id === appointment.id
-                ? {
-                    ...apt,
-                    status: 'Confirmed',
-                    consultationDetails: {
-                      ...apt.consultationDetails,
-                      meetLink: response.meetLink,
-                      chatEnabled: true
-                    }
-                  }
-                : apt
-            ));
-
-            Swal.fire({
-              title: 'Consultation Confirmed',
-              text: 'Google Meet link has been created and chat has been enabled.',
-              icon: 'success'
-            });
-          }
-        }
       });
+
+      if (result.isConfirmed) {
+        // Show loading state
+        Swal.fire({
+          title: 'Creating consultation...',
+          text: 'Setting up Google Meet and chat...',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showConfirmButton: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        // Prepare the update payload
+        const payload = {
+          status: 'Confirmed',
+          type: 'Online Consultation',
+          requiresGoogleMeet: true,
+          date: appointment.date,
+          time: appointment.time,
+          duration: 30 // Default duration in minutes
+        };
+
+        try {
+          const response = await AppointmentsAPI.update(appointment.id, payload);
+
+          if (!response || !response.meetLink) {
+            throw new Error('Failed to create Google Meet link');
+          }
+
+          // Update local state
+          setAppointments(appointments.map(apt =>
+            apt.id === appointment.id
+              ? {
+                  ...apt,
+                  status: 'Confirmed',
+                  type: 'Online Consultation',
+                  consultationDetails: {
+                    ...apt.consultationDetails,
+                    meetLink: response.meetLink,
+                    chatEnabled: true
+                  }
+                }
+              : apt
+          ));
+
+          // Show success message
+          await Swal.fire({
+            title: 'Consultation Confirmed',
+            html: `
+              <div>
+                <p>✅ Google Meet link has been created</p>
+                <p>✅ Chat has been enabled</p>
+                <p>✅ Patient will be notified</p>
+                <br>
+                <p><strong>Meet Link:</strong></p>
+                <p style="word-break: break-all;"><a href="${response.meetLink}" target="_blank">${response.meetLink}</a></p>
+              </div>
+            `,
+            icon: 'success'
+          });
+        } catch (error) {
+          console.error('Meet creation error:', error);
+          await Swal.fire({
+            title: 'Error',
+            html: `
+              <p>Failed to create Google Meet link.</p>
+              <p>Please make sure:</p>
+              <ul style="text-align: left; margin-top: 1em;">
+                <li>Google Calendar API is properly configured</li>
+                <li>The service account has necessary permissions</li>
+                <li>The selected time slot is available</li>
+              </ul>
+            `,
+            icon: 'error'
+          });
+        }
+      }
     } catch (error) {
+      console.error('Confirmation error:', error);
       Swal.fire({
         title: 'Error',
         text: error.message || 'Failed to confirm consultation',
