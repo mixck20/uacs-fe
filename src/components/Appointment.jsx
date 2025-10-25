@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ClinicNavbar from "./ClinicNavbar";
 import "./Appointment.css";
-import { FaCalendarPlus, FaPhone, FaCheck, FaTimes, FaComments, FaUser, FaClock, FaVideo, FaMicrophone } from "react-icons/fa";
+import { FaCalendarPlus, FaPhone, FaCheck, FaTimes, FaComments, FaUser, FaClock, FaVideo, FaMicrophone, FaCalendar, FaFilter, FaStethoscope } from "react-icons/fa";
 import { AppointmentsAPI } from "../api";
 import Swal from "sweetalert2";
 
@@ -12,6 +12,56 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
   const [showChat, setShowChat] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [chatMessage, setChatMessage] = useState("");
+  const [activeFilter, setActiveFilter] = useState('all');
+
+  // Handler for confirming online consultations
+  const handleConfirmConsultation = async (appointment) => {
+    try {
+      Swal.fire({
+        title: 'Confirm Online Consultation',
+        text: 'This will create a Google Meet link and enable chat for the patient.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Confirm',
+        cancelButtonText: 'Cancel'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const response = await AppointmentsAPI.update(appointment.id, {
+            status: 'Confirmed',
+            requiresGoogleMeet: true
+          });
+
+          if (response.meetLink) {
+            setAppointments(appointments.map(apt =>
+              apt.id === appointment.id
+                ? {
+                    ...apt,
+                    status: 'Confirmed',
+                    consultationDetails: {
+                      ...apt.consultationDetails,
+                      meetLink: response.meetLink,
+                      chatEnabled: true
+                    }
+                  }
+                : apt
+            ));
+
+            Swal.fire({
+              title: 'Consultation Confirmed',
+              text: 'Google Meet link has been created and chat has been enabled.',
+              icon: 'success'
+            });
+          }
+        }
+      });
+    } catch (error) {
+      Swal.fire({
+        title: 'Error',
+        text: error.message || 'Failed to confirm consultation',
+        icon: 'error'
+      });
+    }
+  };
   const [form, setForm] = useState({
     patientId: "",
     patientName: "",
@@ -292,9 +342,107 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
            </div>
          )}
 
-        {/* Appointments Table */}
+        {/* Online Consultation Manager */}
+        <div className="online-consultation-manager">
+          <h3><FaVideo /> Online Consultations</h3>
+          
+          <div className="consultation-filters">
+            <button 
+              className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('all')}
+            >
+              All Requests
+            </button>
+            <button 
+              className={`filter-btn ${activeFilter === 'pending' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('pending')}
+            >
+              Pending
+            </button>
+            <button 
+              className={`filter-btn ${activeFilter === 'today' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('today')}
+            >
+              Today's Consultations
+            </button>
+          </div>
+
+          <div className="consultation-requests">
+            {appointments
+              .filter(apt => apt.type === 'Online Consultation')
+              .filter(apt => {
+                if (activeFilter === 'pending') return apt.status === 'Pending';
+                if (activeFilter === 'today') {
+                  const today = new Date().toDateString();
+                  const aptDate = new Date(apt.date).toDateString();
+                  return aptDate === today;
+                }
+                return true;
+              })
+              .map(appointment => (
+                <div key={appointment.id} className="consultation-card">
+                  <div className="consultation-info">
+                    <h4>{appointment.patientName}</h4>
+                    <div className="consultation-detail">
+                      <FaCalendar />
+                      {new Date(appointment.date).toLocaleDateString()}
+                    </div>
+                    <div className="consultation-detail">
+                      <FaClock />
+                      {appointment.time}
+                    </div>
+                    <div className="consultation-detail">
+                      <FaStethoscope />
+                      {appointment.reason}
+                    </div>
+                    <div className={`consultation-status status-${appointment.status.toLowerCase()}`}>
+                      {appointment.status}
+                    </div>
+                  </div>
+                  
+                  <div className="consultation-actions">
+                    {appointment.status === 'Pending' && (
+                      <>
+                        <button 
+                          className="consultation-btn btn-approve"
+                          onClick={() => handleConfirmConsultation(appointment)}
+                        >
+                          <FaCheck /> Approve
+                        </button>
+                        <button 
+                          className="consultation-btn btn-reject"
+                          onClick={() => handleRejectConsultation(appointment)}
+                        >
+                          <FaTimes /> Reject
+                        </button>
+                      </>
+                    )}
+                    
+                    {appointment.status === 'Confirmed' && (
+                      <>
+                        <button 
+                          className="consultation-btn btn-meet"
+                          onClick={() => handleStartMeeting(appointment)}
+                        >
+                          <FaVideo /> Start Meet
+                        </button>
+                        <button 
+                          className="consultation-btn btn-chat"
+                          onClick={() => handleOpenChat(appointment)}
+                        >
+                          <FaComments /> Chat
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+
+        {/* Regular Appointments Section */}
         <div className="appointments-section">
-          <h2>Appointments</h2>
+          <h2>In-Person Appointments</h2>
           <table className="appointments-table">
             <thead>
               <tr>

@@ -335,24 +335,43 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                     </div>
                     
                     <div className="appointment-details">
-                      <p><FaCalendar /> {appointment.date}</p>
-                      <p><FaClock /> {appointment.time}</p>
-                      <p className="reason">{appointment.reason}</p>
+                      <div className="appointment-info">
+                        <p><FaCalendar /> {new Date(appointment.date).toLocaleDateString()}</p>
+                        <p><FaClock /> {appointment.time}</p>
+                        <p className="reason"><FaStethoscope /> {appointment.reason}</p>
+                      </div>
+                      
                       {appointment.type === 'Online Consultation' && (
-                        <div className="online-consultation-details">
-                          {appointment.meetLink ? (
-                            <a 
-                              href={appointment.meetLink} 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
-                              className="meet-link-btn"
-                            >
-                              <FaVideo /> Join Google Meet
-                            </a>
+                        <div className="meet-integration">
+                          <div className="meet-header">
+                            <FaVideo />
+                            <h4>Online Consultation</h4>
+                          </div>
+                          
+                          {appointment.consultationDetails?.meetLink ? (
+                            <>
+                              <p>Your consultation is confirmed. Click the button below to join:</p>
+                              <a 
+                                href={appointment.consultationDetails.meetLink} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="meet-link-btn"
+                              >
+                                <FaVideo /> Join Google Meet
+                              </a>
+                            </>
                           ) : (
-                            <p className="awaiting-link">
-                              <FaVideo /> Meet link will be provided when confirmed
-                            </p>
+                            <div className="meet-status">
+                              <FaClock />
+                              Awaiting confirmation from clinic staff
+                            </div>
+                          )}
+                          
+                          {appointment.consultationDetails?.chatEnabled && (
+                            <div className="chat-status">
+                              <FaComments />
+                              Pre-consultation chat is available
+                            </div>
                           )}
                         </div>
                       )}
