@@ -193,7 +193,7 @@
 }
 
 /* Appointments Section */
-.appointments-section {
+.appointments-container {
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(229, 29, 94, 0.1);
@@ -201,7 +201,7 @@
   margin-bottom: 2rem;
 }
 
-.appointments-section h2 {
+.appointments-container h2 {
   color: #e51d5e;
   font-size: 1.4rem;
   font-weight: 700;
