@@ -2,15 +2,79 @@ import React, { useState } from "react";
 import { FaCalendar, FaVideo, FaFileAlt, FaClock, FaStethoscope, FaTimes } from "react-icons/fa";
 import UserPortalLayout from "./UserPortalLayout";
 import "./UserAppointment.css";
+import { AppointmentsAPI } from '../api';
+import Swal from 'sweetalert2';
 
 const UserAppointment = ({ user, appointments, onLogout }) => {
   const [activeTab, setActiveTab] = useState('schedule');
   const [appointmentType, setAppointmentType] = useState('clinic');
   const currentDate = new Date();
   const [showDetails, setShowDetails] = useState(null);
+  const [formData, setFormData] = useState({
+    reason: '',
+    preferredDate: '',
+    preferredTime: '',
+    type: 'checkup',
+    notes: '',
+    isOnline: false,
+    certificateType: '',
+    purpose: ''
+  });
+  const [loading, setLoading] = useState(false);
 
   // Use appointments from props, or fallback to empty array if not provided
   const appointmentsList = appointments || [];
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const appointmentData = {
+        ...formData,
+        isOnline: appointmentType === 'online',
+        type: appointmentType === 'online' ? 'Online Consultation' : 'Clinic Visit',
+      };
+
+      const response = await AppointmentsAPI.create(appointmentData);
+      
+      Swal.fire({
+        title: 'Success!',
+        text: appointmentType === 'online' 
+          ? 'Your online consultation request has been submitted. You will receive the Google Meet link once confirmed.' 
+          : 'Your appointment has been booked successfully!',
+        icon: 'success'
+      });
+
+      // Reset form
+      setFormData({
+        reason: '',
+        preferredDate: '',
+        preferredTime: '',
+        type: 'checkup',
+        notes: '',
+        isOnline: false,
+        certificateType: '',
+        purpose: ''
+      });
+    } catch (error) {
+      Swal.fire({
+        title: 'Error',
+        text: error.message || 'Failed to book appointment',
+        icon: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <UserPortalLayout user={user} onLogout={onLogout}>
@@ -58,7 +122,7 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
               </button>
             </div>
 
-            <form className="appointment-form">
+            <form className="appointment-form" onSubmit={handleSubmit}>
               <div className="form-section">
                 <h3>{appointmentType === 'certificate' ? 'Medical Certificate Request' : 'Appointment Details'}</h3>
                 
@@ -66,7 +130,12 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                   <>
                     <div className="form-group">
                       <label>Certificate Type</label>
-                      <select required>
+                      <select
+                        name="certificateType"
+                        value={formData.certificateType}
+                        onChange={handleFormChange}
+                        required
+                      >
                         <option value="">Select type</option>
                         <option value="medical">Medical Certificate</option>
                         <option value="fitness">Fitness Certificate</option>
@@ -78,6 +147,9 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                       <label>Purpose</label>
                       <input 
                         type="text"
+                        name="purpose"
+                        value={formData.purpose}
+                        onChange={handleFormChange}
                         placeholder="State the purpose of the certificate"
                         required
                       />
@@ -86,7 +158,12 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                 ) : (
                   <div className="form-group">
                     <label>Reason for Visit</label>
-                    <select required>
+                    <select
+                      name="type"
+                      value={formData.type}
+                      onChange={handleFormChange}
+                      required
+                    >
                       <option value="">Select reason</option>
                       <option value="checkup">General Check-up</option>
                       <option value="followup">Follow-up Visit</option>
@@ -101,13 +178,21 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                     <label>Preferred Date</label>
                     <input 
                       type="date"
+                      name="preferredDate"
+                      value={formData.preferredDate}
+                      onChange={handleFormChange}
                       min={currentDate.toISOString().split('T')[0]}
                       required
                     />
                   </div>
                   <div className="form-group">
                     <label>Preferred Time</label>
-                    <select required>
+                    <select
+                      name="preferredTime"
+                      value={formData.preferredTime}
+                      onChange={handleFormChange}
+                      required
+                    >
                       <option value="">Select time</option>
                       <option value="09:00">09:00 AM</option>
                       <option value="10:00">10:00 AM</option>
@@ -121,22 +206,32 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                 <div className="form-group">
                   <label>Additional Information</label>
                   <textarea 
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleFormChange}
                     placeholder="Please provide any symptoms or concerns..."
                     rows="4"
                   />
                 </div>
 
                 {appointmentType === 'online' && (
-                  <div className="alert-box">
+                  <div className="alert-box info">
                     <p>
-                      <FaVideo /> Online consultation will be conducted through our secure video platform. 
-                      Make sure you have a stable internet connection and a quiet environment.
+                      <FaVideo /> Online consultation will be conducted through Google Meet. 
+                      You will receive the meeting link once your appointment is confirmed.
+                    </p>
+                    <p className="mt-2 text-sm">
+                      Make sure you have a stable internet connection and a quiet environment for the consultation.
                     </p>
                   </div>
                 )}
 
-                <button type="submit" className="submit-btn">
-                  {appointmentType === 'certificate' ? 'Request Certificate' : 'Book Appointment'}
+                <button 
+                  type="submit" 
+                  className="submit-btn"
+                  disabled={loading}
+                >
+                  {loading ? 'Booking...' : appointmentType === 'certificate' ? 'Request Certificate' : `Book ${appointmentType === 'online' ? 'Online Consultation' : 'Appointment'}`}
                 </button>
               </div>
             </form>
