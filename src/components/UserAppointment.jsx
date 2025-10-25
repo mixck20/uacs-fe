@@ -71,10 +71,11 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
     // Debug log to check user data
     console.log('User data:', user);
 
-    if (!user || !user._id) {
+    if (!user || (!user._id && !user.id)) {
+      console.error('Missing user data:', user);
       Swal.fire({
         title: "Authentication Error",
-        text: "You must be logged in to book an appointment",
+        text: "Session data is invalid. Please try logging out and logging in again.",
         icon: "error"
       });
       setLoading(false);
@@ -94,7 +95,7 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
     try {
       // Map the form data to match backend expectations
       const appointmentData = {
-        patientId: user._id, // Add the patient's ID from user prop
+        patientId: user._id || user.id, // Support both _id and id formats
         date: formData.preferredDate,
         time: formData.preferredTime,
         reason: appointmentType === 'certificate' ? formData.purpose : formData.notes || formData.type,

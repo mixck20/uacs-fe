@@ -41,8 +41,13 @@ function App() {
       user = JSON.parse(userStr);
       console.log('Parsed user data:', user);
       
-      if (!user || !user._id) {
+      if (!user || (!user._id && !user.id)) {
         throw new Error('Invalid user data');
+      }
+      
+      // Ensure _id is set for compatibility
+      if (!user._id && user.id) {
+        user._id = user.id;
       }
       
       setUserData(user);
