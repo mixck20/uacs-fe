@@ -2,8 +2,7 @@
  * Base API configuration
  */
 const API_CONFIG = {
-  // Use environment variable or fallback to local development URL
-  baseUrl: process.env.REACT_APP_API_URL || 'http://localhost:3001',
+  baseUrl: 'https://uacs-be.vercel.app',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
