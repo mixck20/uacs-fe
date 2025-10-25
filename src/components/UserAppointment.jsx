@@ -68,6 +68,19 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
     e.preventDefault();
     setLoading(true);
 
+    // Debug log to check user data
+    console.log('User data:', user);
+
+    if (!user || !user._id) {
+      Swal.fire({
+        title: "Authentication Error",
+        text: "You must be logged in to book an appointment",
+        icon: "error"
+      });
+      setLoading(false);
+      return;
+    }
+
     if (!formData.preferredDate || !formData.preferredTime || !formData.type) {
       Swal.fire({
         title: "Missing Information",

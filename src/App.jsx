@@ -22,6 +22,7 @@ function App() {
   const [authPage, setAuthPage] = useState("login");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [activePage, setActivePage] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -31,11 +32,29 @@ function App() {
 
   const handleLoginSuccess = (role) => {
     console.log('Login successful, role:', role);
-    setIsLoggedIn(true);
-    setUserRole(role);
     
-    // Set the role in state and storage
-    localStorage.setItem('userRole', role);
+    // Get the stored user data
+    const userStr = localStorage.getItem('user');
+    let user = null;
+    
+    try {
+      user = JSON.parse(userStr);
+      console.log('Parsed user data:', user);
+      
+      if (!user || !user._id) {
+        throw new Error('Invalid user data');
+      }
+      
+      setUserData(user);
+      setIsLoggedIn(true);
+      setUserRole(role);
+      localStorage.setItem('userRole', role);
+      
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      handleLogout();
+      return;
+    }
     
     // Make sure we have a valid token
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -85,13 +104,22 @@ function App() {
     try {
       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
       const savedRole = localStorage.getItem("userRole");
-      if (token && savedRole) {
-        console.log('Restored session:', { savedRole });
-        setIsLoggedIn(true);
-        setUserRole(savedRole);
+      const userStr = localStorage.getItem("user");
+      
+      if (token && savedRole && userStr) {
+        const user = JSON.parse(userStr);
+        if (user && user._id) {
+          console.log('Restored session:', { savedRole, user });
+          setIsLoggedIn(true);
+          setUserRole(savedRole);
+          setUserData(user);
+        } else {
+          throw new Error('Invalid user data in storage');
+        }
       }
     } catch (error) {
       console.error('Error restoring session:', error);
+      handleLogout();
     }
   }, []);
 
@@ -229,27 +257,27 @@ function App() {
                 <Routes>
                   <Route path="/dashboard" element={
                     <UserDashboard 
-                      user={JSON.parse(localStorage.getItem('user') || '{"firstName":"User"}')}
+                      user={userData}
                       appointments={appointments} 
                       onLogout={handleLogout} 
                     />
                   } />
                   <Route path="/appointments" element={
                     <UserAppointment 
-                      user={JSON.parse(localStorage.getItem('user') || '{"firstName":"User"}')}
+                      user={userData}
                       appointments={appointments} 
                       onLogout={handleLogout}
                     />
                   } />
                   <Route path="/records" element={
                     <UserHealthRecord 
-                      user={JSON.parse(localStorage.getItem('user') || '{"firstName":"User"}')}
+                      user={userData}
                       onLogout={handleLogout}
                     />
                   } />
                   <Route path="/feedback" element={
                     <UserFeedback
-                      user={JSON.parse(localStorage.getItem('user') || '{"firstName":"User"}')}
+                      user={userData}
                       onLogout={handleLogout}
                     />
                   } />
