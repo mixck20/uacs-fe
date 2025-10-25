@@ -9,7 +9,8 @@ const AppointmentForm = ({ onSuccess }) => {
     type: 'Consultation',
     consultationType: 'In-Person',
     reason: '',
-    notes: ''
+    notes: '',
+    isOnline: false
   });
 
   const [error, setError] = useState('');
@@ -36,7 +37,12 @@ const AppointmentForm = ({ onSuccess }) => {
     setSuccessMessage('');
 
     try {
-      const response = await AppointmentsAPI.create(formData);
+      // Update isOnline based on consultationType
+      const appointmentData = {
+        ...formData,
+        isOnline: formData.consultationType === 'Online'
+      };
+      const response = await AppointmentsAPI.create(appointmentData);
       if (response) {
         // Show success message with Meet link for online consultations
         if (formData.type === 'Consultation' && formData.consultationType === 'Online' && response.meetLink) {
@@ -55,7 +61,8 @@ const AppointmentForm = ({ onSuccess }) => {
           type: 'Consultation',
           consultationType: 'In-Person',
           reason: '',
-          notes: ''
+          notes: '',
+          isOnline: false
         });
       }
     } catch (err) {
@@ -146,21 +153,31 @@ const AppointmentForm = ({ onSuccess }) => {
           <label className="block text-sm font-medium text-gray-700">
             Consultation Type
           </label>
-          <select
-            name="consultationType"
-            value={formData.consultationType}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          >
-            <option value="In-Person">In-Person</option>
-            <option value="Online">Online (via Google Meet)</option>
+          <div>
+            <select
+              name="consultationType"
+              value={formData.consultationType}
+              onChange={(e) => {
+                handleChange(e);
+                setFormData(prev => ({
+                  ...prev,
+                  isOnline: e.target.value === 'Online'
+                }));
+              }}
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            >
+              <option value="In-Person">In-Person</option>
+              <option value="Online">Online (via Google Meet)</option>
+            </select>
             {formData.consultationType === 'Online' && (
-              <p className="text-sm text-gray-600 italic mt-2">
-                A Google Meet link will be generated automatically after creating the appointment.
-              </p>
+              <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded">
+                <p className="text-sm text-blue-600">
+                  <span className="font-medium">Online Consultation:</span> A Google Meet link will be generated automatically when your appointment is confirmed.
+                </p>
+              </div>
             )}
-          </select>
+          </div>
         </div>
       )}
 
@@ -199,7 +216,7 @@ const AppointmentForm = ({ onSuccess }) => {
             loading ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >
-          {loading ? 'Creating...' : 'Create Appointment'}
+          {loading ? 'Booking...' : 'Book Consultation'}
         </button>
       </div>
     </form>
