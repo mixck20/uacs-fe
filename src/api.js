@@ -188,6 +188,11 @@ export const AppointmentsAPI = {
   },
 
   create: async (appointmentData) => {
+    // Handle online consultation specific data
+    if (appointmentData.type === 'Consultation' && appointmentData.consultationType === 'Online') {
+      appointmentData.requiresMeetLink = true;
+    }
+    
     return await apiFetch('/api/appointments', {
       method: 'POST',
       body: JSON.stringify(appointmentData)
