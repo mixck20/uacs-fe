@@ -155,17 +155,38 @@
 .alert-box {
   background: #f8f9fa;
   border-left: 4px solid #e51d5e;
-  padding: 1rem;
+  padding: 1.5rem;
   margin-bottom: 1.5rem;
-  border-radius: 4px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .alert-box p {
   display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: #4a5568;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.alert-box svg {
+  color: #e51d5e;
+  margin-top: 0.25rem;
+}
+
+.alert-box ul {
+  margin: 0;
+  padding-left: 2rem;
+  list-style: none;
+}
+
+.alert-box li {
+  color: #4a5568;
+  margin: 0.5rem 0;
+  display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #666;
-  margin: 0;
 }
 
 .submit-btn {
@@ -308,14 +329,91 @@
 .appointment-details p {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin: 0.5rem 0;
-  color: #666;
+  gap: 0.75rem;
+  margin: 0.75rem 0;
+  color: #4a5568;
+  font-size: 0.95rem;
+}
+
+.appointment-details svg {
+  color: #e51d5e;
 }
 
 .appointment-details .reason {
   font-weight: 500;
   color: #1e293b;
+}
+
+.online-consultation-details {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.meet-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: #059669;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+  margin-top: 0.5rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.meet-link-btn:hover {
+  background: #047857;
+  transform: translateY(-1px);
+  color: white;
+  text-decoration: none;
+}
+
+.meet-link-btn svg {
+  color: white;
+}
+
+.awaiting-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: #f3f4f6;
+  border-radius: 6px;
+  justify-content: center;
+}
+
+.chat-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.chat-btn:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+}
+
+.chat-btn svg {
+  color: white;
 }
 
 .appointment-actions {

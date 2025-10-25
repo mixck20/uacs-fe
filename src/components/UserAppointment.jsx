@@ -268,15 +268,27 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                 </div>
 
                 {appointmentType === 'online' && (
-                  <div className="alert-box info">
-                    <p>
-                      <FaVideo /> Online consultation will be conducted through Google Meet. 
-                      You will receive the meeting link once your appointment is confirmed.
-                    </p>
-                    <p className="mt-2 text-sm">
-                      Make sure you have a stable internet connection and a quiet environment for the consultation.
-                    </p>
-                  </div>
+                  <>
+                    <div className="alert-box info">
+                      <p>
+                        <FaVideo /> Online consultation will be conducted through Google Meet. 
+                        You will receive the meeting link once your appointment is confirmed.
+                      </p>
+                      <p className="mt-2">
+                        <FaComments /> A chat feature will be enabled before the consultation 
+                        for any pre-consultation questions or concerns.
+                      </p>
+                      <p className="mt-2 text-sm">
+                        Make sure you have:
+                        <ul className="mt-1">
+                          <li>• A stable internet connection</li>
+                          <li>• A quiet environment for the consultation</li>
+                          <li>• Working camera and microphone</li>
+                          <li>• Google Chrome or compatible browser installed</li>
+                        </ul>
+                      </p>
+                    </div>
+                  </>
                 )}
 
                 <button 
@@ -312,6 +324,24 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                       <p><FaCalendar /> {appointment.date}</p>
                       <p><FaClock /> {appointment.time}</p>
                       <p className="reason">{appointment.reason}</p>
+                      {appointment.type === 'Online Consultation' && (
+                        <div className="online-consultation-details">
+                          {appointment.meetLink ? (
+                            <a 
+                              href={appointment.meetLink} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="meet-link-btn"
+                            >
+                              <FaVideo /> Join Google Meet
+                            </a>
+                          ) : (
+                            <p className="awaiting-link">
+                              <FaVideo /> Meet link will be provided when confirmed
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     <div className="appointment-actions">
@@ -324,6 +354,14 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                       {appointment.status === 'Pending' && (
                         <button className="cancel-btn">
                           Cancel
+                        </button>
+                      )}
+                      {appointment.status === 'Confirmed' && appointment.type === 'Online Consultation' && (
+                        <button 
+                          className="chat-btn"
+                          onClick={() => window.open('/chat/' + appointment._id, '_blank')}
+                        >
+                          <FaComments /> Open Chat
                         </button>
                       )}
                     </div>

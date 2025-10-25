@@ -193,7 +193,7 @@
 }
 
 /* Appointments Section */
-.appointments-container {
+.appointments-section {
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(229, 29, 94, 0.1);
@@ -201,7 +201,7 @@
   margin-bottom: 2rem;
 }
 
-.appointments-container h2 {
+.appointments-section h2 {
   color: #e51d5e;
   font-size: 1.4rem;
   font-weight: 700;
@@ -248,22 +248,73 @@
   background: #f8d7da;
 }
 
+.appointment-type-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.type-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #2d3748;
+  font-weight: 500;
+}
+
+.type-label svg {
+  color: #e51d5e;
+}
+
+.online-consultation-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meet-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
 .meet-link {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  margin-left: 8px;
-  padding: 4px 8px;
-  background: #28a745;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #059669;
   color: white;
   text-decoration: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 0.85rem;
+  font-weight: 500;
   transition: all 0.2s ease;
 }
 
 .meet-link:hover {
-  background: #218838;
+  background: #047857;
+  transform: translateY(-1px);
+  color: white;
+}
+
+.chat-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chat-link:hover {
+  background: #4f46e5;
   transform: translateY(-1px);
 }
 
@@ -401,20 +452,6 @@
   border-color: #e51d5e;
   box-shadow: 0 0 0 3px rgba(229, 29, 94, 0.1);
   outline: none;
-}
-
-.form-row input[type="time"] {
-  height: 42px;
-  padding: 0 10px;
-  color: #333;
-}
-
-.time-note {
-  display: block;
-  margin-top: 5px;
-  color: #666;
-  font-size: 0.85rem;
-  font-style: italic;
 }
 
 textarea {
