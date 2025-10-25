@@ -82,29 +82,8 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
     status: "Waiting"
   });
 
-  // Mock student requests (in real app, these would come from student portal)
-  const [studentRequests, setStudentRequests] = useState([
-    {
-      id: 1,
-      studentName: "Adrian Peralta",
-      studentId: "2025-001",
-      requestType: "Consultation",
-      reason: "Headache and fever for 2 days",
-      status: "Pending",
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-      source: "Student Portal"
-    },
-    {
-      id: 2,
-      studentName: "Johnroy Loverboy",
-      studentId: "2025-015",
-      requestType: "Appointment",
-      reason: "Regular check-up",
-      status: "Confirmed",
-      timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
-      source: "Student Portal"
-    }
-  ]);
+  // Initialize empty student requests state
+  const [studentRequests, setStudentRequests] = useState([]);
 
   // Load appointments from backend
   useEffect(() => {
