@@ -284,175 +284,156 @@ function Appointment({ setActivePage, activePage, patients, onLogout }) {
     <div className="clinic-container">
       <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
       <div className="clinic-content">
-        {/* Section Tabs */}
-        <div className="section-tabs">
-          <button 
-            className={`section-tab ${activeSection === 'appointments' ? 'active' : ''}`}
-            onClick={() => setActiveSection('appointments')}
-          >
-            <FaCalendar /> Regular Appointments
-          </button>
-          <button 
-            className={`section-tab ${activeSection === 'consultations' ? 'active' : ''}`}
-            onClick={() => setActiveSection('consultations')}
-          >
-            <FaVideo /> Online Consultations
-          </button>
+        <div className="appointment-header">
+          <h1 className="appointment-title">Appointments</h1>
+          <div className="header-actions">
+            <button 
+              className="appointment-btn secondary" 
+              onClick={() => setShowConsultation(true)}
+            >
+              <FaVideo /> Start Consultation
+            </button>
+            <button 
+              className="appointment-btn primary" 
+              onClick={() => setShowForm(true)}
+            >
+              <FaCalendarPlus /> New Appointment
+            </button>
+          </div>
         </div>
 
-        {activeSection === 'appointments' ? (
-          <>
-            <div className="appointment-header">
-              <h1 className="appointment-title">Clinic Appointments</h1>
-              <button className="appointment-btn primary" onClick={() => setShowForm(true)}>
-                <FaCalendarPlus /> Schedule New Appointment
-              </button>
+        {/* Active Online Consultation */}
+        {currentCall && (
+          <div className="call-interface">
+            <div className="call-header">
+              <h3><FaVideo /> Active Consultation</h3>
+              <span className="call-status">In Progress</span>
             </div>
-
-            {/* In-Person Appointments Table */}
-            <div className="appointments-section">
-              <h2>In-Person Appointments</h2>
-              <table className="appointments-table">
-                <thead>
-                  <tr>
-                    <th>Patient</th>
-                    <th>Type</th>
-                    <th>Date & Time</th>
-                    <th>Reason</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {regularAppointments.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="no-data">No in-person appointments scheduled</td>
-                    </tr>
-                  ) : (
-                    regularAppointments.map(appointment => (
-                      <tr key={appointment.id} className={`appointment-row ${appointment.status.toLowerCase()}`}>
-                        <td>{appointment.patientName}</td>
-                        <td>{appointment.type}</td>
-                        <td>{new Date(appointment.date + 'T' + appointment.time).toLocaleString()}</td>
-                        <td>{appointment.reason}</td>
-                        <td>
-                          <span className={`status-badge ${appointment.status.toLowerCase()}`}>
-                            {appointment.status}
-                          </span>
-                        </td>
-                        <td className="appointment-actions-cell">
-                          {appointment.status === "Pending" && (
-                            <>
-                              <button 
-                                className="action-btn confirm"
-                                onClick={() => updateAppointmentStatus(appointment.id, "Confirmed")}
-                              >
-                                <FaCheck /> Confirm
-                              </button>
-                              <button 
-                                className="action-btn reject"
-                                onClick={() => updateAppointmentStatus(appointment.id, "Cancelled")}
-                              >
-                                <FaTimes /> Cancel
-                              </button>
-                            </>
-                          )}
-                          {appointment.status === "Confirmed" && (
-                            <button 
-                              className="action-btn complete"
-                              onClick={() => updateAppointmentStatus(appointment.id, "Completed")}
-                            >
-                              <FaCheck /> Complete
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="appointment-header">
-              <h1 className="appointment-title">Online Consultations</h1>
-            </div>
-
-            {/* Active Online Consultation */}
-            {currentCall && (
-              <div className="call-interface">
-                <div className="call-header">
-                  <h3><FaVideo style={{color: '#28a745'}} /> Active Consultation</h3>
-                  <span className="call-status">In Progress</span>
-                </div>
-                <div className="call-info">
-                  <div className="call-patient">
-                    <strong>Patient:</strong> {currentCall.patientName}
-                  </div>
-                  <div className="call-duration">
-                    <strong>Duration:</strong> {Math.floor((new Date() - new Date(currentCall.startTime)) / 1000 / 60)}m
-                  </div>
-                  <div className="meet-link">
-                    <strong>Google Meet:</strong>
-                    <a href={currentCall.meetLink} target="_blank" rel="noopener noreferrer">
-                      Join Meeting <FaVideo />
-                    </a>
-                  </div>
-                </div>
+            <div className="call-info">
+              <div className="call-patient">
+                <strong>Patient:</strong> {currentCall.patientName}
               </div>
-            )}
-
-            {/* Online Consultation Requests */}
-            <div className="consultations-section">
-              <h2><FaVideo /> Online Consultation Requests</h2>
-              <div className="consultation-requests-grid">
-                {onlineConsultations.map(consultation => (
-                  <div key={consultation.id} className={`consultation-card ${consultation.status.toLowerCase()}`}>
-                    <div className="consultation-header">
-                      <h3>{consultation.patientName}</h3>
-                      <span className={`status-badge ${consultation.status.toLowerCase()}`}>
-                        {consultation.status}
-                      </span>
-                    </div>
-                    <div className="consultation-details">
-                      <p><FaCalendar /> {new Date(consultation.date + 'T' + consultation.time).toLocaleString()}</p>
-                      <p><FaComment /> {consultation.reason}</p>
-                    </div>
-                    <div className="consultation-actions">
-                      {consultation.status === "Pending" && (
-                        <>
-                          <button 
-                            className="action-btn confirm"
-                            onClick={() => setSelectedRequest(consultation) || setShowMeetForm(true)}
-                          >
-                            <FaVideo /> Create Meet
-                          </button>
-                          <button 
-                            className="action-btn reject"
-                            onClick={() => updateAppointmentStatus(consultation.id, "Cancelled")}
-                          >
-                            <FaTimes /> Cancel
-                          </button>
-                        </>
-                      )}
-                      {consultation.status === "Confirmed" && consultation.meetLink && (
-                        <a 
-                          href={consultation.meetLink} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="action-btn join-meet"
-                        >
-                          <FaVideo /> Join Meet
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))}
+              <div className="call-duration">
+                <strong>Duration:</strong> {Math.floor((new Date() - new Date(currentCall.startTime)) / 1000 / 60)}m
+              </div>
+              <div className="meet-link">
+                <strong>Google Meet:</strong>
+                <a href={currentCall.meetLink} target="_blank" rel="noopener noreferrer">
+                  Join Meeting <FaVideo />
+                </a>
               </div>
             </div>
-          </>
+          </div>
         )}
+
+        {/* Main Appointments Table */}
+        <div className="appointments-section">
+          <div className="filters">
+            <button 
+              className={`filter-btn ${!activeSection || activeSection === 'all' ? 'active' : ''}`}
+              onClick={() => setActiveSection('all')}
+            >
+              All Appointments
+            </button>
+            <button 
+              className={`filter-btn ${activeSection === 'in-person' ? 'active' : ''}`}
+              onClick={() => setActiveSection('in-person')}
+            >
+              In-Person
+            </button>
+            <button 
+              className={`filter-btn ${activeSection === 'online' ? 'active' : ''}`}
+              onClick={() => setActiveSection('online')}
+            >
+              Online
+            </button>
+          </div>
+
+          <table className="appointments-table">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Type</th>
+                <th>Date & Time</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {appointments.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="no-data">No appointments scheduled</td>
+                </tr>
+              ) : (
+                appointments
+                  .filter(apt => {
+                    if (activeSection === 'in-person') return !apt.isOnline;
+                    if (activeSection === 'online') return apt.isOnline;
+                    return true;
+                  })
+                  .map(appointment => (
+                    <tr key={appointment.id} className={`appointment-row ${appointment.status.toLowerCase()}`}>
+                      <td>{appointment.patientName}</td>
+                      <td>
+                        {appointment.type}
+                        {appointment.meetLink && (
+                          <a 
+                            href={appointment.meetLink} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="meet-link"
+                          >
+                            <FaVideo />
+                          </a>
+                        )}
+                      </td>
+                      <td>{new Date(appointment.date + 'T' + appointment.time).toLocaleString()}</td>
+                      <td>{appointment.reason}</td>
+                      <td>
+                        <span className={`status-badge ${appointment.status.toLowerCase()}`}>
+                          {appointment.status}
+                        </span>
+                      </td>
+                      <td className="appointment-actions-cell">
+                        {appointment.status === "Pending" && (
+                          <>
+                            <button 
+                              className="action-btn confirm"
+                              onClick={() => {
+                                if (appointment.isOnline) {
+                                  setSelectedRequest(appointment);
+                                  setShowMeetForm(true);
+                                } else {
+                                  updateAppointmentStatus(appointment.id, "Confirmed");
+                                }
+                              }}
+                            >
+                              {appointment.isOnline ? <><FaVideo /> Create Meet</> : <><FaCheck /> Confirm</>}
+                            </button>
+                            <button 
+                              className="action-btn reject"
+                              onClick={() => updateAppointmentStatus(appointment.id, "Cancelled")}
+                            >
+                              <FaTimes /> Cancel
+                            </button>
+                          </>
+                        )}
+                        {appointment.status === "Confirmed" && (
+                          <button 
+                            className="action-btn complete"
+                            onClick={() => updateAppointmentStatus(appointment.id, "Completed")}
+                          >
+                            <FaCheck /> Complete
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
 
 
