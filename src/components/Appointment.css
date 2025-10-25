@@ -248,6 +248,25 @@
   background: #f8d7da;
 }
 
+.meet-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 4px 8px;
+  background: #28a745;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.meet-link:hover {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
 .status-badge {
   padding: 6px 12px;
   border-radius: 20px;

@@ -15,11 +15,13 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
   const [form, setForm] = useState({
     patientId: "",
     patientName: "",
-    appointmentType: "Check-up",
+    appointmentType: "Checkup",
     date: "",
     time: "",
     reason: "",
-    status: "Pending"
+    status: "Pending",
+    isOnline: false,
+    meetLink: null
   });
 
   const [consultationForm, setConsultationForm] = useState({
@@ -266,7 +268,19 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
                 appointments.map(appointment => (
                   <tr key={appointment.id} className={`appointment-row ${appointment.status.toLowerCase()}`}>
                     <td>{appointment.patientName}</td>
-                    <td>{appointment.appointmentType}</td>
+                    <td>
+                      {appointment.appointmentType}
+                      {appointment.meetLink && (
+                        <a 
+                          href={appointment.meetLink} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="meet-link"
+                        >
+                          <FaVideo /> Join Meet
+                        </a>
+                      )}
+                    </td>
                     <td>{new Date(appointment.date + 'T' + appointment.time).toLocaleString()}</td>
                     <td>{appointment.reason}</td>
                     <td>
@@ -430,10 +444,11 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
                     onChange={handleFormChange}
                     required
                   >
-                    <option value="Check-up">Check-up</option>
+                    <option value="Checkup">Checkup</option>
                     <option value="Follow-up">Follow-up</option>
                     <option value="Emergency">Emergency</option>
-                    <option value="Consultation">Consultation</option>
+                    <option value="In-Person-Consultation">In-Person Consultation</option>
+                    <option value="Online-Consultation">Online Consultation</option>
                   </select>
                 </div>
                 <div className="form-row">
@@ -451,6 +466,24 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
                     onChange={handleFormChange}
                     required
                   />
+                </div>
+                <div className="form-row">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="isOnline"
+                      checked={form.isOnline}
+                      onChange={(e) => {
+                        const isOnline = e.target.checked;
+                        setForm(prev => ({
+                          ...prev,
+                          isOnline,
+                          appointmentType: isOnline ? "Online-Consultation" : "In-Person-Consultation"
+                        }));
+                      }}
+                    />
+                    Online Consultation (Google Meet)
+                  </label>
                 </div>
                 <textarea
                   name="reason"
