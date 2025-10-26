@@ -5,7 +5,8 @@ const API_CONFIG = {
   baseUrl: 'https://uacs-be.vercel.app',
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    'Accept': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest'
   }
 };
 
@@ -48,7 +49,8 @@ export async function apiFetch(path, options = {}) {
     const response = await fetch(url, {
       ...options,
       headers,
-      credentials: 'include'
+      credentials: 'include',
+      mode: 'cors'
     });
 
     const isJson = response.headers.get('content-type')?.includes('application/json');
