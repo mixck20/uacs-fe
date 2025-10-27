@@ -1,8 +1,15 @@
 /**
  * Base API configuration
+ * 
+ * To use localhost for testing:
+ * 1. Set USE_LOCALHOST to true
+ * 2. Make sure backend is running on port 5000
+ * 3. Test Google Meet integration locally
  */
+const USE_LOCALHOST = false; // Change to true for local testing
+
 const API_CONFIG = {
-  baseUrl: 'https://uacs-be.vercel.app',
+  baseUrl: USE_LOCALHOST ? 'http://localhost:5000' : 'https://uacs-be.vercel.app',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
