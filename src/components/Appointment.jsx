@@ -49,60 +49,55 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
           duration: 30 // Default duration in minutes
         };
 
-        try {
-          const response = await AppointmentsAPI.update(appointment.id, payload);
+        const response = await AppointmentsAPI.update(appointment.id, payload);
 
-          if (!response || !response.meetLink) {
-            throw new Error('Failed to create Google Meet link');
-          }
-
-          // Update local state
-          setAppointments(appointments.map(apt =>
-            apt.id === appointment.id
-              ? {
-                  ...apt,
-                  status: 'Confirmed',
-                  type: 'Online Consultation',
-                  consultationDetails: {
-                    ...apt.consultationDetails,
-                    meetLink: response.meetLink,
-                    chatEnabled: true
-                  }
-                }
-              : apt
-          ));
-
-          // Show success message
+        if (!response || !response.consultationDetails?.meetLink) {
+          // If Meet link creation fails, show warning but keep appointment confirmed
           await Swal.fire({
-            title: 'Consultation Confirmed',
+            title: 'Appointment Confirmed',
             html: `
               <div>
-                <p>✅ Google Meet link has been created</p>
-                <p>✅ Chat has been enabled</p>
-                <p>✅ Patient will be notified</p>
-                <br>
-                <p><strong>Meet Link:</strong></p>
-                <p style="word-break: break-all;"><a href="${response.meetLink}" target="_blank">${response.meetLink}</a></p>
+                <p>✅ Appointment has been confirmed</p>
+                <p>⚠️ Google Meet link creation pending</p>
+                <p style="margin-top: 1em">You can try creating the Meet link again later or use another video conferencing solution.</p>
               </div>
             `,
-            icon: 'success'
+            icon: 'warning'
           });
-        } catch (error) {
-          console.error('Meet creation error:', error);
-          await Swal.fire({
-            title: 'Error',
-            html: `
-              <p>Failed to create Google Meet link.</p>
-              <p>Please make sure:</p>
-              <ul style="text-align: left; margin-top: 1em;">
-                <li>Google Calendar API is properly configured</li>
-                <li>The service account has necessary permissions</li>
-                <li>The selected time slot is available</li>
-              </ul>
-            `,
-            icon: 'error'
-          });
+          return;
         }
+
+        // Update local state
+        setAppointments(appointments.map(apt =>
+          apt.id === appointment.id
+            ? {
+                ...apt,
+                status: 'Confirmed',
+                type: 'Online Consultation',
+                consultationDetails: {
+                  ...apt.consultationDetails,
+                  meetLink: response.consultationDetails.meetLink,
+                  chatEnabled: true
+                }
+              }
+            : apt
+        ));
+
+        // Show success message
+        await Swal.fire({
+          title: 'Consultation Confirmed',
+          html: `
+            <div>
+              <p>✅ Google Meet link has been created</p>
+              <p>✅ Chat has been enabled</p>
+              <p>✅ Patient will be notified</p>
+              <br>
+              <p><strong>Meet Link:</strong></p>
+              <p style="word-break: break-all;"><a href="${response.consultationDetails.meetLink}" target="_blank">${response.consultationDetails.meetLink}</a></p>
+            </div>
+          `,
+          icon: 'success'
+        });
       }
     } catch (error) {
       console.error('Confirmation error:', error);
@@ -216,20 +211,27 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
   async function updateAppointmentStatus(id, newStatus) {
     try {
       const appointment = appointments.find(apt => apt.id === id);
-      const payload = { status: newStatus }; // Keep original case for enum validation
       
       // For online consultations being confirmed
       if (newStatus === 'Confirmed' && appointment.type === 'Online Consultation') {
         const result = await Swal.fire({
           title: 'Confirm Online Consultation',
           html: `
-            <p>This will:</p>
-            <ul style="text-align: left; margin-top: 1em;">
-              <li>1. Create a Google Meet link</li>
-              <li>2. Enable chat for pre-consultation communication</li>
-              <li>3. Send confirmation email to the patient</li>
-            </ul>
-            <p style="margin-top: 1em;">Would you like to proceed?</p>
+            <div style="text-align: left;">
+              <p><strong>Patient:</strong> ${appointment.patientName}</p>
+              <p><strong>Date:</strong> ${new Date(appointment.date).toLocaleDateString()}</p>
+              <p><strong>Time:</strong> ${appointment.time}</p>
+              <p style="margin-top: 1em;">This will:</p>
+              <ul>
+                <li>✓ Create a Google Meet link for the consultation</li>
+                <li>✓ Enable chat for pre-consultation communication</li>
+                <li>✓ Send confirmation email to the patient</li>
+              </ul>
+              <p style="margin-top: 1em; color: #666; font-size: 0.9em;">
+                Note: Using free Google Workspace, you'll need to create the Meet link manually 
+                and share it with the patient.
+              </p>
+            </div>
           `,
           icon: 'question',
           showCancelButton: true,
@@ -242,6 +244,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
         }
       }
 
+      const payload = { status: newStatus };
       const response = await AppointmentsAPI.update(id, payload);
       
       // Update the appointments list with the response data
@@ -249,26 +252,58 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
         apt.id === id ? { 
           ...apt, 
           status: newStatus,
-          meetLink: response.meetLink || apt.meetLink 
+          consultationDetails: response.consultationDetails || apt.consultationDetails
         } : apt
       ));
 
       if (newStatus === 'Confirmed' && appointment.type === 'Online Consultation') {
+        const meetLink = response.consultationDetails?.meetLink || response.meetLink;
+        
         Swal.fire({
           title: 'Online Consultation Confirmed',
           html: `
-            <p>The appointment has been confirmed and:</p>
-            <ul style="text-align: left; margin-top: 1em;">
-              <li>✓ Google Meet link has been created</li>
-              <li>✓ Chat has been enabled</li>
-              <li>✓ Patient has been notified</li>
-            </ul>
+            <div style="text-align: left;">
+              <p>✅ The appointment has been confirmed</p>
+              ${meetLink ? `
+                <p>✅ Google Meet link has been created</p>
+                <p style="margin-top: 1em;"><strong>Meet Link:</strong></p>
+                <p style="word-break: break-all; background: #f5f5f5; padding: 10px; border-radius: 5px;">
+                  <a href="${meetLink}" target="_blank">${meetLink}</a>
+                </p>
+                <p style="margin-top: 1em; color: #666;">
+                  The patient will see this link in their appointment details.
+                </p>
+              ` : `
+                <p style="margin-top: 1em; color: #f39c12;">
+                  ⚠️ To create a Google Meet link:
+                </p>
+                <ol style="margin-top: 0.5em; text-align: left;">
+                  <li>Go to <a href="https://meet.google.com" target="_blank">meet.google.com</a></li>
+                  <li>Click "New meeting" → "Create a meeting for later"</li>
+                  <li>Copy the meeting link</li>
+                  <li>Share it with the patient via email or phone</li>
+                </ol>
+              `}
+            </div>
           `,
-          icon: 'success'
+          icon: meetLink ? 'success' : 'info',
+          width: 600
+        });
+      } else {
+        Swal.fire({
+          title: 'Success',
+          text: `Appointment status updated to ${newStatus}`,
+          icon: 'success',
+          timer: 2000
         });
       }
     } catch (err) {
-      Swal.fire({ title: "Failed to update status", text: err.message, icon: "error" });
+      console.error('Update error:', err);
+      Swal.fire({ 
+        title: "Failed to update status", 
+        text: err.message || 'An error occurred', 
+        icon: "error" 
+      });
     }
   }
 

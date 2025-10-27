@@ -189,6 +189,10 @@ export const AppointmentsAPI = {
     return await apiFetch('/api/appointments');
   },
 
+  getUserAppointments: async () => {
+    return await apiFetch('/api/appointments/user/my-appointments');
+  },
+
   create: async (appointmentData) => {
     // Add requiresMeetLink flag for online consultations
     if (appointmentData.isOnline || appointmentData.consultationType === 'Online') {

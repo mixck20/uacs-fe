@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaCalendar, FaVideo, FaFileAlt, FaClock, FaStethoscope, FaTimes, FaCommentDots } from "react-icons/fa";
 import UserPortalLayout from "./UserPortalLayout";
 import "./UserAppointment.css";
 import { AppointmentsAPI } from '../api';
 import Swal from 'sweetalert2';
 
-const UserAppointment = ({ user, appointments, onLogout }) => {
+const UserAppointment = ({ user, onLogout }) => {
   const [activeTab, setActiveTab] = useState('schedule');
   const [appointmentType, setAppointmentType] = useState('clinic');
   const currentDate = new Date();
   const [showDetails, setShowDetails] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     reason: '',
     preferredDate: '',
@@ -20,10 +22,20 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
     certificateType: '',
     purpose: ''
   });
-  const [loading, setLoading] = useState(false);
 
-  // Use appointments from props, or fallback to empty array if not provided
-  const appointmentsList = appointments || [];
+  // Load user's appointments on component mount
+  useEffect(() => {
+    loadAppointments();
+  }, []);
+
+  const loadAppointments = async () => {
+    try {
+      const data = await AppointmentsAPI.getUserAppointments();
+      setAppointments(data);
+    } catch (error) {
+      console.error('Failed to load appointments:', error);
+    }
+  };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -82,7 +94,7 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
       return;
     }
 
-    if (!formData.preferredDate || !formData.preferredTime || !formData.type) {
+    if (!formData.preferredDate || !formData.preferredTime) {
       Swal.fire({
         title: "Missing Information",
         text: "Please fill in all required fields",
@@ -95,18 +107,21 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
     try {
       // Map the form data to match backend expectations
       const appointmentData = {
-        patientId: user._id || user.id, // Support both _id and id formats
+        patientId: user._id || user.id, // This will be used as userId in backend
         date: formData.preferredDate,
         time: formData.preferredTime,
-        reason: appointmentType === 'certificate' ? formData.purpose : formData.notes || formData.type,
+        reason: appointmentType === 'certificate' 
+          ? formData.purpose 
+          : formData.notes || formData.type,
         type: appointmentType === 'online' 
           ? 'Online Consultation' 
           : appointmentType === 'certificate'
           ? 'Medical Certificate'
           : 'Clinic Visit',
         isOnline: appointmentType === 'online',
-        certificateType: formData.certificateType,
-        notes: formData.notes
+        certificateType: appointmentType === 'certificate' ? formData.certificateType : undefined,
+        notes: formData.notes,
+        status: 'Pending'
       };
 
       const response = await AppointmentsAPI.create(appointmentData);
@@ -121,6 +136,9 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
         icon: 'success'
       });
 
+      // Reload appointments to show the new one
+      await loadAppointments();
+
       // Reset form
       setFormData({
         reason: '',
@@ -132,6 +150,9 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
         certificateType: '',
         purpose: ''
       });
+      
+      // Switch to history tab to show the new appointment
+      setActiveTab('history');
     } catch (error) {
       Swal.fire({
         title: 'Error',
@@ -321,12 +342,12 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
         {activeTab === 'history' && (
           <div className="history-section">
             <div className="appointments-grid">
-              {appointmentsList.length > 0 ? (
-                appointmentsList.map(appointment => (
+              {appointments.length > 0 ? (
+                appointments.map(appointment => (
                   <div key={appointment.id} className={`appointment-card ${appointment.status.toLowerCase()}`}>
                     <div className="appointment-card-header">
                       <div className="appointment-type">
-                        {appointment.type === 'Clinic Visit' ? <FaStethoscope /> : <FaVideo />}
+                        {appointment.type === 'Online Consultation' ? <FaVideo /> : <FaStethoscope />}
                         {appointment.type}
                       </div>
                       <span className={`status-badge ${appointment.status.toLowerCase()}`}>
@@ -360,6 +381,11 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                                 <FaVideo /> Join Google Meet
                               </a>
                             </>
+                          ) : appointment.status === 'Confirmed' ? (
+                            <div className="meet-status">
+                              <FaClock />
+                              Setting up Google Meet link...
+                            </div>
                           ) : (
                             <div className="meet-status">
                               <FaClock />
@@ -389,10 +415,10 @@ const UserAppointment = ({ user, appointments, onLogout }) => {
                           Cancel
                         </button>
                       )}
-                      {appointment.status === 'Confirmed' && appointment.type === 'Online Consultation' && (
+                      {appointment.status === 'Confirmed' && appointment.type === 'Online Consultation' && appointment.consultationDetails?.chatEnabled && (
                         <button 
                           className="chat-btn"
-                          onClick={() => window.open('/chat/' + appointment._id, '_blank')}
+                          onClick={() => window.open('/chat/' + appointment.id, '_blank')}
                         >
                           <FaCommentDots /> Open Chat
                         </button>
