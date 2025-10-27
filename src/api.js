@@ -14,17 +14,15 @@ const API_CONFIG = {
  * Token Management Functions
  */
 export function getAuthToken() {
-  return localStorage.getItem('token') || sessionStorage.getItem('token');
+  return localStorage.getItem('token');
 }
 
 export function setAuthToken(token, remember = false) {
-  const storage = remember ? localStorage : sessionStorage;
-  storage.setItem('token', token);
+  localStorage.setItem('token', token);
 }
 
 export function removeAuthToken() {
   localStorage.removeItem('token');
-  sessionStorage.removeItem('token');
   localStorage.removeItem('user');
 }
 

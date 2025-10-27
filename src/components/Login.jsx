@@ -52,14 +52,8 @@ const Login = ({ onLogin }) => {
 
       const { token, user } = data;
       
-      // Store the token in localStorage or sessionStorage
-      if (form.remember) {
-        localStorage.setItem("token", token);
-      } else {
-        sessionStorage.setItem("token", token);
-      }
-      
-      // Store the user in localStorage
+      // Always store the token in localStorage for persistence
+      localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
       
       // Call onLogin with the user's role

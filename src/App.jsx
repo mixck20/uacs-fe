@@ -62,7 +62,7 @@ function App() {
     }
     
     // Make sure we have a valid token
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const token = localStorage.getItem('token');
     if (!token) {
       console.error('No token found after login');
       handleLogout();
@@ -76,7 +76,6 @@ function App() {
     try {
       await AuthAPI.logout();
       localStorage.removeItem('token');
-      sessionStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('userRole');
       
@@ -94,7 +93,6 @@ function App() {
       console.error('Logout error:', error);
       // Still clear everything even if the API call fails
       localStorage.clear();
-      sessionStorage.clear();
       window.location.reload();
     }
   };
@@ -107,7 +105,7 @@ function App() {
   // Persist auth across refresh
   useEffect(() => {
     try {
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const token = localStorage.getItem("token");
       const savedRole = localStorage.getItem("userRole");
       const userStr = localStorage.getItem("user");
       
