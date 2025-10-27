@@ -134,17 +134,9 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
   // Load appointments from backend
   useEffect(() => {
     AppointmentsAPI.list().then(data => {
-      // Normalize into UI shape
-      const mapped = data.map(d => ({
-        id: d._id,
-        patientName: d.requester?.name || 'N/A',
-        appointmentType: 'Consultation',
-        date: d.preferredDate ? new Date(d.preferredDate).toISOString().slice(0,10) : new Date().toISOString().slice(0,10),
-        time: '09:00',
-        reason: d.concern,
-        status: (d.status || 'pending').charAt(0).toUpperCase() + (d.status || 'pending').slice(1),
-      }));
-      setAppointments(mapped);
+      // Backend already returns properly formatted appointments
+      console.log('Loaded appointments:', data);
+      setAppointments(data);
     }).catch(err => {
       console.error(err);
       Swal.fire({ title: "Failed to load appointments", text: err.message, icon: "error" });
