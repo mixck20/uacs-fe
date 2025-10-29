@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './VerifyEmail.css';
 import { FaCheckCircle, FaExclamationTriangle, FaSpinner } from 'react-icons/fa';
+import { publicApiFetch } from '../api';
 
 const VerifyEmail = () => {
   const [status, setStatus] = useState('verifying'); // verifying, success, error
@@ -26,40 +27,31 @@ const VerifyEmail = () => {
     try {
       console.log('Attempting to verify email with token:', token);
       
-      const response = await fetch('https://uacs-be.vercel.app/api/auth/verify-email', {
+      const data = await publicApiFetch('/api/auth/verify-email', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token }),
-        credentials: 'include'
+        body: JSON.stringify({ token })
       });
 
-      const data = await response.json();
       console.log('Verification response:', data);
 
-      if (response.ok) {
-        setStatus('success');
-        setMessage(data.message || 'Email verified successfully. You can now log in.');
-        
-        // Store the verified email in localStorage
-        if (data.email) {
-          localStorage.setItem('verifiedEmail', data.email);
-          localStorage.setItem('verificationTime', new Date().toLocaleString());
-        }
-        
-        // Auto-redirect to login after 3 seconds
-        setTimeout(() => {
-          navigate('/login', { 
-            state: { 
-              verifiedEmail: data.email,
-              message: 'Email verified successfully! Please log in.'
-            }
-          });
-        }, 3000);
-      } else {
-        throw new Error(data.message || 'Verification failed');
+      setStatus('success');
+      setMessage(data.message || 'Email verified successfully. You can now log in.');
+      
+      // Store the verified email in localStorage
+      if (data.email) {
+        localStorage.setItem('verifiedEmail', data.email);
+        localStorage.setItem('verificationTime', new Date().toLocaleString());
       }
+      
+      // Auto-redirect to login after 3 seconds
+      setTimeout(() => {
+        navigate('/login', { 
+          state: { 
+            verifiedEmail: data.email,
+            message: 'Email verified successfully! Please log in.'
+          }
+        });
+      }, 3000);
     } catch (error) {
       console.error('Verification error:', error);
       setStatus('error');

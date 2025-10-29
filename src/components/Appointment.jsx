@@ -1,18 +1,60 @@
 import React, { useState, useEffect } from "react";
 import ClinicNavbar from "./ClinicNavbar";
 import "./Appointment.css";
-import { FaCalendarPlus, FaPhone, FaCheck, FaTimes, FaCommentDots, FaUser, FaClock, FaVideo, FaMicrophone, FaCalendar, FaFilter, FaStethoscope } from "react-icons/fa";
-import { AppointmentsAPI } from "../api";
+import { 
+  FaCalendarPlus, FaPhone, FaCheck, FaTimes, FaCommentDots, FaUser, 
+  FaClock, FaVideo, FaMicrophone, FaCalendar, FaFilter, FaStethoscope,
+  FaMapMarkerAlt, FaEnvelope, FaLink, FaPaperPlane, FaEllipsisV, FaSearch,
+  FaFileAlt, FaNotesMedical
+} from "react-icons/fa";
+import { AppointmentsAPI, ChatAPI, PatientsAPI } from "../api";
 import Swal from "sweetalert2";
 
 function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, patients, appointments, setAppointments, onLogout }) {
-  const [showForm, setShowForm] = useState(false);
-  const [showConsultation, setShowConsultation] = useState(false);
   const [currentCall, setCurrentCall] = useState(null);
   const [showChat, setShowChat] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [chatMessage, setChatMessage] = useState("");
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [chatMessages, setChatMessages] = useState([]);
+  const [unreadMessages, setUnreadMessages] = useState({}); // Track unread messages per appointment
+  const [activeFilter, setActiveFilter] = useState('pending');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [showHealthRecordModal, setShowHealthRecordModal] = useState(false);
+  const [healthRecordForm, setHealthRecordForm] = useState({
+    diagnosis: '',
+    treatment: '',
+    prescriptions: [],
+    vitalSigns: {
+      bloodPressure: '',
+      temperature: '',
+      heartRate: '',
+      weight: '',
+      height: ''
+    },
+    notes: ''
+  });
+  const [selectedAppointmentForRecord, setSelectedAppointmentForRecord] = useState(null);
+  const [visitTemplates] = useState([
+    {
+      name: 'General Checkup',
+      diagnosis: 'Routine health checkup',
+      treatment: 'General wellness assessment',
+      prescriptions: []
+    },
+    {
+      name: 'Vaccination',
+      diagnosis: 'Immunization',
+      treatment: 'Vaccine administration',
+      prescriptions: []
+    },
+    {
+      name: 'Consultation',
+      diagnosis: 'Medical consultation',
+      treatment: 'Advised treatment plan',
+      prescriptions: []
+    }
+  ]);
 
   // Handler for confirming online consultations
   const handleConfirmConsultation = async (appointment) => {
@@ -56,10 +98,20 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
           await Swal.fire({
             title: 'Appointment Confirmed',
             html: `
-              <div>
-                <p>✅ Appointment has been confirmed</p>
-                <p>⚠️ Google Meet link creation pending</p>
-                <p style="margin-top: 1em">You can try creating the Meet link again later or use another video conferencing solution.</p>
+              <div style="text-align: left; padding: 0 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                  <svg style="width: 20px; height: 20px; color: #10b981;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                  </svg>
+                  <span style="color: #374151; font-weight: 500;">Appointment has been confirmed</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                  <svg style="width: 20px; height: 20px; color: #f59e0b;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                  </svg>
+                  <span style="color: #374151; font-weight: 500;">Google Meet link creation pending</span>
+                </div>
+                <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">You can try creating the Meet link again later or use another video conferencing solution.</p>
               </div>
             `,
             icon: 'warning'
@@ -87,13 +139,33 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
         await Swal.fire({
           title: 'Consultation Confirmed',
           html: `
-            <div>
-              <p>✅ Google Meet link has been created</p>
-              <p>✅ Chat has been enabled</p>
-              <p>✅ Patient will be notified</p>
-              <br>
-              <p><strong>Meet Link:</strong></p>
-              <p style="word-break: break-all;"><a href="${response.consultationDetails.meetLink}" target="_blank">${response.consultationDetails.meetLink}</a></p>
+            <div style="text-align: left; padding: 0 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <svg style="width: 20px; height: 20px; color: #10b981;" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span style="color: #374151; font-weight: 500;">Google Meet link has been created</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <svg style="width: 20px; height: 20px; color: #10b981;" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span style="color: #374151; font-weight: 500;">Chat has been enabled</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <svg style="width: 20px; height: 20px; color: #10b981;" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span style="color: #374151; font-weight: 500;">Patient will be notified</span>
+              </div>
+              <div style="background: #f3f4f6; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: #374151;">Meet Link:</p>
+                <p style="margin: 0; word-break: break-all;">
+                  <a href="${response.consultationDetails.meetLink}" target="_blank" style="color: #3b82f6; text-decoration: none;">
+                    ${response.consultationDetails.meetLink}
+                  </a>
+                </p>
+              </div>
             </div>
           `,
           icon: 'success'
@@ -108,84 +180,72 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
       });
     }
   };
-  const [form, setForm] = useState({
-    patientId: "",
-    patientName: "",
-    appointmentType: "Checkup",
-    date: "",
-    time: "",
-    reason: "",
-    status: "Pending",
-    isOnline: false,
-    meetLink: null
-  });
-
-  const [consultationForm, setConsultationForm] = useState({
-    patientId: "",
-    patientName: "",
-    consultationType: "Video Call",
-    reason: "",
-    status: "Waiting"
-  });
 
   // Initialize empty student requests state
   const [studentRequests, setStudentRequests] = useState([]);
 
-  // Load appointments from backend
+  // Load appointments from backend and poll for updates
   useEffect(() => {
-    AppointmentsAPI.list().then(data => {
-      // Backend already returns properly formatted appointments
-      console.log('Loaded appointments:', data);
-      setAppointments(data);
-    }).catch(err => {
-      console.error(err);
-      Swal.fire({ title: "Failed to load appointments", text: err.message, icon: "error" });
-    });
+    const fetchAppointments = async () => {
+      try {
+        const data = await AppointmentsAPI.list();
+        console.log('Loaded appointments:', data);
+        console.log('First appointment user data:', data[0]?.user);
+        setAppointments(data);
+      } catch (err) {
+        console.error(err);
+        // Only show error on initial load, not on polling failures
+        if (appointments.length === 0) {
+          Swal.fire({ title: "Failed to load appointments", text: err.message, icon: "error" });
+        }
+      }
+    };
+
+    // Initial fetch
+    fetchAppointments();
+
+    // Poll every 5 seconds for new appointments
+    const intervalId = setInterval(fetchAppointments, 5000);
+
+    return () => clearInterval(intervalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function handleFormChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
+  // Poll for unread messages across all appointments (every 10 seconds)
+  useEffect(() => {
+    const checkUnreadMessages = async () => {
+      try {
+        const unreadCounts = {};
+        for (const appointment of appointments) {
+          if (appointment.consultationDetails?.chatEnabled) {
+            const chatData = await ChatAPI.getAppointmentChat(appointment.id);
+            const unreadCount = chatData.messages.filter(msg => 
+              msg.sender === 'user' && !msg.read
+            ).length;
+            if (unreadCount > 0) {
+              unreadCounts[appointment.id] = unreadCount;
+            }
+          }
+        }
+        setUnreadMessages(unreadCounts);
+      } catch (error) {
+        console.error('Error checking unread messages:', error);
+      }
+    };
 
-  function handleConsultationFormChange(e) {
-    setConsultationForm({ ...consultationForm, [e.target.name]: e.target.value });
-  }
-
-  function handleAddAppointment(e) {
-    e.preventDefault();
-    if (form.patientId && form.date && form.time) {
-      const newAppointment = {
-        id: Date.now(),
-        ...form,
-        createdAt: new Date().toISOString()
-      };
-      setAppointments([...appointments, newAppointment]);
-      setForm({ patientId: "", patientName: "", appointmentType: "Check-up", date: "", time: "", reason: "", status: "Pending" });
-      setShowForm(false);
-    } else {
-      alert("Please fill all required fields.");
+    if (appointments.length > 0) {
+      checkUnreadMessages();
+      const intervalId = setInterval(checkUnreadMessages, 10000);
+      return () => clearInterval(intervalId);
     }
-  }
+  }, [appointments]);
 
-  function handleStartConsultation(e) {
-    e.preventDefault();
-    if (consultationForm.patientId) {
-      const newConsultation = {
-        id: Date.now(),
-        ...consultationForm,
-        startTime: new Date().toISOString(),
-        status: "In Progress"
-      };
-      setCurrentCall(newConsultation);
-      setShowConsultation(false);
-      setConsultationForm({ patientId: "", patientName: "", consultationType: "Video Call", reason: "", status: "Waiting" });
-    } else {
-      alert("Please select a patient for consultation.");
+  // Request notification permission on mount
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
     }
-    // Here you would integrate with actual video calling service
-    // For now, we'll simulate the call interface
-  }
+  }, []);
 
   function handleEndCall() {
     if (currentCall) {
@@ -209,19 +269,35 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
         const result = await Swal.fire({
           title: 'Confirm Online Consultation',
           html: `
-            <div style="text-align: left;">
-              <p><strong>Patient:</strong> ${appointment.patientName}</p>
-              <p><strong>Date:</strong> ${new Date(appointment.date).toLocaleDateString()}</p>
-              <p><strong>Time:</strong> ${appointment.time}</p>
-              <p style="margin-top: 1em;">This will:</p>
-              <ul>
-                <li>✓ Create a Google Meet link for the consultation</li>
-                <li>✓ Enable chat for pre-consultation communication</li>
-                <li>✓ Send confirmation email to the patient</li>
-              </ul>
-              <p style="margin-top: 1em; color: #666; font-size: 0.9em;">
-                Note: Using free Google Workspace, you'll need to create the Meet link manually 
-                and share it with the patient.
+            <div style="text-align: left; padding: 0 1rem;">
+              <div style="background: #f3f4f6; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                <p style="margin: 0 0 0.25rem 0;"><strong style="color: #374151;">Patient:</strong> <span style="color: #6b7280;">${appointment.patientName}</span></p>
+                <p style="margin: 0 0 0.25rem 0;"><strong style="color: #374151;">Date:</strong> <span style="color: #6b7280;">${new Date(appointment.date).toLocaleDateString()}</span></p>
+                <p style="margin: 0;"><strong style="color: #374151;">Time:</strong> <span style="color: #6b7280;">${appointment.time}</span></p>
+              </div>
+              <p style="margin: 0 0 0.75rem 0; font-weight: 600; color: #374151;">This will:</p>
+              <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <svg style="width: 18px; height: 18px; color: #10b981;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  <span style="color: #374151;">Create a Google Meet link for the consultation</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <svg style="width: 18px; height: 18px; color: #10b981;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  <span style="color: #374151;">Enable chat for pre-consultation communication</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <svg style="width: 18px; height: 18px; color: #10b981;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  <span style="color: #374151;">Send confirmation notification to the patient</span>
+                </div>
+              </div>
+              <p style="margin-top: 1rem; margin-bottom: 0; color: #6b7280; font-size: 0.85rem; line-height: 1.4;">
+                <strong>Note:</strong> If you're using a free Google account, you may need to create the Meet link manually and share it with the patient.
               </p>
             </div>
           `,
@@ -236,7 +312,19 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
         }
       }
 
+      // Prepare payload - include additional data for online consultations
       const payload = { status: newStatus };
+      
+      // If confirming an online consultation, add necessary data for Meet link creation
+      if (newStatus === 'Confirmed' && appointment.type === 'Online Consultation') {
+        payload.type = 'Online Consultation';
+        payload.isOnline = true;
+        payload.requiresGoogleMeet = true;
+        payload.date = appointment.date;
+        payload.time = appointment.time;
+        payload.duration = 30;
+      }
+      
       const response = await AppointmentsAPI.update(id, payload);
       
       // Update the appointments list with the response data
@@ -254,27 +342,44 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
         Swal.fire({
           title: 'Online Consultation Confirmed',
           html: `
-            <div style="text-align: left;">
-              <p>✅ The appointment has been confirmed</p>
+            <div style="text-align: left; padding: 0 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <svg style="width: 20px; height: 20px; color: #10b981;" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span style="color: #374151; font-weight: 500;">The appointment has been confirmed</span>
+              </div>
               ${meetLink ? `
-                <p>✅ Google Meet link has been created</p>
-                <p style="margin-top: 1em;"><strong>Meet Link:</strong></p>
-                <p style="word-break: break-all; background: #f5f5f5; padding: 10px; border-radius: 5px;">
-                  <a href="${meetLink}" target="_blank">${meetLink}</a>
-                </p>
-                <p style="margin-top: 1em; color: #666;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                  <svg style="width: 20px; height: 20px; color: #10b981;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                  </svg>
+                  <span style="color: #374151; font-weight: 500;">Google Meet link has been created</span>
+                </div>
+                <div style="background: #f3f4f6; padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem;">
+                  <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: #374151;">Meet Link:</p>
+                  <p style="margin: 0; word-break: break-all;">
+                    <a href="${meetLink}" target="_blank" style="color: #3b82f6; text-decoration: none;">${meetLink}</a>
+                  </p>
+                </div>
+                <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">
                   The patient will see this link in their appointment details.
                 </p>
               ` : `
-                <p style="margin-top: 1em; color: #f39c12;">
-                  ⚠️ To create a Google Meet link:
-                </p>
-                <ol style="margin-top: 0.5em; text-align: left;">
-                  <li>Go to <a href="https://meet.google.com" target="_blank">meet.google.com</a></li>
-                  <li>Click "New meeting" → "Create a meeting for later"</li>
-                  <li>Copy the meeting link</li>
-                  <li>Share it with the patient via email or phone</li>
-                </ol>
+                <div style="display: flex; align-items: flex-start; gap: 0.75rem; margin-top: 1rem; margin-bottom: 1rem;">
+                  <svg style="width: 20px; height: 20px; color: #f59e0b; flex-shrink: 0; margin-top: 0.25rem;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                  </svg>
+                  <div>
+                    <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: #374151;">To create a Google Meet link:</p>
+                    <ol style="margin: 0; padding-left: 1.25rem; color: #374151; font-size: 0.9rem;">
+                      <li>Go to <a href="https://meet.google.com" target="_blank" style="color: #3b82f6;">meet.google.com</a></li>
+                      <li>Click "New meeting" → "Create a meeting for later"</li>
+                      <li>Copy the meeting link</li>
+                      <li>Share it with the patient via email or phone</li>
+                    </ol>
+                  </div>
+                </div>
               `}
             </div>
           `,
@@ -309,23 +414,658 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
   }
 
   // Handle chat functionality
-  function handleSendChatMessage() {
+  async function handleSendChatMessage() {
     if (chatMessage.trim() && selectedRequest) {
-      // In real app, this would send message to student
-      console.log(`Sending message to ${selectedRequest.studentName}: ${chatMessage}`);
-      setChatMessage("");
+      try {
+        await ChatAPI.sendMessage(selectedRequest.id, chatMessage.trim());
+        setChatMessage("");
+        // Reload messages after sending
+        await loadChatMessages(selectedRequest.id);
+      } catch (error) {
+        console.error('Error sending message:', error);
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to send message',
+          icon: 'error'
+        });
+      }
     }
   }
 
-  // Open chat for confirmed requests
-  function openChat(request) {
-    if (request.status === "Confirmed") {
+  // Load chat messages
+  async function loadChatMessages(appointmentId) {
+    try {
+      const chatData = await ChatAPI.getAppointmentChat(appointmentId);
+      const formattedMessages = chatData.messages.map(msg => ({
+        id: msg._id,
+        sender: msg.sender,
+        text: msg.text,
+        time: new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        read: msg.read
+      }));
+      setChatMessages(formattedMessages);
+    } catch (error) {
+      console.error('Error loading chat:', error);
+    }
+  }
+
+  // Open chat for online consultations (pending or confirmed)
+  async function openChat(request) {
+    // Allow chat for online appointments that are Pending or Confirmed
+    if (request.status === "Pending" || request.status === "Confirmed") {
       setSelectedRequest(request);
       setShowChat(true);
+      
+      // Clear unread count for this appointment
+      setUnreadMessages(prev => {
+        const updated = { ...prev };
+        delete updated[request.id];
+        return updated;
+      });
+      
+      await loadChatMessages(request.id);
+      
+      // Mark messages as read
+      try {
+        await ChatAPI.markMessagesAsRead(request.id);
+      } catch (error) {
+        console.error('Error marking messages as read:', error);
+      }
     }
   }
 
+  // Poll for new messages when chat is open
+  useEffect(() => {
+    if (!showChat || !selectedRequest) return;
+
+    let previousMessageCount = chatMessages.length;
+
+    const pollMessages = async () => {
+      try {
+        await loadChatMessages(selectedRequest.id);
+        
+        // Check for new user messages
+        if (chatMessages.length > previousMessageCount) {
+          const newMsg = chatMessages[chatMessages.length - 1];
+          if (newMsg.sender === 'user') {
+            // Show browser notification
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('New Patient Message', {
+                body: `${selectedRequest.patientName}: ${newMsg.text.substring(0, 100)}`,
+                icon: '/favicon.ico'
+              });
+            }
+            // Play sound
+            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZizcIGWi77eefTRAMUKfj8LZjHAY4ktfyzHksBSR3x/DdkEAKFF606+uoVRQKRp/g8r5sIQUrj9H0164pBjWQ1vLSeSwGLYTO8t2PQHJ3D'); 
+            audio.play().catch(e => console.log('Audio play failed:', e));
+          }
+        }
+        previousMessageCount = chatMessages.length;
+      } catch (error) {
+        console.error('Error polling messages:', error);
+      }
+    };
+
+    // Poll every 3 seconds for real-time feel
+    const intervalId = setInterval(pollMessages, 3000);
+
+    return () => clearInterval(intervalId);
+  }, [showChat, selectedRequest, chatMessages.length]);
+
+  // Handle reschedule approval
+  const handleRescheduleResponse = async (appointment, requestId, action) => {
+    const result = await Swal.fire({
+      title: action === 'approve' ? 'Approve Reschedule?' : 'Reject Reschedule?',
+      html: `
+        <div style="text-align: left; margin-top: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+            ${action === 'approve' ? 'Approval Note (Optional)' : 'Reason for Rejection'}
+          </label>
+          <textarea 
+            id="response-note" 
+            style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 80px; font-family: inherit; font-size: 0.95rem;"
+            placeholder="${action === 'approve' ? 'Add any notes...' : 'Please provide a reason...'}"
+          ></textarea>
+        </div>
+      `,
+      icon: action === 'approve' ? 'question' : 'warning',
+      showCancelButton: true,
+      confirmButtonText: action === 'approve' ? 'Approve' : 'Reject',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: action === 'approve' ? '#10b981' : '#dc2626',
+      preConfirm: () => {
+        const note = document.getElementById('response-note').value.trim();
+        if (action === 'reject' && !note) {
+          Swal.showValidationMessage('Please provide a reason');
+        }
+        return note;
+      }
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await AppointmentsAPI.respondToReschedule(
+          appointment.id,
+          requestId,
+          action,
+          result.value
+        );
+        
+        // Reload appointments
+        const updatedAppointments = await AppointmentsAPI.list();
+        setAppointments(updatedAppointments);
+        
+        Swal.fire({
+          title: action === 'approve' ? 'Approved!' : 'Rejected',
+          text: `Reschedule request has been ${action === 'approve' ? 'approved' : 'rejected'}.`,
+          icon: 'success'
+        });
+      } catch (error) {
+        Swal.fire({
+          title: 'Error',
+          text: error.message || 'Failed to process reschedule request',
+          icon: 'error'
+        });
+      }
+    }
+  };
+
+  // Handle consultation notes
+  const handleAddConsultationNotes = async (appointment) => {
+    const result = await Swal.fire({
+      title: 'Add Consultation Notes',
+      html: `
+        <div style="text-align: left; margin-top: 1rem; max-height: 500px; overflow-y: auto;">
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+              Diagnosis *
+            </label>
+            <input 
+              id="diagnosis" 
+              type="text" 
+              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; font-size: 0.95rem;"
+              placeholder="Enter diagnosis..."
+            />
+          </div>
+          
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+              Symptoms
+            </label>
+            <textarea 
+              id="symptoms" 
+              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 60px; font-family: inherit; font-size: 0.95rem;"
+              placeholder="List symptoms..."
+            ></textarea>
+          </div>
+          
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+              Vital Signs
+            </label>
+            <input 
+              id="vitalSigns" 
+              type="text" 
+              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; font-size: 0.95rem;"
+              placeholder="BP, Temp, Pulse, etc..."
+            />
+          </div>
+          
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+              Assessment
+            </label>
+            <textarea 
+              id="assessment" 
+              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 80px; font-family: inherit; font-size: 0.95rem;"
+              placeholder="Clinical assessment..."
+            ></textarea>
+          </div>
+          
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+              Treatment Plan
+            </label>
+            <textarea 
+              id="treatment" 
+              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 80px; font-family: inherit; font-size: 0.95rem;"
+              placeholder="Recommended treatment..."
+            ></textarea>
+          </div>
+          
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+              Prescriptions (JSON format or leave blank)
+            </label>
+            <textarea 
+              id="prescriptions" 
+              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 60px; font-family: 'Courier New', monospace; font-size: 0.85rem;"
+              placeholder='[{"medication":"Paracetamol","dosage":"500mg","frequency":"3x daily","duration":"5 days"}]'
+            ></textarea>
+          </div>
+          
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+              Follow-up Required?
+            </label>
+            <input 
+              id="followUpRequired" 
+              type="checkbox" 
+              style="margin-right: 0.5rem;"
+            />
+            <label for="followUpRequired">Yes, schedule follow-up</label>
+          </div>
+          
+          <div id="followUpDate" style="display: none; margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+              Follow-up Date
+            </label>
+            <input 
+              id="followUpDateInput" 
+              type="date" 
+              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; font-size: 0.95rem;"
+            />
+          </div>
+          
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+              Follow-up Notes
+            </label>
+            <textarea 
+              id="followUpNotes" 
+              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 60px; font-family: inherit; font-size: 0.95rem;"
+              placeholder="Additional recommendations..."
+            ></textarea>
+          </div>
+        </div>
+        <script>
+          document.getElementById('followUpRequired').addEventListener('change', function() {
+            document.getElementById('followUpDate').style.display = this.checked ? 'block' : 'none';
+          });
+        </script>
+      `,
+      width: '600px',
+      showCancelButton: true,
+      confirmButtonText: 'Save Notes',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#e51d5e',
+      preConfirm: () => {
+        const diagnosis = document.getElementById('diagnosis').value.trim();
+        if (!diagnosis) {
+          Swal.showValidationMessage('Diagnosis is required');
+          return false;
+        }
+
+        const prescriptionsText = document.getElementById('prescriptions').value.trim();
+        let prescriptions = [];
+        if (prescriptionsText) {
+          try {
+            prescriptions = JSON.parse(prescriptionsText);
+          } catch (e) {
+            Swal.showValidationMessage('Invalid prescriptions format. Must be valid JSON or leave blank.');
+            return false;
+          }
+        }
+
+        return {
+          diagnosis,
+          symptoms: document.getElementById('symptoms').value.trim(),
+          vitalSigns: document.getElementById('vitalSigns').value.trim(),
+          assessment: document.getElementById('assessment').value.trim(),
+          treatment: document.getElementById('treatment').value.trim(),
+          prescriptions,
+          followUpRecommendations: {
+            required: document.getElementById('followUpRequired').checked,
+            date: document.getElementById('followUpDateInput').value,
+            notes: document.getElementById('followUpNotes').value.trim()
+          }
+        };
+      }
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await AppointmentsAPI.addConsultationNotes(appointment.id, result.value);
+        
+        // Reload appointments
+        const updatedAppointments = await AppointmentsAPI.list();
+        setAppointments(updatedAppointments);
+        
+        Swal.fire({
+          title: 'Success!',
+          text: 'Consultation notes have been saved.',
+          icon: 'success'
+        });
+      } catch (error) {
+        Swal.fire({
+          title: 'Error',
+          text: error.message || 'Failed to save consultation notes',
+          icon: 'error'
+        });
+      }
+    }
+  };
+
+  // Open health record modal for completed appointment
+  const openHealthRecordModal = (appointment) => {
+    setSelectedAppointmentForRecord(appointment);
+    setHealthRecordForm({
+      diagnosis: '',
+      treatment: '',
+      prescriptions: [],
+      vitalSigns: {
+        bloodPressure: '',
+        temperature: '',
+        heartRate: '',
+        weight: '',
+        height: ''
+      },
+      notes: ''
+    });
+    setShowHealthRecordModal(true);
+  };
+
+  // Apply visit template
+  const applyTemplate = (template) => {
+    setHealthRecordForm(prev => ({
+      ...prev,
+      diagnosis: template.diagnosis,
+      treatment: template.treatment,
+      prescriptions: template.prescriptions
+    }));
+  };
+
+  // Handle health record form change
+  const handleHealthRecordChange = (field, value) => {
+    if (field.startsWith('vitalSigns.')) {
+      const vitalField = field.split('.')[1];
+      setHealthRecordForm(prev => ({
+        ...prev,
+        vitalSigns: {
+          ...prev.vitalSigns,
+          [vitalField]: value
+        }
+      }));
+    } else {
+      setHealthRecordForm(prev => ({
+        ...prev,
+        [field]: value
+      }));
+    }
+  };
+
+  // Add prescription
+  const addPrescription = () => {
+    setHealthRecordForm(prev => ({
+      ...prev,
+      prescriptions: [...prev.prescriptions, { medication: '', dosage: '', instructions: '' }]
+    }));
+  };
+
+  // Remove prescription
+  const removePrescription = (index) => {
+    setHealthRecordForm(prev => ({
+      ...prev,
+      prescriptions: prev.prescriptions.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Update prescription
+  const updatePrescription = (index, field, value) => {
+    setHealthRecordForm(prev => ({
+      ...prev,
+      prescriptions: prev.prescriptions.map((p, i) => 
+        i === index ? { ...p, [field]: value } : p
+      )
+    }));
+  };
+
+  // Submit health record
+  const submitHealthRecord = async () => {
+    if (!selectedAppointmentForRecord) return;
+
+    // Validation
+    if (!healthRecordForm.diagnosis.trim()) {
+      Swal.fire('Error', 'Diagnosis is required', 'error');
+      return;
+    }
+    if (!healthRecordForm.treatment.trim()) {
+      Swal.fire('Error', 'Treatment is required', 'error');
+      return;
+    }
+
+    try {
+      Swal.fire({
+        title: 'Saving...',
+        text: 'Adding health record',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      console.log('Selected appointment for record:', selectedAppointmentForRecord);
+      
+      // Get patient ID from appointment
+      let patientId = selectedAppointmentForRecord.patientId || selectedAppointmentForRecord.patient?._id;
+      console.log('Initial patientId:', patientId);
+      console.log('userId in appointment:', selectedAppointmentForRecord.userId);
+      console.log('user in appointment:', selectedAppointmentForRecord.user);
+      
+      // Always verify patient exists or create one
+      const userInfo = selectedAppointmentForRecord.userId || selectedAppointmentForRecord.user;
+      
+      if (userInfo) {
+        console.log('Verifying/creating patient for user:', userInfo);
+        
+        try {
+          // Try to find existing patient by userId
+          const allPatients = await PatientsAPI.list();
+          console.log('All patients:', allPatients.length);
+          
+          // Extract the actual user ID (could be string, object with _id, or object with id)
+          let userId;
+          if (typeof userInfo === 'string') {
+            userId = userInfo;
+          } else if (userInfo._id) {
+            userId = userInfo._id;
+          } else if (userInfo.id) {
+            userId = userInfo.id;
+          } else {
+            // userInfo is the user object but doesn't have _id or id
+            console.log('User object without ID, searching by email:', userInfo.email);
+            
+            // Try to find by email in patients list
+            const patientByEmail = allPatients.find(p => p.email === userInfo.email);
+            
+            if (patientByEmail) {
+              patientId = patientByEmail._id;
+              console.log('✅ Found existing patient by email:', patientId);
+              userId = null; // Skip the userId-based search below
+            } else {
+              // No patient found in list, but one might exist in DB (if list is filtered)
+              // Try to create, and if duplicate error, fetch all and retry
+              console.log('⚠️ No patient found in list, attempting to create');
+              try {
+                const newPatientData = {
+                  fullName: userInfo.name || userInfo.fullName || selectedAppointmentForRecord.patientName || 'Unknown',
+                  email: userInfo.email || '',
+                  role: userInfo.role || 'Student',
+                  courseYear: userInfo.courseYear || '',
+                  isRegisteredUser: false,
+                  contact: userInfo.contact || '',
+                  address: userInfo.address || '',
+                  studentId: `TEMP-${Date.now()}`
+                };
+                
+                console.log('Creating patient with data:', newPatientData);
+                const newPatient = await PatientsAPI.create(newPatientData);
+                patientId = newPatient._id;
+                console.log('✅ Created new patient:', patientId);
+                userId = null;
+              } catch (createError) {
+                // If duplicate email error, fetch the patient by querying all without filters
+                if (createError.message.includes('E11000') && createError.message.includes('email')) {
+                  console.log('⚠️ Patient exists with this email, fetching without filters');
+                  const allPatientsUnfiltered = await PatientsAPI.list('all', '');
+                  const existingPatient = allPatientsUnfiltered.find(p => p.email === userInfo.email);
+                  if (existingPatient) {
+                    patientId = existingPatient._id;
+                    console.log('✅ Found existing patient after duplicate error:', patientId);
+                    
+                    // Update patient to link with userId if not already linked
+                    if (!existingPatient.userId) {
+                      console.log('🔗 Linking patient to user');
+                      try {
+                        await PatientsAPI.update(patientId, { isRegisteredUser: false });
+                        console.log('✅ Patient record updated');
+                      } catch (updateError) {
+                        console.warn('⚠️ Could not update patient:', updateError.message);
+                      }
+                    }
+                    userId = null;
+                  } else {
+                    throw createError; // Re-throw if still not found
+                  }
+                } else {
+                  throw createError; // Re-throw other errors
+                }
+              }
+            }
+          }
+          
+          if (userId) {
+            console.log('Looking for patient with userId:', userId);
+            
+            const existingPatient = allPatients.find(p => {
+              const pUserId = p.userId?._id || p.userId;
+              console.log('Comparing patient userId:', pUserId, 'with target:', userId);
+              return pUserId === userId;
+            });
+            
+            if (existingPatient) {
+              patientId = existingPatient._id;
+              console.log('✅ Found existing patient:', patientId);
+            } else {
+              // Create new patient record
+              console.log('⚠️ No patient found, creating new patient with userId link');
+              
+              try {
+                const newPatientData = {
+                  userId: userId,
+                  fullName: userInfo.name || userInfo.fullName || selectedAppointmentForRecord.patientName || 'Unknown',
+                  email: userInfo.email || '',
+                  role: userInfo.role || 'Student',
+                  courseYear: userInfo.courseYear || '',
+                  isRegisteredUser: true,
+                  contact: userInfo.contact || '',
+                  address: userInfo.address || '',
+                  studentId: `TEMP-${Date.now()}`
+                };
+                
+                console.log('Creating patient with data:', newPatientData);
+                const newPatient = await PatientsAPI.create(newPatientData);
+                patientId = newPatient._id;
+                console.log('✅ Created new patient:', patientId);
+              } catch (createError) {
+                // If duplicate email error, fetch the patient by querying all without filters
+                if (createError.message.includes('E11000') && createError.message.includes('email')) {
+                  console.log('⚠️ Patient exists with this email, fetching without filters');
+                  const allPatientsUnfiltered = await PatientsAPI.list('all', '');
+                  const existingPatient = allPatientsUnfiltered.find(p => p.email === userInfo.email);
+                  if (existingPatient) {
+                    patientId = existingPatient._id;
+                    console.log('✅ Found existing patient after duplicate error:', patientId);
+                    
+                    // Update patient to link with userId if not already linked
+                    if (userId && !existingPatient.userId) {
+                      console.log('🔗 Linking patient to userId:', userId);
+                      try {
+                        await PatientsAPI.update(patientId, { userId: userId, isRegisteredUser: true });
+                        console.log('✅ Patient linked to user account');
+                      } catch (updateError) {
+                        console.warn('⚠️ Could not link patient to user:', updateError.message);
+                      }
+                    }
+                  } else {
+                    throw createError; // Re-throw if still not found
+                  }
+                } else {
+                  throw createError; // Re-throw other errors
+                }
+              }
+            }
+          }
+        } catch (patientError) {
+          console.error('❌ Error finding/creating patient:', patientError);
+          throw new Error(`Could not find or create patient record: ${patientError.message}`);
+        }
+      } else {
+        console.warn('⚠️ No user information in appointment, using existing patientId:', patientId);
+      }
+      
+      if (!patientId) {
+        throw new Error('Patient ID not found. Please ensure the user has a patient record.');
+      }
+
+      console.log('Adding visit to patient:', patientId);
+      const visitData = {
+        appointmentId: selectedAppointmentForRecord.id,
+        ...healthRecordForm
+      };
+      console.log('Visit data:', visitData);
+
+      await PatientsAPI.addVisit(patientId, visitData);
+
+      Swal.fire({
+        title: 'Success!',
+        text: 'Health record has been added successfully',
+        icon: 'success'
+      });
+
+      setShowHealthRecordModal(false);
+      setSelectedAppointmentForRecord(null);
+
+    } catch (error) {
+      console.error('Error adding health record:', error);
+      Swal.fire({
+        title: 'Error',
+        text: error.message || 'Failed to add health record',
+        icon: 'error'
+      });
+    }
+  };
+
   // Filter appointments by status
+  // Filter appointments based on active filter and search
+  const filteredAppointments = appointments
+    .filter(apt => {
+      // Filter by status/type
+      switch (activeFilter) {
+        case 'pending':
+          return apt.status === 'Pending';
+        case 'online':
+          return apt.type === 'Online Consultation';
+        case 'inPerson':
+          return apt.type === 'In-Person-Consultation' || apt.type === 'Clinic Visit';
+        case 'today':
+          const today = new Date().toDateString();
+          const aptDate = new Date(apt.date).toDateString();
+          return aptDate === today;
+        default:
+          return true;
+      }
+    })
+    .filter(apt => {
+      // Filter by search term
+      if (!searchTerm) return true;
+      const search = searchTerm.toLowerCase();
+      return (
+        apt.patientName?.toLowerCase().includes(search) ||
+        apt.reason?.toLowerCase().includes(search) ||
+        apt.type?.toLowerCase().includes(search) ||
+        apt.user?.courseYear?.toLowerCase().includes(search)
+      );
+    });
+
   const pendingAppointments = appointments.filter(apt => apt.status === "Pending");
   const confirmedAppointments = appointments.filter(apt => apt.status === "Confirmed");
   const completedAppointments = appointments.filter(apt => apt.status === "Completed");
@@ -339,244 +1079,359 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
     <div className="clinic-container">
       <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
       <div className="clinic-content">
+        
+        {/* Header */}
         <div className="appointment-header">
-          <h1 className="appointment-title">Appointments & Consultations</h1>
-          <div className="appointment-actions">
-                         <button className="appointment-btn primary" onClick={() => setShowForm(true)}>
-               <FaCalendarPlus /> Add Appointment
-             </button>
-             <button className="appointment-btn secondary" onClick={() => setShowConsultation(true)}>
-               <FaPhone /> Start Consultation
-             </button>
+          <div className="header-content">
+            <h1 className="appointment-title">Appointments & Consultations</h1>
+            <p className="appointment-subtitle">Manage patient appointments and online consultations</p>
           </div>
         </div>
 
         {/* Statistics Cards */}
-        <div className="appointment-stats">
-          <div className="stat-card">
-            <div className="stat-number">{todayAppointments.length}</div>
-            <div className="stat-label">Today's Appointments</div>
+        <div className="appointment-stats-grid">
+          <div className="stat-card stat-today">
+            <div className="stat-icon">
+              <FaCalendar />
+            </div>
+            <div className="stat-details">
+              <div className="stat-number">{todayAppointments.length}</div>
+              <div className="stat-label">Today</div>
+            </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-number">{pendingAppointments.length}</div>
-            <div className="stat-label">Pending Requests</div>
+          <div className="stat-card stat-pending">
+            <div className="stat-icon">
+              <FaClock />
+            </div>
+            <div className="stat-details">
+              <div className="stat-number">{pendingAppointments.length}</div>
+              <div className="stat-label">Pending</div>
+            </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-number">{confirmedAppointments.length}</div>
-            <div className="stat-label">Confirmed</div>
+          <div className="stat-card stat-confirmed">
+            <div className="stat-icon">
+              <FaCheck />
+            </div>
+            <div className="stat-details">
+              <div className="stat-number">{confirmedAppointments.length}</div>
+              <div className="stat-label">Confirmed</div>
+            </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-number">{completedAppointments.length}</div>
-            <div className="stat-label">Completed</div>
+          <div className="stat-card stat-completed">
+            <div className="stat-icon">
+              <FaStethoscope />
+            </div>
+            <div className="stat-details">
+              <div className="stat-number">{completedAppointments.length}</div>
+              <div className="stat-label">Completed</div>
+            </div>
           </div>
         </div>
 
-        {/* Current Call Interface */}
-                 {currentCall && (
-           <div className="call-interface">
-             <div className="call-header">
-               <h3><FaUser style={{color: '#28a745'}} /> Active Consultation</h3>
-               <span className="call-status">In Progress</span>
-             </div>
-             <div className="call-info">
-               <div className="call-patient">
-                 <strong>Patient:</strong> {currentCall.patientName}
-               </div>
-               <div className="call-type">
-                 <strong>Type:</strong> {currentCall.consultationType}
-               </div>
-               <div className="call-duration">
-                 <strong>Duration:</strong> {Math.floor((new Date() - new Date(currentCall.startTime)) / 1000 / 60)}m
-               </div>
-             </div>
-             <div className="call-controls">
-               <button className="call-btn end-call" onClick={handleEndCall}>
-                 <FaPhone /> End Call
-               </button>
-               <button className="call-btn mute"><FaMicrophone /> Mute</button>
-               <button className="call-btn video"><FaVideo /> Video</button>
-             </div>
-           </div>
-         )}
-
-        {/* All Appointments Section */}
-        <div className="appointments-section">
-          <h2><FaUser /> Appointment & Consultation Requests</h2>
-          
-          <div className="consultation-filters">
-            <button 
-              className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('all')}
-            >
-              All Appointments
-            </button>
-            <button 
-              className={`filter-btn ${activeFilter === 'pending' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('pending')}
-            >
-              Pending
-            </button>
-            <button 
-              className={`filter-btn ${activeFilter === 'online' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('online')}
-            >
-              Online Consultations
-            </button>
-            <button 
-              className={`filter-btn ${activeFilter === 'inPerson' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('inPerson')}
-            >
-              In-Person Visits
-            </button>
-            <button 
-              className={`filter-btn ${activeFilter === 'today' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('today')}
-            >
-              Today's Appointments
-            </button>
-          </div>
-          <table className="appointments-table">
-            <thead>
-              <tr>
-                <th>Patient</th>
-                <th>Type</th>
-                <th>Date & Time</th>
-                <th>Reason</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {appointments
-                .filter(apt => {
-                  switch (activeFilter) {
-                    case 'pending':
-                      return apt.status === 'Pending';
-                    case 'online':
-                      return apt.type === 'Online Consultation';
-                    case 'inPerson':
-                      return apt.type === 'In-Person-Consultation' || apt.type === 'Clinic Visit';
-                    case 'today':
-                      const today = new Date().toDateString();
-                      const aptDate = new Date(apt.date).toDateString();
-                      return aptDate === today;
-                    default:
-                      return true;
-                  }
-                })
-                .length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="no-data">No appointments found</td>
-                </tr>
-              ) : (
-                appointments
-                .filter(apt => {
-                  switch (activeFilter) {
-                    case 'pending':
-                      return apt.status === 'Pending';
-                    case 'online':
-                      return apt.type === 'Online Consultation';
-                    case 'inPerson':
-                      return apt.type === 'In-Person-Consultation' || apt.type === 'Clinic Visit';
-                    case 'today':
-                      const today = new Date().toDateString();
-                      const aptDate = new Date(apt.date).toDateString();
-                      return aptDate === today;
-                    default:
-                      return true;
-                  }
-                })
-                .map(appointment => (
-                  <tr key={appointment.id} className={`appointment-row ${appointment.status.toLowerCase()}`}>
-                    <td>{appointment.patientName}</td>
-                    <td>
-                      <div className="appointment-type-cell">
-                        {appointment.type === 'Online Consultation' ? (
-                          <div className="online-consultation-info">
-                            <span className="type-label">
-                              <FaVideo /> Online Consultation
-                            </span>
-                            {appointment.meetLink && (
-                              <div className="meet-actions">
-                                <a 
-                                  href={appointment.meetLink} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className="meet-link"
-                                >
-                                  <FaVideo /> Join Meet
-                                </a>
-                                <button
-                                  className="chat-link"
-                                  onClick={() => openChat(appointment)}
-                                >
-                                  <FaCommentDots /> Chat
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <span>{appointment.appointmentType}</span>
-                        )}
-                      </div>
-                    </td>
-                    <td>{new Date(appointment.date + 'T' + appointment.time).toLocaleString()}</td>
-                    <td>{appointment.reason}</td>
-                    <td>
-                      <span className={`status-badge ${appointment.status.toLowerCase()}`}>
-                        {appointment.status}
-                      </span>
-                    </td>
-                    <td className="appointment-actions-cell">
-                                             {appointment.status === "Pending" && (
-                         <>
-                           <button 
-                             className="action-btn confirm"
-                             onClick={() => updateAppointmentStatus(appointment.id, "Confirmed")}
-                           >
-                             <FaCheck /> Confirm
-                           </button>
-                           <button 
-                             className="action-btn reject"
-                             onClick={() => updateAppointmentStatus(appointment.id, "Cancelled")}
-                           >
-                             <FaTimes /> Cancel
-                           </button>
-                         </>
-                       )}
-                       {appointment.status === "Confirmed" && (
-                         <button 
-                           className="action-btn complete"
-                           onClick={() => updateAppointmentStatus(appointment.id, "Completed")}
-                         >
-                           <FaCheck /> Complete
-                         </button>
-                       )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-                 {/* Chat Interface */}
-         {showChat && selectedRequest && (
-           <div className="chat-modal">
-             <div className="chat-modal-content">
-               <div className="chat-header">
-                 <h3><FaCommentDots /> Chat with {selectedRequest.studentName}</h3>
-                 <button className="close-btn" onClick={() => setShowChat(false)}><FaTimes /></button>
-               </div>
-              <div className="chat-messages">
-                <div className="message clinic">
-                  <div className="message-content">
-                    Hello {selectedRequest.studentName}! Your consultation request has been confirmed. How can I help you today?
-                  </div>
-                  <div className="message-time">Just now</div>
+        {/* Active Call Interface */}
+        {currentCall && (
+          <div className="active-call-card">
+            <div className="call-card-header">
+              <div className="call-status-badge pulsing">
+                <span className="pulse-dot"></span>
+                Active Consultation
+              </div>
+              <button className="call-end-btn" onClick={handleEndCall}>
+                <FaTimes /> End Call
+              </button>
+            </div>
+            <div className="call-card-body">
+              <div className="call-patient-info">
+                <div className="patient-avatar">
+                  {currentCall.patientName?.charAt(0).toUpperCase()}
+                </div>
+                <div className="patient-details">
+                  <h3>{currentCall.patientName}</h3>
+                  <p>{currentCall.consultationType}</p>
                 </div>
               </div>
-              <div className="chat-input">
+              <div className="call-duration">
+                <FaClock /> {Math.floor((new Date() - new Date(currentCall.startTime)) / 1000 / 60)} min
+              </div>
+            </div>
+            <div className="call-card-controls">
+              <button className="call-control-btn"><FaMicrophone /> Mute</button>
+              <button className="call-control-btn"><FaVideo /> Camera</button>
+              <button className="call-control-btn"><FaCommentDots /> Chat</button>
+            </div>
+          </div>
+        )}
+
+        {/* Search and Filters */}
+        <div className="appointments-toolbar">
+          <div className="search-box">
+            <FaSearch className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search by patient name, reason..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+          
+          <div className="filter-tabs">
+            <button 
+              className={`filter-tab ${activeFilter === 'pending' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('pending')}
+            >
+              <FaClock /> Pending
+            </button>
+            <button 
+              className={`filter-tab ${activeFilter === 'all' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('all')}
+            >
+              <FaCalendar /> All
+            </button>
+            <button 
+              className={`filter-tab ${activeFilter === 'online' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('online')}
+            >
+              <FaVideo /> Online
+            </button>
+            <button 
+              className={`filter-tab ${activeFilter === 'inPerson' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('inPerson')}
+            >
+              <FaMapMarkerAlt /> In-Person
+            </button>
+            <button 
+              className={`filter-tab ${activeFilter === 'today' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('today')}
+            >
+              <FaStethoscope /> Today
+            </button>
+          </div>
+        </div>
+
+        {/* Appointments Grid */}
+        <div className="appointments-grid">
+          {filteredAppointments.length === 0 ? (
+            <div className="empty-state">
+              <FaCalendar className="empty-icon" />
+              <h3>No appointments found</h3>
+              <p>Try adjusting your filters or search terms</p>
+            </div>
+          ) : (
+            filteredAppointments.map(appointment => (
+              <div key={appointment.id} className={`appointment-card appointment-${appointment.status?.toLowerCase()}`}>
+                <div className="appointment-card-header">
+                  <div className="appointment-type-badge">
+                    {appointment.type === 'Online Consultation' ? (
+                      <><FaVideo /> Online</>
+                    ) : (
+                      <><FaMapMarkerAlt /> In-Person</>
+                    )}
+                  </div>
+                  <button 
+                    className="appointment-menu-btn"
+                    onClick={() => setSelectedAppointment(appointment)}
+                  >
+                    <FaEllipsisV />
+                  </button>
+                </div>
+
+                <div className="appointment-card-body">
+                  <div className="patient-info">
+                    <div className="patient-avatar-sm">
+                      <FaUser />
+                    </div>
+                    <div>
+                      <h4 className="patient-name">
+                        {appointment.patientName || 'Unknown Patient'}
+                      </h4>
+                      <p className="patient-course">
+                        {appointment.user?.courseYear || 
+                         (appointment.user?.role && appointment.user.role !== 'student' && appointment.user.role !== 'STUDENT' 
+                           ? appointment.user.role.toUpperCase() 
+                           : 'No course info')}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="appointment-details">
+                    <div className="detail-row">
+                      <FaCalendar className="detail-icon" />
+                      <span>{new Date(appointment.date).toLocaleDateString('en-US', { 
+                        weekday: 'short', 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                      })}</span>
+                    </div>
+                    <div className="detail-row">
+                      <FaClock className="detail-icon" />
+                      <span>{appointment.time}</span>
+                    </div>
+                    <div className="detail-row">
+                      <FaStethoscope className="detail-icon" />
+                      <span>{appointment.reason || 'No reason provided'}</span>
+                    </div>
+                  </div>
+
+                  <div className={`status-badge status-${appointment.status?.toLowerCase()}`}>
+                    {appointment.status}
+                  </div>
+
+                  {/* Online Consultation Features */}
+                  {appointment.type === 'Online Consultation' && (
+                    <div className="online-consultation-section">
+                      {appointment.consultationDetails?.meetLink && (
+                        <div className="meet-link-container">
+                          <FaLink className="link-icon" />
+                          <a 
+                            href={appointment.consultationDetails.meetLink} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="meet-link-text"
+                          >
+                            Join Google Meet
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Chat available for Pending and Confirmed appointments */}
+                  {(appointment.status === 'Pending' || appointment.status === 'Confirmed') && (
+                    <div className="chat-section">
+                      <button 
+                        className="chat-btn"
+                        onClick={() => openChat(appointment)}
+                        style={{ position: 'relative' }}
+                      >
+                        <FaCommentDots /> Open Chat
+                        {unreadMessages[appointment.id] > 0 && (
+                          <span className="unread-badge-clinic">{unreadMessages[appointment.id]}</span>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="appointment-card-footer">
+                  {/* Pending reschedule requests */}
+                  {appointment.rescheduleRequests && appointment.rescheduleRequests.some(r => r.status === 'pending') && (
+                    <div className="reschedule-alert">
+                      <span>📅 Reschedule request pending</span>
+                      <div className="reschedule-actions">
+                        {appointment.rescheduleRequests.filter(r => r.status === 'pending').map(request => (
+                          <div key={request._id} className="reschedule-request">
+                            <p>New date/time: {new Date(request.newDate).toLocaleDateString()} at {request.newTime}</p>
+                            <div className="request-buttons">
+                              <button 
+                                className="action-btn action-confirm-sm"
+                                onClick={() => handleRescheduleResponse(appointment, request._id, 'approve')}
+                              >
+                                Approve
+                              </button>
+                              <button 
+                                className="action-btn action-decline-sm"
+                                onClick={() => handleRescheduleResponse(appointment, request._id, 'reject')}
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {appointment.status === 'Pending' && (
+                    <>
+                      <button 
+                        className="action-btn action-confirm"
+                        onClick={() => {
+                          if (appointment.type === 'Online Consultation') {
+                            handleConfirmConsultation(appointment);
+                          } else {
+                            updateAppointmentStatus(appointment.id, 'Confirmed');
+                          }
+                        }}
+                      >
+                        <FaCheck /> Confirm
+                      </button>
+                      <button 
+                        className="action-btn action-decline"
+                        onClick={() => updateAppointmentStatus(appointment.id, 'Declined')}
+                      >
+                        <FaTimes /> Decline
+                      </button>
+                    </>
+                  )}
+                  {appointment.status === 'Confirmed' && (
+                    <button 
+                      className="action-btn action-complete"
+                      onClick={() => updateAppointmentStatus(appointment.id, 'Completed')}
+                    >
+                      <FaCheck /> Mark Complete
+                    </button>
+                  )}
+                  {appointment.status === 'Completed' && !appointment.consultationNotes && (
+                    <>
+                      <button 
+                        className="action-btn action-notes"
+                        onClick={() => handleAddConsultationNotes(appointment)}
+                      >
+                        <FaFileAlt /> Add Consultation Notes
+                      </button>
+                      <button 
+                        className="action-btn action-health-record"
+                        onClick={() => openHealthRecordModal(appointment)}
+                      >
+                        <FaNotesMedical /> Add Health Record
+                      </button>
+                    </>
+                  )}
+                  {appointment.status === 'Completed' && appointment.consultationNotes && (
+                    <>
+                      <span className="notes-added-badge">
+                        <FaCheck /> Consultation notes recorded
+                      </span>
+                      <button 
+                        className="action-btn action-health-record"
+                        onClick={() => openHealthRecordModal(appointment)}
+                      >
+                        <FaNotesMedical /> Add Health Record
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Chat Interface */}
+        {showChat && selectedRequest && (
+          <div className="chat-modal-overlay" onClick={() => setShowChat(false)}>
+            <div className="chat-modal-modern" onClick={(e) => e.stopPropagation()}>
+              <div className="chat-modal-header">
+                <div>
+                  <h3>Chat with {selectedRequest.patientName}</h3>
+                  <p>Pre-consultation discussion</p>
+                </div>
+                <button className="close-btn-icon" onClick={() => setShowChat(false)}>
+                  <FaTimes />
+                </button>
+              </div>
+              <div className="chat-messages-area">
+                {chatMessages.map(msg => (
+                  <div key={msg.id} className={`chat-message ${msg.sender}`}>
+                    <div className="message-content">
+                      <p>{msg.text}</p>
+                      <span className="message-time">{msg.time}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="chat-input-area">
                 <input
                   type="text"
                   placeholder="Type your message..."
@@ -584,148 +1439,175 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
                   onChange={(e) => setChatMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendChatMessage()}
                 />
-                <button onClick={handleSendChatMessage}>Send</button>
+                <button className="send-btn-modern" onClick={handleSendChatMessage}>
+                  <FaPaperPlane />
+                </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Add Appointment Modal */}
-        {showForm && (
-          <div className="appointment-modal">
-            <div className="appointment-modal-content">
-              <h2>Schedule New Appointment</h2>
-              <form onSubmit={handleAddAppointment}>
-                <div className="form-row">
-                  <select
-                    name="patientId"
-                    value={form.patientId}
-                    onChange={(e) => {
-                      const patient = patients.find(p => p.id === parseInt(e.target.value));
-                      setForm({
-                        ...form,
-                        patientId: e.target.value,
-                        patientName: patient ? patient.name : ""
-                      });
-                    }}
-                    required
-                  >
-                    <option value="">Select Patient</option>
-                    {patients.map(patient => (
-                      <option key={patient.id} value={patient.id}>{patient.name}</option>
-                    ))}
-                  </select>
-                  <select
-                    name="appointmentType"
-                    value={form.appointmentType}
-                    onChange={handleFormChange}
-                    required
-                  >
-                    <option value="Checkup">Checkup</option>
-                    <option value="Follow-up">Follow-up</option>
-                    <option value="Emergency">Emergency</option>
-                    <option value="In-Person-Consultation">In-Person Consultation</option>
-                    <option value="Online-Consultation">Online Consultation</option>
-                  </select>
-                </div>
-                <div className="form-row">
-                  <input
-                    type="date"
-                    name="date"
-                    value={form.date}
-                    onChange={handleFormChange}
-                    required
-                  />
-                  <input
-                    type="time"
-                    name="time"
-                    value={form.time}
-                    onChange={handleFormChange}
-                    required
-                  />
-                </div>
-                <div className="form-row">
-                  <label className="checkbox-label">
-                    <input
-                      type="checkbox"
-                      name="isOnline"
-                      checked={form.isOnline}
-                      onChange={(e) => {
-                        const isOnline = e.target.checked;
-                        setForm(prev => ({
-                          ...prev,
-                          isOnline,
-                          appointmentType: isOnline ? "Online-Consultation" : "In-Person-Consultation"
-                        }));
-                      }}
-                    />
-                    Online Consultation (Google Meet)
-                  </label>
-                </div>
-                <textarea
-                  name="reason"
-                  placeholder="Reason for appointment"
-                  value={form.reason}
-                  onChange={handleFormChange}
-                  rows="3"
-                />
-                <div className="modal-actions">
-                  <button type="submit" className="appointment-btn primary">Schedule</button>
-                  <button type="button" className="appointment-btn secondary" onClick={() => setShowForm(false)}>Cancel</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        {/* Health Record Modal */}
+        {showHealthRecordModal && selectedAppointmentForRecord && (
+          <div className="appointment-modal" onClick={() => setShowHealthRecordModal(false)}>
+            <div className="appointment-modal-content health-record-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2><FaNotesMedical /> Add Health Record</h2>
+                <p className="modal-subtitle">
+                  Patient: {selectedAppointmentForRecord.patientName} | 
+                  Date: {new Date(selectedAppointmentForRecord.date).toLocaleDateString()}
+                </p>
+              </div>
 
-        {/* Start Consultation Modal */}
-        {showConsultation && (
-          <div className="appointment-modal">
-            <div className="appointment-modal-content">
-              <h2>Start Online Consultation</h2>
-              <form onSubmit={handleStartConsultation}>
-                <div className="form-row">
-                  <select
-                    name="patientId"
-                    value={consultationForm.patientId}
-                    onChange={(e) => {
-                      const patient = patients.find(p => p.id === parseInt(e.target.value));
-                      setConsultationForm({
-                        ...consultationForm,
-                        patientId: e.target.value,
-                        patientName: patient ? patient.name : ""
-                      });
-                    }}
-                    required
-                  >
-                    <option value="">Select Patient</option>
-                    {patients.map(patient => (
-                      <option key={patient.id} value={patient.id}>{patient.name}</option>
-                    ))}
-                  </select>
-                  <select
-                    name="consultationType"
-                    value={consultationForm.consultationType}
-                    onChange={handleConsultationFormChange}
-                    required
-                  >
-                    <option value="Video Call">Video Call</option>
-                    <option value="Voice Call">Voice Call</option>
-                    <option value="Chat">Chat</option>
-                  </select>
+              {/* Visit Templates */}
+              <div className="visit-templates">
+                <label>Quick Templates:</label>
+                <div className="template-buttons">
+                  {visitTemplates.map((template, index) => (
+                    <button 
+                      key={index}
+                      type="button"
+                      className="template-btn"
+                      onClick={() => applyTemplate(template)}
+                    >
+                      {template.name}
+                    </button>
+                  ))}
                 </div>
-                <textarea
-                  name="reason"
-                  placeholder="Reason for consultation"
-                  value={consultationForm.reason}
-                  onChange={handleConsultationFormChange}
-                  rows="3"
-                />
-                                 <div className="modal-actions">
-                   <button type="submit" className="appointment-btn primary"><FaPhone /> Start Call</button>
-                   <button type="button" className="appointment-btn secondary" onClick={() => setShowConsultation(false)}>Cancel</button>
-                 </div>
-              </form>
+              </div>
+
+              <div className="health-record-form">
+                {/* Diagnosis */}
+                <div className="form-group">
+                  <label>Diagnosis *</label>
+                  <input
+                    type="text"
+                    value={healthRecordForm.diagnosis}
+                    onChange={(e) => handleHealthRecordChange('diagnosis', e.target.value)}
+                    placeholder="Enter diagnosis..."
+                    required
+                  />
+                </div>
+
+                {/* Treatment */}
+                <div className="form-group">
+                  <label>Treatment Plan *</label>
+                  <textarea
+                    value={healthRecordForm.treatment}
+                    onChange={(e) => handleHealthRecordChange('treatment', e.target.value)}
+                    placeholder="Enter treatment plan..."
+                    rows="3"
+                    required
+                  />
+                </div>
+
+                {/* Vital Signs */}
+                <div className="form-group">
+                  <label>Vital Signs</label>
+                  <div className="vitals-grid">
+                    <input
+                      type="text"
+                      placeholder="Blood Pressure"
+                      value={healthRecordForm.vitalSigns.bloodPressure}
+                      onChange={(e) => handleHealthRecordChange('vitalSigns.bloodPressure', e.target.value)}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Temperature"
+                      value={healthRecordForm.vitalSigns.temperature}
+                      onChange={(e) => handleHealthRecordChange('vitalSigns.temperature', e.target.value)}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Heart Rate"
+                      value={healthRecordForm.vitalSigns.heartRate}
+                      onChange={(e) => handleHealthRecordChange('vitalSigns.heartRate', e.target.value)}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Weight"
+                      value={healthRecordForm.vitalSigns.weight}
+                      onChange={(e) => handleHealthRecordChange('vitalSigns.weight', e.target.value)}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Height"
+                      value={healthRecordForm.vitalSigns.height}
+                      onChange={(e) => handleHealthRecordChange('vitalSigns.height', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Prescriptions */}
+                <div className="form-group">
+                  <label>Prescriptions</label>
+                  {healthRecordForm.prescriptions.map((prescription, index) => (
+                    <div key={index} className="prescription-row">
+                      <input
+                        type="text"
+                        placeholder="Medication"
+                        value={prescription.medication}
+                        onChange={(e) => updatePrescription(index, 'medication', e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Dosage"
+                        value={prescription.dosage}
+                        onChange={(e) => updatePrescription(index, 'dosage', e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Instructions"
+                        value={prescription.instructions}
+                        onChange={(e) => updatePrescription(index, 'instructions', e.target.value)}
+                      />
+                      <button 
+                        type="button" 
+                        className="remove-btn"
+                        onClick={() => removePrescription(index)}
+                      >
+                        <FaTimes />
+                      </button>
+                    </div>
+                  ))}
+                  <button 
+                    type="button" 
+                    className="add-prescription-btn"
+                    onClick={addPrescription}
+                  >
+                    + Add Prescription
+                  </button>
+                </div>
+
+                {/* Notes */}
+                <div className="form-group">
+                  <label>Additional Notes</label>
+                  <textarea
+                    value={healthRecordForm.notes}
+                    onChange={(e) => handleHealthRecordChange('notes', e.target.value)}
+                    placeholder="Additional notes..."
+                    rows="4"
+                  />
+                </div>
+
+                {/* Actions */}
+                <div className="modal-actions">
+                  <button 
+                    type="button" 
+                    className="appointment-btn primary"
+                    onClick={submitHealthRecord}
+                  >
+                    <FaCheck /> Save Health Record
+                  </button>
+                  <button 
+                    type="button" 
+                    className="appointment-btn secondary"
+                    onClick={() => setShowHealthRecordModal(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}

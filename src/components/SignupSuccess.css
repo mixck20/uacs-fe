@@ -25,39 +25,45 @@
 
 .verification-steps {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 3rem;
-  padding: 0 1rem;
+  justify-content: center;
+  align-items: flex-start;
+  margin: 0 auto 3rem;
+  padding: 0;
+  position: relative;
+  max-width: 500px;
+  gap: 0;
 }
 
 .step {
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 1;
   position: relative;
-  z-index: 1;
+  flex: 0 0 25%;
+  min-width: 0;
 }
 
 .step-icon {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: #f8f9fa;
-  border: 2px solid #e2e8f0;
+  border: 3px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 0.5rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #718096;
   transition: all 0.3s ease;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .step-circle {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #e2e8f0;
 }
@@ -68,28 +74,44 @@
   color: white;
 }
 
+.check-icon {
+  font-size: 1.75rem;
+}
+
 .step-label {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: #718096;
-  font-weight: 500;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  width: 100%;
+  padding: 0 4px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .step.completed .step-label {
   color: #e51d5e;
+  font-weight: 700;
 }
 
 .step-connector {
-  flex-grow: 1;
-  height: 2px;
+  position: absolute;
+  top: 25px;
+  left: calc(50% + 30px);
+  right: calc(-50% + 30px);
+  height: 3px;
   background: #e2e8f0;
-  margin: 0 0.5rem;
-  position: relative;
-  top: -20px;
-  z-index: 0;
+  z-index: 1;
   transition: background-color 0.3s ease;
 }
 
-.step-connector.completed {
+.step:last-child .step-connector {
+  display: none;
+}
+
+.step.completed .step-connector {
   background: #e51d5e;
 }
 
@@ -99,7 +121,7 @@
 }
 
 .success-icon, .error-icon {
-  font-size: 4rem;
+  font-size: 5rem;
   margin-bottom: 1.5rem;
   color: #e51d5e;
 }
@@ -245,5 +267,165 @@ p {
   100% {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .signup-success-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .signup-success-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .signup-success-card h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .verification-steps {
+    margin-bottom: 2rem;
+    max-width: 400px;
+  }
+
+  .step {
+    flex: 0 0 25%;
+  }
+
+  .step-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .step-label {
+    font-size: 0.7rem;
+    padding: 0 2px;
+  }
+
+  .step-connector {
+    top: 21px;
+    left: calc(50% + 26px);
+    right: calc(-50% + 26px);
+  }
+
+  .success-icon,
+  .error-icon {
+    font-size: 3rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .verification-info {
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+  }
+
+  .email-icon {
+    font-size: 1.75rem;
+  }
+
+  .verification-info p {
+    font-size: 0.95rem;
+  }
+
+  .note-box {
+    padding: 0.875rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .note-box p {
+    font-size: 0.875rem;
+  }
+
+  .goto-login-btn {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .signup-success-container {
+    padding: 1rem 0.75rem;
+  }
+
+  .signup-success-card {
+    padding: 1.5rem 1rem;
+    border-radius: 1.25rem;
+  }
+
+  .signup-success-card h1 {
+    font-size: 1.3rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .verification-steps {
+    margin-bottom: 1.5rem;
+    max-width: 320px;
+  }
+
+  .step {
+    flex: 0 0 25%;
+  }
+
+  .step-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 0.85rem;
+  }
+
+  .step-circle {
+    width: 10px;
+    height: 10px;
+  }
+
+  .check-icon {
+    font-size: 1rem;
+  }
+
+  .step-label {
+    font-size: 0.625rem;
+    padding: 0 1px;
+  }
+
+  .step-connector {
+    top: 18px;
+    left: calc(50% + 22px);
+    right: calc(-50% + 22px);
+    height: 2px;
+  }
+
+  .success-icon,
+  .error-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .verification-info {
+    padding: 1rem;
+    margin: 1.25rem 0;
+  }
+
+  .email-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .verification-info p {
+    font-size: 0.875rem;
+  }
+
+  .note-box {
+    padding: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .note-box p {
+    font-size: 0.8rem;
+  }
+
+  .goto-login-btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
   }
 }

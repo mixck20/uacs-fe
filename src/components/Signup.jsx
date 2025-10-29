@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./Signup.css";
 import Swal from "sweetalert2";
+import { publicApiFetch } from "../api";
 import { 
   FaUser,
   FaEnvelope, 
@@ -13,6 +14,7 @@ import {
   FaEye,
   FaEyeSlash
 } from "react-icons/fa";
+import uacsLogo from "../assets/uacs logo.png";
 
 import { useNavigate } from "react-router-dom";
 
@@ -23,6 +25,7 @@ const Signup = () => {
     lastName: "",
     gender: "",
     role: "",
+    courseYear: "", // For students
     email: "",
     idNumber: "",
     password: "",
@@ -77,19 +80,18 @@ const Signup = () => {
         emailUpdates: form.emailUpdates
       };
 
-      const res = await fetch("https://uacs-be.vercel.app/api/auth/register", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-        },
-        credentials: 'include',
-        body: JSON.stringify(payload),
-      });
+      // Add courseYear only for students
+      if (form.role === 'Student' && form.courseYear) {
+        payload.courseYear = form.courseYear.trim();
+      }
 
-      const data = await res.json();
+      const data = await publicApiFetch('/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
       
-      if (!res.ok) {
-        throw new Error(data.message || "Registration failed");
+      if (!data) {
+        throw new Error("Registration failed");
       }
 
       // Clear form
@@ -98,6 +100,7 @@ const Signup = () => {
         lastName: "",
         gender: "",
         role: "",
+        courseYear: "",
         email: "",
         idNumber: "",
         password: "",
@@ -130,7 +133,15 @@ const Signup = () => {
         <div className="signup-right">
           <div className="signup-form-container">
             <div className="signup-logo-placeholder">
-              Logo
+              <img 
+                src={uacsLogo} 
+                alt="UACS Logo" 
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain"
+                }}
+              />
             </div>
             <form className="signup-form" onSubmit={handleSubmit}>
               {error && (
@@ -185,7 +196,6 @@ const Signup = () => {
                     <option value="" disabled>Sex</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
-                    <option value="Prefer not to say">Prefer not to say</option>
                   </select>
                   <FaVenusMars className="signup-input-icon" />
                   <FaChevronDown className="signup-select-arrow" />
@@ -207,6 +217,24 @@ const Signup = () => {
                 </div>
               </div>
 
+              {/* Course/Year field - only for students */}
+              {form.role === 'Student' && (
+                <div className="signup-row">
+                  <div className="signup-input-container">
+                    <input
+                      type="text"
+                      name="courseYear"
+                      placeholder="Course & Year (e.g., BSIT 3rd Year)"
+                      value={form.courseYear}
+                      onChange={handleChange}
+                      className="signup-input"
+                      required
+                    />
+                    <FaGraduationCap className="signup-input-icon" />
+                  </div>
+                </div>
+              )}
+
               <div className="signup-row">
                 <div className="signup-input-container">
                   <input
@@ -227,11 +255,10 @@ const Signup = () => {
                   <input
                     type="text"
                     name="idNumber"
-                    placeholder="Student/Faculty Number ID"
+                    placeholder="Student/Faculty Number ID (Optional)"
                     value={form.idNumber}
                     onChange={handleChange}
                     className="signup-input"
-                    required
                   />
                   <FaIdCard className="signup-input-icon" />
                 </div>

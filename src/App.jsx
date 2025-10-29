@@ -11,11 +11,13 @@ import UserDashboard from "./components/UserDashboard";
 import UserAppointment from "./components/UserAppointment";
 import UserHealthRecord from "./components/UserHealthRecord";
 import UserFeedback from "./components/UserFeedback";
+import UserSettings from "./components/UserSettings";
 import Patients from "./components/Patients";
 import Inventory from "./components/Inventory";
 import Appointment from "./components/Appointment";
 import Email from "./components/Email";
 import EHR from "./components/EHR";
+import CertificateManagement from "./components/CertificateManagement";
 
 
 function App() {
@@ -104,26 +106,73 @@ function App() {
 
   // Persist auth across refresh
   useEffect(() => {
-    try {
-      const token = localStorage.getItem("token");
-      const savedRole = localStorage.getItem("userRole");
-      const userStr = localStorage.getItem("user");
-      
-      if (token && savedRole && userStr) {
-        const user = JSON.parse(userStr);
-        if (user && user._id) {
-          console.log('Restored session:', { savedRole, user });
-          setIsLoggedIn(true);
-          setUserRole(savedRole);
-          setUserData(user);
+    const restoreSession = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const savedRole = localStorage.getItem("userRole");
+        const userStr = localStorage.getItem("user");
+        
+        console.log('Attempting to restore session:', { hasToken: !!token, hasRole: !!savedRole, hasUser: !!userStr });
+        
+        if (token && savedRole && userStr) {
+          try {
+            const user = JSON.parse(userStr);
+            
+            // For now, skip backend verification and just restore from localStorage
+            // This allows the app to work even if backend is slow to start
+            if (user && (user._id || user.id)) {
+              // Ensure _id is set for compatibility
+              if (!user._id && user.id) {
+                user._id = user.id;
+              }
+              
+              console.log('Session restored successfully:', { savedRole, userId: user._id });
+              setIsLoggedIn(true);
+              setUserRole(savedRole);
+              setUserData(user);
+              
+              // Optionally verify token in background (don't block UI)
+              try {
+                await AuthAPI.verifyToken();
+                console.log('Token verified with backend');
+              } catch (verifyError) {
+                console.warn('Background token verification failed:', verifyError.message);
+                
+                // If user not found (404), clear the session immediately
+                if (verifyError.message === 'User not found' || verifyError.message.includes('not found')) {
+                  console.log('User account no longer exists, clearing session');
+                  localStorage.removeItem('token');
+                  localStorage.removeItem('user');
+                  localStorage.removeItem('userRole');
+                  setIsLoggedIn(false);
+                  setUserRole(null);
+                  setUserData(null);
+                }
+                // For other errors (network issues, etc.), keep session and let user continue
+              }
+            } else {
+              throw new Error('Invalid user data in storage');
+            }
+          } catch (parseError) {
+            console.error('Failed to parse stored session:', parseError);
+            // Clear invalid data
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('userRole');
+          }
         } else {
-          throw new Error('Invalid user data in storage');
+          console.log('No stored session found');
         }
+      } catch (error) {
+        console.error('Error restoring session:', error);
+        // Clear any invalid data
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('userRole');
       }
-    } catch (error) {
-      console.error('Error restoring session:', error);
-      handleLogout();
-    }
+    };
+    
+    restoreSession();
   }, []);
 
   // Load data when user is logged in
@@ -219,6 +268,12 @@ function App() {
               inventory={inventory}
             />
           );
+        case 'certificates':
+          return (
+            <CertificateManagement
+              {...commonProps}
+            />
+          );
         case 'dashboard':
         default:
           return (
@@ -282,6 +337,13 @@ function App() {
                     <UserFeedback
                       user={userData}
                       onLogout={handleLogout}
+                    />
+                  } />
+                  <Route path="/settings" element={
+                    <UserSettings
+                      user={userData}
+                      onLogout={handleLogout}
+                      onUserUpdate={setUserData}
                     />
                   } />
                   <Route path="/" element={<Navigate to="/dashboard" />} />

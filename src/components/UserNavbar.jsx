@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaUser, FaBell, FaSignOutAlt, FaCheckCircle } from "react-icons/fa";
+import { FaBell, FaCheckCircle, FaTimesCircle, FaCalendarCheck, FaEnvelope } from "react-icons/fa";
+import { NotificationsAPI } from "../api";
 import "./UserNavbar.css";
 
 const UserNavbar = ({ user, onLogout }) => {
   const location = useLocation();
-  const name = user?.firstName ? `${user.firstName} ${user.lastName}` : "User";
-  const userRole = user?.role || "Student/Faculty";
+  const [menuOpen, setMenuOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const notificationRef = React.useRef(null);
 
   useEffect(() => {
-    // Add click outside handler
     const handleClickOutside = (event) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setShowNotifications(false);
@@ -25,110 +24,282 @@ const UserNavbar = ({ user, onLogout }) => {
     };
   }, []);
 
-  useEffect(() => {
-    // Check if there's a verification notification
-    const verifiedEmail = localStorage.getItem('verifiedEmail');
-    const verificationTime = localStorage.getItem('verificationTime');
-    
-    // For testing - ensure we have a notification
-    if (!verifiedEmail) {
-      localStorage.setItem('verifiedEmail', 'test@example.com');
-      localStorage.setItem('verificationTime', new Date().toLocaleString());
-    }
-    
-    const testEmail = localStorage.getItem('verifiedEmail');
-    const testTime = localStorage.getItem('verificationTime');
-    
-    if (testEmail && testTime) {
-      const newNotification = {
-        id: 'email-verification',
-        type: 'success',
-        icon: <FaCheckCircle className="notification-icon success" />,
-        title: 'Email Verified',
-        message: `Your email (${testEmail}) has been successfully verified.`,
-        time: testTime
-      };
+  // Fetch notifications from API
+  const fetchNotifications = async () => {
+    try {
+      const data = await NotificationsAPI.getUserNotifications();
+      
+      // Transform backend notifications to frontend format
+      const transformedNotifications = data.map(notif => ({
+        id: notif._id,
+        type: getNotificationType(notif.type),
+        title: notif.title,
+        message: notif.message,
+        time: formatNotificationTime(notif.createdAt),
+        data: notif.data,
+        read: notif.read
+      }));
 
-      setNotifications(prev => {
-        // Only add if not already present
-        if (!prev.find(n => n.id === 'email-verification')) {
-          return [...prev, newNotification];
+      // Add email verification notification from localStorage if exists
+      const verifiedEmail = localStorage.getItem('verifiedEmail');
+      const verificationTime = localStorage.getItem('verificationTime');
+      
+      if (verifiedEmail && verificationTime) {
+        const emailNotification = {
+          id: 'email-verification',
+          type: 'success',
+          title: 'Email Verified',
+          message: `Your email (${verifiedEmail}) has been successfully verified.`,
+          time: verificationTime,
+          read: false
+        };
+        
+        // Only add if not already in the list
+        if (!transformedNotifications.find(n => n.id === 'email-verification')) {
+          transformedNotifications.unshift(emailNotification);
         }
-        return prev;
-      });
-    }
-  }, []);
+      }
 
-  const handleNotificationClick = () => {
-    setShowNotifications(!showNotifications);
+      setNotifications(transformedNotifications);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
   };
 
-  const clearNotification = (id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+  // Get notification type class for styling
+  const getNotificationType = (type) => {
+    switch (type) {
+      case 'appointment_confirmed':
+        return 'success';
+      case 'appointment_declined':
+        return 'error';
+      case 'appointment_completed':
+        return 'info';
+      case 'appointment_rescheduled':
+        return 'warning';
+      case 'clinic_message':
+        return 'message';
+      case 'email_verification':
+        return 'success';
+      default:
+        return 'info';
+    }
+  };
+
+  // Get icon for notification type
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case 'success':
+        return <FaCheckCircle />;
+      case 'error':
+        return <FaTimesCircle />;
+      case 'info':
+        return <FaCalendarCheck />;
+      case 'warning':
+        return <FaCalendarCheck />;
+      case 'message':
+        return <FaEnvelope />;
+      default:
+        return <FaBell />;
+    }
+  };
+
+  // Format notification time
+  const formatNotificationTime = (timestamp) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  // Poll for new notifications every 30 seconds
+  useEffect(() => {
+    fetchNotifications();
+    
+    const interval = setInterval(() => {
+      fetchNotifications();
+    }, 30000); // Poll every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleNavClick = () => {
+    setMenuOpen(false);
+  };
+
+  const clearNotification = async (id) => {
+    // Handle email verification notification separately
     if (id === 'email-verification') {
+      setNotifications(prev => prev.filter(n => n.id !== id));
       localStorage.removeItem('verifiedEmail');
       localStorage.removeItem('verificationTime');
+      return;
+    }
+
+    try {
+      await NotificationsAPI.deleteNotification(id);
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+    }
+  };
+
+  const clearAllNotifications = async () => {
+    try {
+      await NotificationsAPI.deleteAllNotifications();
+      localStorage.removeItem('verifiedEmail');
+      localStorage.removeItem('verificationTime');
+      setNotifications([]);
+    } catch (error) {
+      console.error('Error clearing all notifications:', error);
+    }
+  };
+
+  const markAsRead = async (id) => {
+    if (id === 'email-verification') return; // Skip localStorage notifications
+    
+    try {
+      await NotificationsAPI.markAsRead(id);
+      setNotifications(prev => 
+        prev.map(n => n.id === id ? { ...n, read: true } : n)
+      );
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
     }
   };
 
   return (
-    <nav className="portal-navbar">
-      <div className="nav-left">
-        <div className="nav-brand">UA Clinic System</div>
-      </div>
+    <nav className="user-navbar">
+      <div className="user-brand">UA Clinic System</div>
+      
+      <button 
+        className="user-hamburger"
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Toggle menu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
 
-      <div className="nav-center">
-        <div className="nav-links">
-          <Link to="/dashboard" className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}>Dashboard</Link>
-          <Link to="/appointments" className={`nav-link ${location.pathname === '/appointments' ? 'active' : ''}`}>Appointments</Link>
-          <Link to="/records" className={`nav-link ${location.pathname === '/records' ? 'active' : ''}`}>Health Records</Link>
-          <Link to="/feedback" className={`nav-link ${location.pathname === '/feedback' ? 'active' : ''}`}>Feedback</Link>
-        </div>
+      <div className={`user-nav-links ${menuOpen ? 'open' : ''}`}>
+        <Link 
+          to="/dashboard" 
+          className={`user-nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
+          onClick={handleNavClick}
+        >
+          Dashboard
+        </Link>
+        <Link 
+          to="/appointments" 
+          className={`user-nav-link ${location.pathname === '/appointments' ? 'active' : ''}`}
+          onClick={handleNavClick}
+        >
+          Appointments
+        </Link>
+        <Link 
+          to="/records" 
+          className={`user-nav-link ${location.pathname === '/records' ? 'active' : ''}`}
+          onClick={handleNavClick}
+        >
+          Health Records
+        </Link>
+        <Link 
+          to="/feedback" 
+          className={`user-nav-link ${location.pathname === '/feedback' ? 'active' : ''}`}
+          onClick={handleNavClick}
+        >
+          Feedback
+        </Link>
+        <Link 
+          to="/settings" 
+          className={`user-nav-link ${location.pathname === '/settings' ? 'active' : ''}`}
+          onClick={handleNavClick}
+        >
+          Settings
+        </Link>
+        <button className="user-logout-btn mobile-logout" onClick={onLogout}>
+          Logout
+        </button>
       </div>
-
-      <div className="nav-right">
-        <div className="notification-wrapper" ref={notificationRef}>
-          <button className="nav-notification" onClick={handleNotificationClick}>
+      
+      <div className="user-nav-right">
+        <div className="user-notification-wrapper" ref={notificationRef}>
+          <button 
+            className="user-notification-btn"
+            onClick={() => setShowNotifications(!showNotifications)}
+            aria-label="Notifications"
+          >
             <FaBell />
             {notifications.length > 0 && (
-              <span className="notification-badge">{notifications.length}</span>
+              <span className="user-notification-badge">{notifications.length}</span>
             )}
           </button>
-          
-          {showNotifications && notifications.length > 0 && (
-            <div className="notifications-dropdown">
-              {notifications.map(notification => (
-                <div key={notification.id} className="notification-item">
-                  {notification.icon}
-                  <div className="notification-content">
-                    <div className="notification-title">{notification.title}</div>
-                    <div className="notification-message">{notification.message}</div>
-                    <div className="notification-time">{notification.time}</div>
-                  </div>
+
+          {showNotifications && (
+            <div className="user-notification-dropdown">
+              <div className="user-notification-header">
+                <h3>Notifications</h3>
+                {notifications.length > 0 && (
                   <button 
-                    className="notification-close"
-                    onClick={() => clearNotification(notification.id)}
+                    className="clear-all-btn"
+                    onClick={clearAllNotifications}
                   >
-                    ×
+                    Clear All
                   </button>
-                </div>
-              ))}
+                )}
+              </div>
+              <div className="user-notification-list">
+                {notifications.length === 0 ? (
+                  <div className="no-notifications">
+                    <FaBell />
+                    <p>No new notifications</p>
+                  </div>
+                ) : (
+                  notifications.map(notification => (
+                    <div 
+                      key={notification.id} 
+                      className={`notification-item ${notification.type} ${notification.read ? 'read' : ''}`}
+                      onClick={() => !notification.read && markAsRead(notification.id)}
+                      style={{ cursor: notification.read ? 'default' : 'pointer' }}
+                    >
+                      <div className="notification-icon">
+                        {getNotificationIcon(notification.type)}
+                      </div>
+                      <div className="notification-content">
+                        <h4>{notification.title}</h4>
+                        <p>{notification.message}</p>
+                        <span className="notification-time">{notification.time}</span>
+                      </div>
+                      <button 
+                        className="notification-close"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          clearNotification(notification.id);
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           )}
         </div>
         
-        <div className="nav-user">
-          <div className="user-icon">
-            <FaUser />
-          </div>
-          <div className="user-info">
-            <span className="user-name">{name}</span>
-            <span className="user-role">{userRole}</span>
-          </div>
-          <button className="nav-logout" onClick={onLogout}>
-            <FaSignOutAlt />
-          </button>
-        </div>
+        <button className="user-logout-btn desktop-logout" onClick={onLogout}>
+          Logout
+        </button>
       </div>
     </nav>
   );

@@ -1,8 +1,10 @@
 import React, { useMemo } from "react";
 import ClinicNavbar from "./ClinicNavbar";
 import "./ClinicDashboard.css";
-import { FaUsers, FaClipboardList, FaClock, FaBoxes, FaExclamationTriangle, FaChartLine, FaPlus, FaFileAlt, FaBox } from "react-icons/fa";
+import { FaUsers, FaClipboardList, FaClock, FaBoxes, FaExclamationTriangle, FaChartLine, FaPlus, FaFileAlt, FaBox, FaFileExcel } from "react-icons/fa";
 import { getRelativeTime, formatDate } from "../utils/timeUtils";
+import * as XLSX from 'xlsx';
+import Swal from 'sweetalert2';
 
 const ClinicDashboard = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, patients = [], inventory = [], appointments = [], onLogout }) => {
   // Real data from patients and inventory state with default values
@@ -53,6 +55,111 @@ const ClinicDashboard = ({ setActivePage, activePage, sidebarOpen, setSidebarOpe
     return mapped[0] || null;
   }, [inventory]);
 
+  // Download report function
+  const handleDownloadReport = () => {
+    try {
+      // Create workbook
+      const wb = XLSX.utils.book_new();
+
+      // Summary Sheet
+      const summaryData = [
+        ['UACS Clinic Dashboard Report'],
+        ['Generated on:', new Date().toLocaleString()],
+        [''],
+        ['OVERVIEW STATISTICS'],
+        ['Total Patients', totalPatients],
+        ['Total Appointments', totalAppointments],
+        ['Pending Appointments', pendingAppointments],
+        ['Confirmed Appointments', confirmedAppointments],
+        ['Completed Appointments', completedAppointments],
+        [''],
+        ['INVENTORY SUMMARY'],
+        ['Total Inventory Items', totalInventoryItems],
+        ['Available Medicines (>10 qty)', availableMedicines],
+        ['Low Stock Medicines (≤10 qty)', shortageMedicines],
+        [''],
+        ['TODAY\'S ACTIVITY'],
+        ['New Patients Today', todayPatients],
+      ];
+      const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
+      XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary');
+
+      // Patients Sheet
+      if (patients && patients.length > 0) {
+        const patientsData = patients.map(p => ({
+          'Name': p.fullName || p.name || 'N/A',
+          'School ID': p.schoolId || 'N/A',
+          'Gender': p.gender || 'N/A',
+          'Role': p.role || 'N/A',
+          'Course/Year': p.courseYear || 'N/A',
+          'Contact': p.contact || 'N/A',
+          'Email': p.email || 'N/A',
+          'Address': p.address || 'N/A',
+          'Emergency Contact': p.emergencyContact?.name || 'N/A',
+          'Emergency Phone': p.emergencyContact?.phone || 'N/A',
+          'Created': p.createdAt ? new Date(p.createdAt).toLocaleString() : 'N/A'
+        }));
+        const patientsWs = XLSX.utils.json_to_sheet(patientsData);
+        XLSX.utils.book_append_sheet(wb, patientsWs, 'Patients');
+      }
+
+      // Appointments Sheet
+      if (appointments && appointments.length > 0) {
+        const appointmentsData = appointments.map(apt => ({
+          'Date': apt.date || 'N/A',
+          'Time': apt.time || 'N/A',
+          'Type': apt.type || 'N/A',
+          'Status': apt.status || 'N/A',
+          'Reason': apt.reason || 'N/A',
+          'Notes': apt.notes || 'N/A',
+          'Online': apt.isOnline ? 'Yes' : 'No',
+          'Queue #': apt.queueNumber || 'N/A',
+          'Created': apt.createdAt ? new Date(apt.createdAt).toLocaleString() : 'N/A'
+        }));
+        const appointmentsWs = XLSX.utils.json_to_sheet(appointmentsData);
+        XLSX.utils.book_append_sheet(wb, appointmentsWs, 'Appointments');
+      }
+
+      // Inventory Sheet
+      if (inventory && inventory.length > 0) {
+        const inventoryData = inventory.map(item => ({
+          'Name': item.name || 'N/A',
+          'Category': item.category || 'N/A',
+          'Quantity': item.quantity || 0,
+          'Unit': item.unit || 'N/A',
+          'Expiry Date': item.expiryDate || 'N/A',
+          'Supplier': item.supplier || 'N/A',
+          'Notes': item.notes || 'N/A',
+          'Status': item.quantity <= 10 ? 'Low Stock' : 'Available'
+        }));
+        const inventoryWs = XLSX.utils.json_to_sheet(inventoryData);
+        XLSX.utils.book_append_sheet(wb, inventoryWs, 'Inventory');
+      }
+
+      // Generate filename with timestamp
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `UACS_Clinic_Report_${timestamp}.xlsx`;
+
+      // Write file
+      XLSX.writeFile(wb, filename);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Report Downloaded!',
+        text: `Report saved as ${filename}`,
+        timer: 3000,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      console.error('Error generating report:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Download Failed',
+        text: 'Failed to generate report. Please try again.',
+      });
+    }
+  };
+
   return (
     <div>
       <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
@@ -64,8 +171,8 @@ const ClinicDashboard = ({ setActivePage, activePage, sidebarOpen, setSidebarOpe
               Welcome, <span className="dashboard-staff-name">{name}</span>
             </div>
           </div>
-          <button className="dashboard-download-btn">
-            Download Report <span className="arrow">↓</span>
+          <button className="dashboard-download-btn" onClick={handleDownloadReport}>
+            <FaFileExcel /> Download Report <span className="arrow">↓</span>
           </button>
         </div>
 

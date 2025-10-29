@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaUserAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
-import { setAuthToken } from "../api";
+import { setAuthToken, AuthAPI } from "../api";
+import uacsLogo from "../assets/uacs logo.png";
 
 const Login = ({ onLogin }) => {
   const navigate = useNavigate();
@@ -33,20 +34,12 @@ const Login = ({ onLogin }) => {
     setResendStatus("");
     
     try {
-      const response = await fetch("https://uacs-be.vercel.app/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          email: form.email,
-          password: form.password
-        })
+      const data = await AuthAPI.login({
+        email: form.email,
+        password: form.password
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
+      if (!data.token) {
         throw new Error(data.message || "Login failed");
       }
 
@@ -86,17 +79,22 @@ const Login = ({ onLogin }) => {
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-header">
             <div style={{
-              width: "80px",
-              height: "80px",
+              width: "140px",
+              height: "140px",
               margin: "0 auto 1.5rem",
-              background: "#f8fafc",
-              borderRadius: "12px",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              border: "2px dashed #e2e8f0"
+              justifyContent: "center"
             }}>
-              Logo
+              <img 
+                src={uacsLogo} 
+                alt="UACS Logo" 
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain"
+                }}
+              />
             </div>
           </div>
           

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './SignupSuccess.css';
 import { FaCheckCircle, FaEnvelope, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
+import { publicApiFetch } from '../api';
 
 const SignupSuccess = () => {
   const [verificationStatus, setVerificationStatus] = useState('pending');
@@ -28,31 +29,19 @@ const SignupSuccess = () => {
       setVerificationStatus('verifying');
       setErrorMessage('');
 
-      const response = await fetch('https://uacs-be.vercel.app/api/auth/verify-email', {
+      const data = await publicApiFetch('/api/auth/verify-email', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token }),
-        credentials: 'include'
+        body: JSON.stringify({ token })
       });
-
-      const data = await response.json();
       
-      if (response.ok) {
-        setVerificationStatus('verified');
-        if (data.email) {
-          localStorage.setItem('verifiedEmail', data.email);
-        }
-      } else {
-        console.error('Verification failed:', data.message);
-        setVerificationStatus('error');
-        setErrorMessage(data.message || 'Verification failed. Please try again.');
+      setVerificationStatus('verified');
+      if (data.email) {
+        localStorage.setItem('verifiedEmail', data.email);
       }
     } catch (error) {
       console.error('Verification error:', error);
       setVerificationStatus('error');
-      setErrorMessage('Connection error. Please try again later.');
+      setErrorMessage(error.message || 'Connection error. Please try again later.');
     }
   };
 
@@ -113,8 +102,8 @@ const SignupSuccess = () => {
                   )}
                 </div>
                 <div className="step-label">{step.label}</div>
+                {index < steps.length - 1 && <div className={`step-connector ${getStepStatus(step.id) ? 'completed' : ''}`} />}
               </div>
-              {index < steps.length - 1 && <div className={`step-connector ${getStepStatus(step.id) ? 'completed' : ''}`} />}
             </React.Fragment>
           ))}
         </div>

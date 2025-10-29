@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import ClinicNavbar from "./ClinicNavbar";
 import "./EHR.css";
-
-// Helper to get JWT token
-const getToken = () => localStorage.getItem("token") || "";
+import { PatientsAPI } from "../api";
+import { FaUser, FaCalendar, FaStethoscope, FaPills, FaNotesMedical, FaHeartbeat, FaPhone, FaFileMedical, FaTimes, FaPlus, FaFileExport } from "react-icons/fa";
+import jsPDF from "jspdf";
 
 function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout }) {
   const [search, setSearch] = useState("");
@@ -14,18 +14,18 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout 
   // EHR record form state
   const [newRecord, setNewRecord] = useState({
     date: "",
-    complaint: "",
-    vitals: {
-      bp: "",
-      temp: "",
-      pulse: "",
-    },
+    age: "",
+    physician: "",
+    nurse: "",
+    courseYearSection: "",
+    // PE Findings
+    height: "",
+    weight: "",
+    bloodPressure: "",
+    lmp: "",
+    // Diagnosis & Treatment
     diagnosis: "",
     treatment: "",
-    prescriptions: "",
-    tests: [],
-    followUp: "",
-    staff: "",
     notes: "",
   });
 
@@ -33,27 +33,9 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout 
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        console.log('Fetching patients...');
-        const token = getToken();
-        if (!token) {
-          console.error('No auth token found');
-          return;
-        }
-
-        const response = await fetch("https://uacs-be.vercel.app/api/patients", {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log(`Successfully fetched ${data.length} patients`);
+        console.log('Fetching patients for EHR...');
+        const data = await PatientsAPI.list();
+        console.log(`Successfully fetched ${data.length} patients for EHR`);
         setPatients(data || []);
       } catch (err) {
         console.error("Failed to fetch patients:", err);
@@ -65,26 +47,17 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout 
   }, []);
 
   // --- Fetch health record for selected patient ---
-  function fetchPatientRecord(patientId) {
-    fetch(`/api/records/${patientId}`, {
-      headers: {
-        "Authorization": `Bearer ${getToken()}`
-      }
-    })
-      .then(res => {
-        if (!res.ok) throw new Error("No record found for patient");
-        return res.json();
-      })
-      .then(record => {
-        setSelectedPatient(prev => ({
-          ...prev,
-          history: record.visits || []
-        }));
-      })
-      .catch(err => {
-        setSelectedPatient(prev => ({ ...prev, history: [] }));
-        // Optionally display message if not found
-      });
+  async function fetchPatientRecord(patientId) {
+    try {
+      const record = await PatientsAPI.get(patientId);
+      setSelectedPatient(prev => ({
+        ...prev,
+        visits: record.visits || []
+      }));
+    } catch (err) {
+      setSelectedPatient(prev => ({ ...prev, visits: [] }));
+      // Optionally display message if not found
+    }
   }
 
   // --- Handle patient selection ---
@@ -105,76 +78,290 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout 
   // --- Handle record field update ---
   function handleRecordChange(e) {
     const { name, value } = e.target;
-    if (["bp", "temp", "pulse"].includes(name)) {
-      setNewRecord({
-        ...newRecord,
-        vitals: { ...newRecord.vitals, [name]: value },
-      });
-    } else {
-      setNewRecord({ ...newRecord, [name]: value });
-    }
+    setNewRecord({ ...newRecord, [name]: value });
   }
 
   // --- Add a new medical record via backend ---
-  function handleAddRecord() {
+  async function handleAddRecord() {
     if (!selectedPatient) return;
 
     if (
       !newRecord.date ||
-      !newRecord.complaint ||
       !newRecord.diagnosis ||
       !newRecord.treatment
     ) {
-      alert("Please fill in all required fields for the medical record.");
+      alert("Please fill in Date, Diagnosis, and Treatment fields.");
       return;
     }
 
-    fetch(`/api/records/${selectedPatient._id || selectedPatient.id}/visits`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${getToken()}`
-      },
-      body: JSON.stringify(newRecord)
-    })
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to add record");
-        return res.json();
-      })
-      .then(record => {
-        // Update history from backend response
-        setSelectedPatient({
-          ...selectedPatient,
-          history: record.visits || []
-        });
+    try {
+      const data = await PatientsAPI.addVisit(selectedPatient._id || selectedPatient.id, newRecord);
+      
+      // Update visits from backend response
+      setSelectedPatient({
+        ...selectedPatient,
+        visits: data.patient.visits || []
+      });
 
-        // Optionally update patients array
-        setPatients(patients.map(p =>
-          (p._id || p.id) === (selectedPatient._id || selectedPatient.id) ?
-            { ...p, history: record.visits || [] } :
-            p
-        ));
+      // Optionally update patients array
+      setPatients(patients.map(p =>
+        (p._id || p.id) === (selectedPatient._id || selectedPatient.id) ?
+          { ...p, visits: data.patient.visits || [] } :
+          p
+      ));
 
-        // Reset form
-        setNewRecord({
-          date: "",
-          complaint: "",
-          vitals: { bp: "", temp: "", pulse: "" },
-          diagnosis: "",
-          treatment: "",
-          prescriptions: "",
-          tests: [],
-          followUp: "",
-          staff: "",
-          notes: "",
-        });
-        setShowForm(false);
-      })
-      .catch(err => alert(err.message));
+      // Reset form
+      setNewRecord({
+        date: "",
+        age: "",
+        physician: "",
+        nurse: "",
+        courseYearSection: "",
+        height: "",
+        weight: "",
+        bloodPressure: "",
+        lmp: "",
+        diagnosis: "",
+        treatment: "",
+        notes: "",
+      });
+      setShowForm(false);
+    } catch (err) {
+      alert(err.message || 'Failed to add record');
+    }
   }
 
   function handleExportPDF() {
-    alert("Export to PDF functionality will go here.");
+    if (!selectedPatient) {
+      alert("Please select a patient first.");
+      return;
+    }
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPos = 20;
+
+    // Header
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("UNIVERSITY OF THE ASSUMPTION", pageWidth / 2, yPos, { align: "center" });
+    yPos += 8;
+    doc.setFontSize(12);
+    doc.text("CLINIC ELECTRONIC HEALTH RECORD", pageWidth / 2, yPos, { align: "center" });
+    yPos += 15;
+
+    // Patient Information
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("PATIENT INFORMATION", 20, yPos);
+    yPos += 8;
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Name: ${selectedPatient.fullName || selectedPatient.name || 'N/A'}`, 20, yPos);
+    yPos += 6;
+    
+    if (selectedPatient.studentId) {
+      doc.text(`Student ID: ${selectedPatient.studentId}`, 20, yPos);
+      yPos += 6;
+    }
+    
+    if (selectedPatient.email) {
+      doc.text(`Email: ${selectedPatient.email}`, 20, yPos);
+      yPos += 6;
+    }
+    
+    if (selectedPatient.courseYear) {
+      doc.text(`Course/Year: ${selectedPatient.courseYear}`, 20, yPos);
+      yPos += 6;
+    }
+    
+    if (selectedPatient.contactNumber) {
+      doc.text(`Contact: ${selectedPatient.contactNumber}`, 20, yPos);
+      yPos += 6;
+    }
+    
+    if (selectedPatient.dateOfBirth) {
+      const dob = new Date(selectedPatient.dateOfBirth);
+      doc.text(`Date of Birth: ${dob.toLocaleDateString()}`, 20, yPos);
+      yPos += 6;
+    }
+    
+    if (selectedPatient.gender) {
+      doc.text(`Gender: ${selectedPatient.gender}`, 20, yPos);
+      yPos += 6;
+    }
+
+    yPos += 5;
+    doc.setDrawColor(229, 29, 94);
+    doc.line(20, yPos, pageWidth - 20, yPos);
+    yPos += 10;
+
+    // Medical Records
+    const visits = selectedPatient.visits || [];
+    
+    if (visits.length === 0) {
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "italic");
+      doc.text("No medical records available.", 20, yPos);
+    } else {
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text(`MEDICAL HISTORY (${visits.length} Records)`, 20, yPos);
+      yPos += 10;
+
+      visits.forEach((visit, index) => {
+        // Check if we need a new page
+        if (yPos > pageHeight - 40) {
+          doc.addPage();
+          yPos = 20;
+        }
+
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text(`Visit #${index + 1}`, 20, yPos);
+        yPos += 7;
+
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+
+        // Date
+        if (visit.date) {
+          const visitDate = new Date(visit.date);
+          doc.text(`Date: ${visitDate.toLocaleDateString()}`, 25, yPos);
+          yPos += 5;
+        }
+
+        // Age & Course
+        if (visit.age) {
+          doc.text(`Age: ${visit.age}`, 25, yPos);
+          yPos += 5;
+        }
+
+        if (visit.courseYearSection) {
+          doc.text(`Course/Year/Section: ${visit.courseYearSection}`, 25, yPos);
+          yPos += 5;
+        }
+
+        // Healthcare providers
+        if (visit.physician) {
+          doc.text(`Physician: ${visit.physician}`, 25, yPos);
+          yPos += 5;
+        }
+
+        if (visit.nurse) {
+          doc.text(`Nurse: ${visit.nurse}`, 25, yPos);
+          yPos += 5;
+        }
+
+        yPos += 2;
+
+        // PE Findings
+        doc.setFont("helvetica", "bold");
+        doc.text("P.E. FINDINGS:", 25, yPos);
+        yPos += 5;
+        doc.setFont("helvetica", "normal");
+
+        const findings = [];
+        if (visit.height) findings.push(`Height: ${visit.height}`);
+        if (visit.weight) findings.push(`Weight: ${visit.weight}`);
+        if (visit.bloodPressure) findings.push(`BP: ${visit.bloodPressure}`);
+        if (visit.lmp) findings.push(`LMP: ${visit.lmp}`);
+
+        if (findings.length > 0) {
+          doc.text(findings.join(' | '), 30, yPos);
+          yPos += 5;
+        } else {
+          doc.text("No physical exam findings recorded", 30, yPos);
+          yPos += 5;
+        }
+
+        yPos += 2;
+
+        // Diagnosis
+        doc.setFont("helvetica", "bold");
+        doc.text("DIAGNOSIS:", 25, yPos);
+        yPos += 5;
+        doc.setFont("helvetica", "normal");
+        
+        if (visit.diagnosis) {
+          const diagnosisLines = doc.splitTextToSize(visit.diagnosis, pageWidth - 60);
+          doc.text(diagnosisLines, 30, yPos);
+          yPos += diagnosisLines.length * 5 + 2;
+        } else {
+          doc.text("Not specified", 30, yPos);
+          yPos += 7;
+        }
+
+        // Treatment
+        doc.setFont("helvetica", "bold");
+        doc.text("TREATMENT:", 25, yPos);
+        yPos += 5;
+        doc.setFont("helvetica", "normal");
+        
+        if (visit.treatment) {
+          const treatmentLines = doc.splitTextToSize(visit.treatment, pageWidth - 60);
+          doc.text(treatmentLines, 30, yPos);
+          yPos += treatmentLines.length * 5 + 2;
+        } else {
+          doc.text("Not specified", 30, yPos);
+          yPos += 7;
+        }
+
+        // Prescriptions
+        if (visit.prescriptions && visit.prescriptions.length > 0) {
+          doc.setFont("helvetica", "bold");
+          doc.text("PRESCRIPTIONS:", 25, yPos);
+          yPos += 5;
+          doc.setFont("helvetica", "normal");
+          
+          visit.prescriptions.forEach((rx) => {
+            const rxText = `- ${rx.medication || 'N/A'} (${rx.dosage || 'N/A'}) - ${rx.frequency || rx.instructions || 'As directed'}`;
+            doc.text(rxText, 30, yPos);
+            yPos += 5;
+          });
+          yPos += 2;
+        }
+
+        // Notes
+        if (visit.notes) {
+          doc.setFont("helvetica", "bold");
+          doc.text("NOTES:", 25, yPos);
+          yPos += 5;
+          doc.setFont("helvetica", "normal");
+          
+          const notesLines = doc.splitTextToSize(visit.notes, pageWidth - 60);
+          doc.text(notesLines, 30, yPos);
+          yPos += notesLines.length * 5 + 2;
+        }
+
+        // Separator line
+        yPos += 3;
+        doc.setDrawColor(200, 200, 200);
+        doc.line(20, yPos, pageWidth - 20, yPos);
+        yPos += 8;
+      });
+    }
+
+    // Footer
+    const totalPages = doc.internal.pages.length - 1;
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "italic");
+      doc.setTextColor(128, 128, 128);
+      doc.text(
+        `Generated on ${new Date().toLocaleString()} | Page ${i} of ${totalPages}`,
+        pageWidth / 2,
+        pageHeight - 10,
+        { align: "center" }
+      );
+    }
+
+    // Save PDF
+    const fileName = `EHR_${selectedPatient.fullName || selectedPatient.name || 'Patient'}_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(fileName);
   }
 
   // --- Filter patients by search ---
@@ -199,7 +386,11 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout 
 
         <div className="ehr-layout">
           <div className="ehr-patient-list">
-            <h2>Patients</h2>
+            <div className="patient-list-header">
+              <FaUser />
+              <h2>Patients</h2>
+              <span className="patient-count">{filteredPatients.length}</span>
+            </div>
             {filteredPatients.length === 0 ? (
               <p className="ehr-empty">No patients found</p>
             ) : (
@@ -211,57 +402,164 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout 
                   }`}
                   onClick={() => handleSelectPatient(p)}
                 >
-                  {p.fullName || p.name}
+                  <div className="patient-avatar">
+                    {(p.fullName || p.name || 'U').charAt(0).toUpperCase()}
+                  </div>
+                  <div className="patient-info">
+                    <p className="patient-name">{p.fullName || p.name}</p>
+                    <p className="patient-meta">
+                      {p.courseYear && <span>{p.courseYear}</span>}
+                      {p.visits && <span>• {p.visits.length} visits</span>}
+                    </p>
+                  </div>
                 </div>
               ))
             )}
           </div>
 
           <div className="ehr-records">
-            <div className="ehr-actions">
-              <button className="ehr-btn" onClick={() => setShowForm(true)}>
-                Add Record
-              </button>
-              <button className="ehr-btn" onClick={handleExportPDF}>
-                Export as PDF
-              </button>
-            </div>
             {selectedPatient ? (
               <>
-                <h2>{(selectedPatient.fullName || selectedPatient.name) + "'s"} Medical History</h2>
-                {(!selectedPatient.history || selectedPatient.history.length === 0) ? (
-                  <p className="ehr-empty">No medical history available.</p>
-                ) : (
-                  selectedPatient.history.map((rec, index) => (
-                    <div key={index} className="ehr-record">
-                      <h3>Visit on {rec.date}</h3>
-                      <p><strong>Complaint:</strong> {rec.complaint}</p>
-                      <p>
-                        <strong>Vitals:</strong>
-                        {` BP: ${rec.vitals?.bp || "-"}, Temp: ${rec.vitals?.temp || "-"}, Pulse: ${rec.vitals?.pulse || "-"}`}
-                      </p>
-                      <p><strong>Diagnosis:</strong> {rec.diagnosis}</p>
-                      <p><strong>Treatment:</strong> {rec.treatment}</p>
-                      <p><strong>Prescriptions:</strong> {rec.prescriptions}</p>
-                      {rec.tests.length > 0 && (
-                        <div>
-                          <strong>Test Results:</strong>
-                          <ul>
-                            {rec.tests.map((file, idx) => (
-                              <li key={idx}>{file}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      <p><strong>Follow-up:</strong> {rec.followUp}</p>
-                      <p><strong>Attending Nurse/Doctor:</strong> {rec.staff}</p>
-                      <p><strong>Notes:</strong> {rec.notes}</p>
+                {/* Patient Header */}
+                <div className="patient-header">
+                  <div className="patient-header-avatar">
+                    {(selectedPatient.fullName || selectedPatient.name || 'U').charAt(0).toUpperCase()}
+                  </div>
+                  <div className="patient-header-info">
+                    <h2>{selectedPatient.fullName || selectedPatient.name}</h2>
+                    <div className="patient-header-details">
+                      {selectedPatient.email && <span><FaUser /> {selectedPatient.email}</span>}
+                      {selectedPatient.courseYear && <span><FaFileMedical /> {selectedPatient.courseYear}</span>}
                     </div>
-                  ))
-                )}
+                  </div>
+                  <div className="ehr-actions">
+                    <button className="ehr-btn add-btn" onClick={() => setShowForm(true)}>
+                      <FaPlus /> Add Record
+                    </button>
+                    <button className="ehr-btn export-btn" onClick={handleExportPDF}>
+                      <FaFileExport /> Export PDF
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Medical History */}
+                <div className="medical-history-section">
+                  <div className="section-header">
+                    <FaNotesMedical />
+                    <h3>Medical History</h3>
+                    <span className="record-count">
+                      {selectedPatient.visits?.length || 0} {selectedPatient.visits?.length === 1 ? 'Record' : 'Records'}
+                    </span>
+                  </div>
+                  
+                  {(!selectedPatient.visits || selectedPatient.visits.length === 0) ? (
+                    <div className="empty-state">
+                      <FaFileMedical className="empty-icon" />
+                      <p>No medical history available</p>
+                      <button className="ehr-btn add-btn" onClick={() => setShowForm(true)}>
+                        <FaPlus /> Add First Record
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="records-timeline">
+                      {selectedPatient.visits.map((visit, index) => (
+                        <div key={index} className="record-card">
+                          <div className="record-header">
+                            <div className="record-date">
+                              <FaCalendar />
+                              <span>{new Date(visit.date).toLocaleDateString()}</span>
+                            </div>
+                            {visit.appointmentId && (
+                              <span className="appointment-badge">From Appointment</span>
+                            )}
+                          </div>
+                          
+                          <div className="record-body">
+                            {/* Vital Signs */}
+                            {visit.vitalSigns && (
+                              <div className="record-section vitals-section">
+                                <h4><FaHeartbeat /> Vital Signs</h4>
+                                <div className="vitals-grid">
+                                  {visit.vitalSigns.bloodPressure && (
+                                    <div className="vital-item">
+                                      <span className="vital-label">BP</span>
+                                      <span className="vital-value">{visit.vitalSigns.bloodPressure}</span>
+                                    </div>
+                                  )}
+                                  {visit.vitalSigns.temperature && (
+                                    <div className="vital-item">
+                                      <span className="vital-label">Temp</span>
+                                      <span className="vital-value">{visit.vitalSigns.temperature}</span>
+                                    </div>
+                                  )}
+                                  {visit.vitalSigns.heartRate && (
+                                    <div className="vital-item">
+                                      <span className="vital-label">Heart Rate</span>
+                                      <span className="vital-value">{visit.vitalSigns.heartRate}</span>
+                                    </div>
+                                  )}
+                                  {visit.vitalSigns.weight && (
+                                    <div className="vital-item">
+                                      <span className="vital-label">Weight</span>
+                                      <span className="vital-value">{visit.vitalSigns.weight}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Diagnosis */}
+                            {visit.diagnosis && (
+                              <div className="record-section">
+                                <h4><FaStethoscope /> Diagnosis</h4>
+                                <p>{visit.diagnosis}</p>
+                              </div>
+                            )}
+                            
+                            {/* Treatment */}
+                            {visit.treatment && (
+                              <div className="record-section">
+                                <h4><FaNotesMedical /> Treatment</h4>
+                                <p>{visit.treatment}</p>
+                              </div>
+                            )}
+                            
+                            {/* Prescriptions */}
+                            {visit.prescriptions && visit.prescriptions.length > 0 && (
+                              <div className="record-section">
+                                <h4><FaPills /> Prescriptions</h4>
+                                <div className="prescriptions-list">
+                                  {visit.prescriptions.map((rx, idx) => (
+                                    <div key={idx} className="prescription-item">
+                                      <span className="rx-name">{rx.medication}</span>
+                                      <span className="rx-dosage">{rx.dosage}</span>
+                                      <span className="rx-frequency">{rx.frequency}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Notes */}
+                            {visit.notes && (
+                              <div className="record-section">
+                                <h4>Additional Notes</h4>
+                                <p className="notes-text">{visit.notes}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
-              <p className="ehr-empty">Select a patient to view and add records.</p>
+              <div className="empty-state centered">
+                <FaUser className="empty-icon large" />
+                <h3>No Patient Selected</h3>
+                <p>Select a patient from the list to view their medical records</p>
+              </div>
             )}
           </div>
         </div>
@@ -270,102 +568,163 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout 
         {showForm && (
           <div className="ehr-modal">
             <div className="ehr-modal-content">
-              <h2>Add New Record</h2>
-              <input
-                type="date"
-                name="date"
-                placeholder="Visit Date"
-                value={newRecord.date}
-                onChange={handleRecordChange}
-                required
-              />
-              <input
-                type="text"
-                name="complaint"
-                placeholder="Complaint / Reason for Visit"
-                value={newRecord.complaint}
-                onChange={handleRecordChange}
-                required
-              />
-              <div className="ehr-vitals-row">
-                <input
-                  type="text"
-                  name="bp"
-                  placeholder="Blood Pressure"
-                  value={newRecord.vitals.bp}
-                  onChange={handleRecordChange}
-                />
-                <input
-                  type="text"
-                  name="temp"
-                  placeholder="Temperature"
-                  value={newRecord.vitals.temp}
-                  onChange={handleRecordChange}
-                />
-                <input
-                  type="text"
-                  name="pulse"
-                  placeholder="Pulse"
-                  value={newRecord.vitals.pulse}
-                  onChange={handleRecordChange}
-                />
-              </div>
-              <textarea
-                type="text"
-                name="diagnosis"
-                placeholder="Diagnosis"
-                value={newRecord.diagnosis}
-                onChange={handleRecordChange}
-                rows="2"
-                required
-              />
-              <textarea
-                type="text"
-                name="treatment"
-                placeholder="Treatment"
-                value={newRecord.treatment}
-                onChange={handleRecordChange}
-                rows="2"
-                required
-              />
-              <textarea
-                type="text"
-                name="prescriptions"
-                placeholder="Prescriptions"
-                value={newRecord.prescriptions}
-                onChange={handleRecordChange}
-                rows="2"
-              />
-              <textarea
-                type="text"
-                name="followUp"
-                placeholder="Follow-up / Next Steps"
-                value={newRecord.followUp}
-                onChange={handleRecordChange}
-                rows="2"
-              />
-              <input
-                type="text"
-                name="staff"
-                placeholder="Attending Nurse/Doctor"
-                value={newRecord.staff}
-                onChange={handleRecordChange}
-              />
-              <textarea
-                type="text"
-                name="notes"
-                placeholder="Additional Notes (optional)"
-                value={newRecord.notes}
-                onChange={handleRecordChange}
-                rows="3"
-              />
-              <input type="file" multiple onChange={handleFileUpload} />
-              <div className="ehr-modal-actions">
-                <button className="ehr-btn" onClick={handleAddRecord}>
-                  Save
+              <div className="modal-header">
+                <h2>Add New Medical Record</h2>
+                <button className="close-modal-btn" onClick={() => setShowForm(false)}>
+                  <FaTimes />
                 </button>
-                <button className="ehr-btn" onClick={() => setShowForm(false)}>
+              </div>
+
+              <div className="form-section">
+                <h3 className="form-section-title">Basic Information</h3>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Date <span className="required">*</span></label>
+                    <input
+                      type="date"
+                      name="date"
+                      value={newRecord.date}
+                      onChange={handleRecordChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Age</label>
+                    <input
+                      type="number"
+                      name="age"
+                      placeholder="Age"
+                      value={newRecord.age}
+                      onChange={handleRecordChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Course, Year & Section</label>
+                    <input
+                      type="text"
+                      name="courseYearSection"
+                      placeholder="e.g., BSCS 3A"
+                      value={newRecord.courseYearSection}
+                      onChange={handleRecordChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Physician</label>
+                    <input
+                      type="text"
+                      name="physician"
+                      placeholder="Physician Name"
+                      value={newRecord.physician}
+                      onChange={handleRecordChange}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Nurse</label>
+                    <input
+                      type="text"
+                      name="nurse"
+                      placeholder="Nurse Name"
+                      value={newRecord.nurse}
+                      onChange={handleRecordChange}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-section">
+                <h3 className="form-section-title">P.E. FINDINGS</h3>
+                <div className="form-row form-row-4">
+                  <div className="form-group">
+                    <label>HT (Height)</label>
+                    <input
+                      type="text"
+                      name="height"
+                      placeholder="e.g., 170 cm"
+                      value={newRecord.height}
+                      onChange={handleRecordChange}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>WT (Weight)</label>
+                    <input
+                      type="text"
+                      name="weight"
+                      placeholder="e.g., 65 kg"
+                      value={newRecord.weight}
+                      onChange={handleRecordChange}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>BP (Blood Pressure)</label>
+                    <input
+                      type="text"
+                      name="bloodPressure"
+                      placeholder="e.g., 120/80"
+                      value={newRecord.bloodPressure}
+                      onChange={handleRecordChange}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>LMP (for female)</label>
+                    <input
+                      type="text"
+                      name="lmp"
+                      placeholder="Last Menstrual Period"
+                      value={newRecord.lmp}
+                      onChange={handleRecordChange}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-section">
+                <h3 className="form-section-title">Clinical Assessment</h3>
+                <div className="form-group">
+                  <label>DIAGNOSIS <span className="required">*</span></label>
+                  <textarea
+                    name="diagnosis"
+                    placeholder="Enter diagnosis..."
+                    value={newRecord.diagnosis}
+                    onChange={handleRecordChange}
+                    rows="3"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>TREATMENT <span className="required">*</span></label>
+                  <textarea
+                    name="treatment"
+                    placeholder="Enter treatment plan..."
+                    value={newRecord.treatment}
+                    onChange={handleRecordChange}
+                    rows="3"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Additional Notes</label>
+                  <textarea
+                    name="notes"
+                    placeholder="Any additional notes..."
+                    value={newRecord.notes}
+                    onChange={handleRecordChange}
+                    rows="2"
+                  />
+                </div>
+              </div>
+
+              <div className="ehr-modal-actions">
+                <button className="ehr-btn cancel-btn" onClick={() => setShowForm(false)}>
                   Cancel
+                </button>
+                <button className="ehr-btn save-btn" onClick={handleAddRecord}>
+                  Save Record
                 </button>
               </div>
             </div>
