@@ -6,6 +6,10 @@
   align-items: flex-start;
   flex-wrap: wrap;
   gap: 1rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .header-content {
@@ -13,13 +17,26 @@
 }
 
 .inventory-title {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
-  color: #1f2937;
+  color: #e51d5e;
   margin: 0 0 0.5rem 0;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.75rem;
+  padding-bottom: 0.5rem;
+  position: relative;
+}
+
+.inventory-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60%;
+  height: 4px;
+  background: linear-gradient(90deg, #e51d5e 0%, rgba(229, 29, 94, 0.2) 100%);
+  border-radius: 2px;
 }
 
 .inventory-title svg {
@@ -28,8 +45,9 @@
 
 .inventory-subtitle {
   font-size: 1rem;
-  color: #6b7280;
+  color: #64748b;
   margin: 0;
+  font-weight: 500;
 }
 
 .add-medicine-btn {

@@ -193,11 +193,40 @@ const UserAppointment = ({ user, onLogout }) => {
         });
         return;
       }
+
+      // If time is already selected and date is today, revalidate the time
+      if (formData.preferredTime && value) {
+        const today = new Date();
+        selectedDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+        
+        if (selectedDate.getTime() === today.getTime()) {
+          const [hours, minutes] = formData.preferredTime.split(':').map(Number);
+          const currentTime = new Date();
+          const selectedTime = new Date();
+          selectedTime.setHours(hours, minutes, 0, 0);
+          
+          if (selectedTime <= currentTime) {
+            Swal.fire({
+              title: "Invalid Time",
+              text: "The selected time has already passed for today. Please choose a future time or a different date.",
+              icon: "warning"
+            });
+            // Clear the time field
+            setFormData(prev => ({
+              ...prev,
+              [name]: value,
+              preferredTime: ''
+            }));
+            return;
+          }
+        }
+      }
     }
 
     if (name === 'preferredTime') {
       const timeValue = value;
-      const [hours] = timeValue.split(':').map(Number);
+      const [hours, minutes] = timeValue.split(':').map(Number);
       
       // Check if time is within clinic hours (9 AM to 5 PM)
       if (hours < 9 || hours >= 17) {
@@ -207,6 +236,32 @@ const UserAppointment = ({ user, onLogout }) => {
           icon: "warning"
         });
         return;
+      }
+
+      // Check if selected date is today and time has already passed
+      if (formData.preferredDate) {
+        const selectedDate = new Date(formData.preferredDate);
+        const today = new Date();
+        
+        // Reset time to compare dates only
+        selectedDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+        
+        if (selectedDate.getTime() === today.getTime()) {
+          // Selected date is today, check if time has passed
+          const currentTime = new Date();
+          const selectedTime = new Date();
+          selectedTime.setHours(hours, minutes, 0, 0);
+          
+          if (selectedTime <= currentTime) {
+            Swal.fire({
+              title: "Invalid Time",
+              text: "The selected time has already passed. Please choose a future time.",
+              icon: "warning"
+            });
+            return;
+          }
+        }
       }
     }
 
