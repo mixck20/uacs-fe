@@ -683,3 +683,27 @@
   color: #374151;
   font-weight: 600;
 }
+
+/* Dispense Button */
+.dispense-btn {
+  background: #17a2b8 !important;
+  color: white !important;
+}
+
+.dispense-btn:hover:not(:disabled) {
+  background: #138496 !important;
+  transform: translateY(-2px);
+}
+
+.dispense-info {
+  background: #e7f3ff;
+  border-left: 4px solid #2196F3;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.dispense-info p {
+  margin: 5px 0;
+  color: #1565C0;
+}

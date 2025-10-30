@@ -26,6 +26,15 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
   const [editingItem, setEditingItem] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [showDispenseModal, setShowDispenseModal] = useState(false);
+  const [dispensingItem, setDispensingItem] = useState(null);
+  const [dispenseForm, setDispenseForm] = useState({
+    quantity: "",
+    patientName: "",
+    studentId: "",
+    reason: "",
+    notes: ""
+  });
   const [form, setForm] = useState({
     name: "",
     quantity: "",
@@ -248,6 +257,114 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
     });
   };
 
+  // Dispensing functions
+  const openDispenseModal = (item) => {
+    setDispensingItem(item);
+    setShowDispenseModal(true);
+    setDispenseForm({
+      quantity: "",
+      patientName: "",
+      studentId: "",
+      reason: "",
+      notes: ""
+    });
+  };
+
+  const closeDispenseModal = () => {
+    setShowDispenseModal(false);
+    setDispensingItem(null);
+    setDispenseForm({
+      quantity: "",
+      patientName: "",
+      studentId: "",
+      reason: "",
+      notes: ""
+    });
+  };
+
+  const handleDispenseSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!dispenseForm.quantity || parseInt(dispenseForm.quantity) <= 0) {
+      Swal.fire({
+        title: "Invalid Quantity",
+        text: "Please enter a valid quantity",
+        icon: "warning"
+      });
+      return;
+    }
+
+    if (parseInt(dispenseForm.quantity) > dispensingItem.quantity) {
+      Swal.fire({
+        title: "Insufficient Stock",
+        text: `Available: ${dispensingItem.quantity}. Requested: ${dispenseForm.quantity}`,
+        icon: "error"
+      });
+      return;
+    }
+
+    if (!dispenseForm.patientName.trim()) {
+      Swal.fire({
+        title: "Patient Name Required",
+        text: "Please enter the patient's name",
+        icon: "warning"
+      });
+      return;
+    }
+
+    try {
+      const result = await Swal.fire({
+        title: "Confirm Dispensing",
+        html: `
+          <div style="text-align: left;">
+            <p><strong>Item:</strong> ${dispensingItem.name}</p>
+            <p><strong>Quantity:</strong> ${dispenseForm.quantity}</p>
+            <p><strong>Patient:</strong> ${dispenseForm.patientName}</p>
+            ${dispenseForm.studentId ? `<p><strong>Student ID:</strong> ${dispenseForm.studentId}</p>` : ''}
+            <p style="color: #666; margin-top: 10px;">Remaining stock: ${dispensingItem.quantity - parseInt(dispenseForm.quantity)}</p>
+          </div>
+        `,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#e51d5e",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Yes, dispense it!"
+      });
+
+      if (!result.isConfirmed) return;
+
+      const response = await InventoryAPI.dispense({
+        itemId: dispensingItem._id || dispensingItem.id,
+        quantity: parseInt(dispenseForm.quantity),
+        patientName: dispenseForm.patientName,
+        studentId: dispenseForm.studentId,
+        reason: dispenseForm.reason,
+        notes: dispenseForm.notes
+      });
+
+      await loadInventory();
+      closeDispenseModal();
+
+      const message = response.lowStockAlert 
+        ? `Item dispensed successfully! ⚠️ Low stock alert sent - only ${response.item.quantity} remaining.`
+        : "Item dispensed successfully!";
+
+      Swal.fire({
+        title: "Dispensed!",
+        text: message,
+        icon: "success",
+        confirmButtonColor: "#e51d5e"
+      });
+
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: error.message || "Failed to dispense item",
+        icon: "error"
+      });
+    }
+  };
+
   // Filter and calculations
   const filteredItems = items.filter(item =>
     item.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -446,10 +563,10 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
                       <FaPlus /> Add
                     </button>
                     <button
-                      className="action-btn remove-btn"
-                      onClick={() => handleAdjustStock(item, 'remove')}
+                      className="action-btn dispense-btn"
+                      onClick={() => openDispenseModal(item)}
                       disabled={item.quantity === 0}
-                      title="Dispense"
+                      title="Quick Dispense"
                     >
                       <FaChartLine /> Dispense
                     </button>
@@ -586,6 +703,99 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
                     {editingItem ? 'Update Medicine' : 'Add Medicine'}
                   </button>
                   <button type="button" className="cancel-btn" onClick={closeForm}>
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Quick Dispense Modal */}
+        {showDispenseModal && dispensingItem && (
+          <div className="inventory-modal">
+            <div className="inventory-modal-content">
+              <div className="modal-header">
+                <h2>
+                  <FaChartLine /> Quick Dispense: {dispensingItem.name}
+                </h2>
+                <button className="close-btn" onClick={closeDispenseModal}>
+                  <FaTimes />
+                </button>
+              </div>
+
+              <div className="dispense-info">
+                <p><strong>Available Stock:</strong> {dispensingItem.quantity}</p>
+                <p><strong>Category:</strong> {dispensingItem.category}</p>
+              </div>
+
+              <form onSubmit={handleDispenseSubmit}>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Quantity to Dispense *</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max={dispensingItem.quantity}
+                      value={dispenseForm.quantity}
+                      onChange={(e) => setDispenseForm({...dispenseForm, quantity: e.target.value})}
+                      placeholder="Enter quantity"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Patient Name *</label>
+                    <input
+                      type="text"
+                      value={dispenseForm.patientName}
+                      onChange={(e) => setDispenseForm({...dispenseForm, patientName: e.target.value})}
+                      placeholder="Enter patient name"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Student ID (Optional)</label>
+                    <input
+                      type="text"
+                      value={dispenseForm.studentId}
+                      onChange={(e) => setDispenseForm({...dispenseForm, studentId: e.target.value})}
+                      placeholder="Enter student ID"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Reason</label>
+                    <input
+                      type="text"
+                      value={dispenseForm.reason}
+                      onChange={(e) => setDispenseForm({...dispenseForm, reason: e.target.value})}
+                      placeholder="e.g., Headache, Fever, etc."
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Additional Notes</label>
+                    <textarea
+                      value={dispenseForm.notes}
+                      onChange={(e) => setDispenseForm({...dispenseForm, notes: e.target.value})}
+                      placeholder="Any additional notes..."
+                      rows="3"
+                    />
+                  </div>
+                </div>
+
+                <div className="modal-actions">
+                  <button type="submit" className="submit-btn">
+                    <FaChartLine /> Dispense Medicine
+                  </button>
+                  <button type="button" className="cancel-btn" onClick={closeDispenseModal}>
                     Cancel
                   </button>
                 </div>

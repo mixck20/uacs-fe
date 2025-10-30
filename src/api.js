@@ -262,6 +262,28 @@ export const InventoryAPI = {
     return await apiFetch(`/api/inventory/${id}`, {
       method: 'DELETE'
     });
+  },
+
+  // Dispensing methods
+  dispense: async (dispenseData) => {
+    return await apiFetch('/api/inventory/dispense', {
+      method: 'POST',
+      body: JSON.stringify(dispenseData)
+    });
+  },
+
+  getDispensingHistory: async (itemId, params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return await apiFetch(`/api/inventory/dispensing/history/${itemId}?${queryString}`);
+  },
+
+  getAllDispensingRecords: async (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return await apiFetch(`/api/inventory/dispensing/records?${queryString}`);
+  },
+
+  getDispensingStats: async (period = 30) => {
+    return await apiFetch(`/api/inventory/dispensing/stats?period=${period}`);
   }
 };
 
