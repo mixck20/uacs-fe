@@ -5,7 +5,7 @@ import { FaEnvelope, FaPaperPlane, FaFileAlt, FaTimes, FaExclamationTriangle, Fa
 import { EmailAPI } from "../api";
 import Swal from "sweetalert2";
 
-function Email({ patients, setActivePage, onLogout }) {
+function Email({ patients, setActivePage, onLogout, user }) {
   const [showComposeForm, setShowComposeForm] = useState(false);
   const [showTemplateForm, setShowTemplateForm] = useState(false);
   const [emailHistory, setEmailHistory] = useState([]);
@@ -275,7 +275,7 @@ function Email({ patients, setActivePage, onLogout }) {
 
   return (
     <div className="clinic-container">
-      <ClinicNavbar activePage="email" setActivePage={setActivePage} onLogout={onLogout} />
+      <ClinicNavbar activePage="email" setActivePage={setActivePage} onLogout={onLogout} user={user} />
       <main className="email-container">
         <div className="email-header">
           <div>

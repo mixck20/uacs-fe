@@ -5,7 +5,7 @@ import { PatientsAPI } from "../api";
 import { FaUser, FaCalendar, FaStethoscope, FaPills, FaNotesMedical, FaHeartbeat, FaPhone, FaFileMedical, FaTimes, FaPlus, FaFileExport } from "react-icons/fa";
 import jsPDF from "jspdf";
 
-function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout }) {
+function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout, user }) {
   const [search, setSearch] = useState("");
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -371,7 +371,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout 
 
   return (
     <div>
-      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
+      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} user={user} />
       <div className="clinic-content">
         <h1 className="ehr-title">Electronic Health Records</h1>
 

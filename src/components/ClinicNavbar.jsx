@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { FaBell, FaCog } from 'react-icons/fa';
+import React, { useState, useEffect, useRef } from 'react';
+import { FaBell, FaCog, FaSignOutAlt, FaUser } from 'react-icons/fa';
 import { NotificationsAPI } from '../api';
 import './ClinicNavbar.css';
 
-const ClinicNavbar = ({ activePage, setActivePage, onLogout }) => {
+const ClinicNavbar = ({ activePage, setActivePage, onLogout, user }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showSettingsDropdown, setShowSettingsDropdown] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const settingsRef = useRef(null);
 
   useEffect(() => {
     loadNotifications();
@@ -20,6 +22,17 @@ const ClinicNavbar = ({ activePage, setActivePage, onLogout }) => {
     }, 30000);
     
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (settingsRef.current && !settingsRef.current.contains(event.target)) {
+        setShowSettingsDropdown(false);
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   async function loadNotifications() {
@@ -138,16 +151,6 @@ const ClinicNavbar = ({ activePage, setActivePage, onLogout }) => {
         >
           Schedule
         </span>
-        <span 
-          className={`clinic-nav-link clinic-nav-icon-only ${activePage === "settings" ? "active" : ""}`}
-          onClick={() => handleNavClick("settings")}
-          title="Settings"
-        >
-          <FaCog />
-        </span>
-        <button className="clinic-logout-btn mobile-logout" onClick={onLogout}>
-          Logout
-        </button>
       </div>
       
       {/* Notification Bell */}
@@ -196,10 +199,48 @@ const ClinicNavbar = ({ activePage, setActivePage, onLogout }) => {
           </div>
         )}
       </div>
-      
-      <button className="clinic-logout-btn desktop-logout" onClick={onLogout}>
-        Logout
-      </button>
+
+      {/* Settings Dropdown */}
+      <div className="clinic-settings-wrapper" ref={settingsRef}>
+        <button 
+          className="clinic-settings-icon-btn"
+          onClick={() => setShowSettingsDropdown(!showSettingsDropdown)}
+          title="Settings"
+        >
+          <FaCog className={showSettingsDropdown ? 'rotating' : ''} />
+        </button>
+        
+        {showSettingsDropdown && (
+          <div className="clinic-settings-dropdown">
+            <div className="clinic-dropdown-user-info">
+              <FaUser />
+              <div>
+                <div className="clinic-dropdown-user-name">{user?.name || 'Clinic Staff'}</div>
+                <div className="clinic-dropdown-user-role">{user?.role || 'Staff'}</div>
+              </div>
+            </div>
+            <div className="clinic-dropdown-divider"></div>
+            <button 
+              className="clinic-dropdown-item"
+              onClick={() => {
+                handleNavClick("settings");
+                setShowSettingsDropdown(false);
+              }}
+            >
+              <FaCog /> Account Settings
+            </button>
+            <button 
+              className="clinic-dropdown-item clinic-logout"
+              onClick={() => {
+                setShowSettingsDropdown(false);
+                onLogout();
+              }}
+            >
+              <FaSignOutAlt /> Logout
+            </button>
+          </div>
+        )}
+      </div>
     </nav>
   );
 };

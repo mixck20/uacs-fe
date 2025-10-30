@@ -6,9 +6,9 @@ import { getRelativeTime, formatDate } from "../utils/timeUtils";
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
 
-const ClinicDashboard = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, patients = [], inventory = [], appointments = [], onLogout }) => {
+const ClinicDashboard = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, patients = [], inventory = [], appointments = [], onLogout, user }) => {
   // Real data from patients and inventory state with default values
-  const name = "Clinic Staff";
+  const name = user?.name || "Clinic Staff";
   const totalPatients = patients?.length || 0;
   
   // Real appointment data
@@ -162,7 +162,7 @@ const ClinicDashboard = ({ setActivePage, activePage, sidebarOpen, setSidebarOpe
 
   return (
     <div>
-      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
+      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} user={user} />
       <div className="dashboard-content">
         <div className="dashboard-header">
           <div>

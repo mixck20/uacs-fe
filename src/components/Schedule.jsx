@@ -5,7 +5,7 @@ import './Schedule.css';
 
 const API_URL = 'https://uacs-be.vercel.app/api';
 
-const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout }) => {
+const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout, user }) => {
   const [schedule, setSchedule] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingStaff, setEditingStaff] = useState(null);
@@ -166,7 +166,7 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
   if (loading) {
     return (
       <div className="clinic-container">
-        <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
+        <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} user={user} />
         <div className="clinic-content">
           <div className="loading-message">Loading schedule...</div>
         </div>

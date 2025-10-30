@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 import jsPDF from "jspdf";
 import * as XLSX from "xlsx";
 
-const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpen, setSidebarOpen, onLogout }) => {
+const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpen, setSidebarOpen, onLogout, user }) => {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -401,7 +401,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
 
   return (
     <div className="clinic-container">
-      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
+      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} user={user} />
       <div className="clinic-content">
         {/* Header Section */}
         <div className="patients-header">

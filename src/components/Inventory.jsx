@@ -18,7 +18,7 @@ import {
 
 const lowStockThreshold = 10;
 
-function Inventory({ setActivePage, activePage, inventory, setInventory, onLogout }) {
+function Inventory({ setActivePage, activePage, inventory, setInventory, onLogout, user }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -266,7 +266,7 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
 
   return (
     <div className="clinic-container">
-      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
+      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} user={user} />
       <div className="clinic-content">
         {/* Header */}
         <div className="inventory-header">

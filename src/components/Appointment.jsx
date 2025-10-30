@@ -10,7 +10,7 @@ import {
 import { AppointmentsAPI, ChatAPI, PatientsAPI } from "../api";
 import Swal from "sweetalert2";
 
-function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, patients, appointments, setAppointments, onLogout }) {
+function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, patients, appointments, setAppointments, onLogout, user }) {
   const [currentCall, setCurrentCall] = useState(null);
   const [showChat, setShowChat] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
@@ -1077,7 +1077,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
 
   return (
     <div className="clinic-container">
-      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
+      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} user={user} />
       <div className="clinic-content">
         
         {/* Header */}

@@ -17,7 +17,7 @@ import {
 } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 
-const CertificateManagement = ({ setActivePage, activePage, onLogout }) => {
+const CertificateManagement = ({ setActivePage, activePage, onLogout, user }) => {
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -121,7 +121,7 @@ const CertificateManagement = ({ setActivePage, activePage, onLogout }) => {
 
   return (
     <div className="clinic-container">
-      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
+      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} user={user} />
       <div className="clinic-content">
         {/* Header */}
         <div className="certificate-header">

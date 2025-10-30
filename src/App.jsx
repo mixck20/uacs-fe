@@ -215,7 +215,8 @@ function App() {
     sidebarOpen,
     setSidebarOpen,
     onLogout: handleLogout,
-    userRole
+    userRole,
+    user: userData
   };
 
   const getActiveComponent = () => {
