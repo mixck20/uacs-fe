@@ -29,16 +29,39 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
   const fetchDispensingData = async () => {
     try {
       setLoading(true);
-      const [records, statistics] = await Promise.all([
+      const [recordsResponse, statistics] = await Promise.all([
         InventoryAPI.getAllDispensingRecords(),
         InventoryAPI.getDispensingStats()
       ]);
       
-      setDispensingRecords(records || []);
-      setFilteredRecords(records || []);
-      setStats(statistics);
+      // Handle response structure: { total, records }
+      const records = recordsResponse?.records || [];
+      
+      // Calculate additional stats from records
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      weekAgo.setHours(0, 0, 0, 0);
+      
+      const todayDispensed = records.filter(r => new Date(r.dispensedAt) >= today).length;
+      const weekDispensed = records.filter(r => new Date(r.dispensedAt) >= weekAgo).length;
+      const uniquePatients = new Set(records.map(r => r.patientId)).size;
+      
+      setDispensingRecords(records);
+      setFilteredRecords(records);
+      setStats({
+        ...statistics,
+        totalDispensed: records.length,
+        todayDispensed,
+        weekDispensed,
+        uniquePatients
+      });
     } catch (error) {
       console.error('Failed to fetch dispensing data:', error);
+      setDispensingRecords([]);
+      setFilteredRecords([]);
       Swal.fire({
         title: 'Error',
         text: 'Failed to load dispensing records',
