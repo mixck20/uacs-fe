@@ -4,9 +4,10 @@
 }
 
 .dispensing-content {
-  padding: 24px 24px 24px 80px;
+  padding: 100px 24px 24px 24px;
   max-width: 1600px;
   margin: 0 auto;
+  min-height: 100vh;
 }
 
 .dispensing-header {
