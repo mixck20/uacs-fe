@@ -1,0 +1,236 @@
+.clinic-settings {
+  padding: 90px 20px 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+.clinic-settings-container h1 {
+  color: #e51d5e;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.clinic-settings .settings-container {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
+}
+
+.clinic-settings .settings-tabs {
+  display: flex;
+  border-bottom: 2px solid #f1f5f9;
+  background: #f9fafb;
+}
+
+.clinic-settings .settings-tab {
+  flex: 1;
+  padding: 1.25rem 1.5rem;
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s;
+  border-bottom: 3px solid transparent;
+}
+
+.clinic-settings .settings-tab:hover {
+  background: white;
+  color: #e51d5e;
+}
+
+.clinic-settings .settings-tab.active {
+  background: white;
+  color: #e51d5e;
+  border-bottom: 3px solid #e51d5e;
+  font-weight: 600;
+}
+
+.clinic-settings .settings-content {
+  padding: 2rem;
+}
+
+.clinic-settings .settings-section {
+  margin-bottom: 2.5rem;
+}
+
+.clinic-settings .settings-section:last-child {
+  margin-bottom: 0;
+}
+
+.clinic-settings .settings-section h2 {
+  color: #1f2937;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.clinic-settings .section-description {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.clinic-settings .settings-form {
+  max-width: 600px;
+}
+
+.clinic-settings .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.clinic-settings .form-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.clinic-settings .form-group input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+.clinic-settings .form-group input:focus {
+  outline: none;
+  border-color: #e51d5e;
+  box-shadow: 0 0 0 3px rgba(229, 29, 94, 0.1);
+}
+
+.clinic-settings .form-hint {
+  display: block;
+  margin-top: 0.5rem;
+  color: #e51d5e;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.clinic-settings .form-actions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.clinic-settings .btn-primary {
+  background: linear-gradient(135deg, #e51d5e 0%, #ff4081 100%);
+  color: white;
+  padding: 0.875rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.clinic-settings .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(229, 29, 94, 0.3);
+}
+
+.clinic-settings .account-info {
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid #f1f5f9;
+}
+
+.clinic-settings .info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.clinic-settings .info-item:last-child {
+  border-bottom: none;
+}
+
+.clinic-settings .info-label {
+  font-weight: 500;
+  color: #64748b;
+}
+
+.clinic-settings .info-value {
+  font-weight: 600;
+  color: #1f2937;
+  text-transform: capitalize;
+}
+
+.clinic-settings .info-badge {
+  padding: 0.375rem 0.875rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.clinic-settings .info-badge.verified {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.clinic-settings .info-badge.unverified {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.clinic-settings .security-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  color: #92400e;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  font-size: 0.95rem;
+}
+
+.clinic-settings .security-notice svg {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.clinic-settings .security-notice p {
+  margin: 0;
+}
+
+.clinic-settings .loading-spinner {
+  text-align: center;
+  padding: 100px 20px;
+  font-size: 1.2rem;
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .clinic-settings .settings-content {
+    padding: 1.5rem;
+  }
+
+  .clinic-settings .settings-tab {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .clinic-settings .settings-form {
+    max-width: 100%;
+  }
+}

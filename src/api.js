@@ -602,6 +602,167 @@ export const FeedbackAPI = {
 };
 
 /**
+ * Admin API endpoints
+ */
+export const AdminAPI = {
+  // User Management
+  getAllUsers: async (page = 1, limit = 20, role = null, status = null, search = null) => {
+    const params = new URLSearchParams({ page, limit });
+    if (role) params.append('role', role);
+    if (status) params.append('status', status);
+    if (search) params.append('search', search);
+    return await apiFetch(`/api/admin/users?${params.toString()}`);
+  },
+
+  getUserById: async (id) => {
+    return await apiFetch(`/api/admin/users/${id}`);
+  },
+
+  createUser: async (userData) => {
+    return await apiFetch('/api/admin/users', {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    });
+  },
+
+  updateUser: async (id, userData) => {
+    return await apiFetch(`/api/admin/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData)
+    });
+  },
+
+  deleteUser: async (id) => {
+    return await apiFetch(`/api/admin/users/${id}`, {
+      method: 'DELETE'
+    });
+  },
+
+  resetUserPassword: async (id, newPassword) => {
+    return await apiFetch(`/api/admin/users/${id}/reset-password`, {
+      method: 'POST',
+      body: JSON.stringify({ newPassword })
+    });
+  },
+
+  toggleUserStatus: async (id) => {
+    return await apiFetch(`/api/admin/users/${id}/toggle-status`, {
+      method: 'POST'
+    });
+  },
+
+  // Bulk user import
+  importUsers: async (users) => {
+    return await apiFetch('/api/admin/users/bulk-import', {
+      method: 'POST',
+      body: JSON.stringify({ users })
+    });
+  },
+
+  // Audit Logs
+  getAuditLogs: async (page = 1, limit = 50, filters = {}) => {
+    const params = new URLSearchParams({ page, limit });
+    if (filters.userId) params.append('userId', filters.userId);
+    if (filters.action) params.append('action', filters.action);
+    if (filters.resource) params.append('resource', filters.resource);
+    if (filters.startDate) params.append('startDate', filters.startDate);
+    if (filters.endDate) params.append('endDate', filters.endDate);
+    if (filters.search) params.append('search', filters.search);
+    return await apiFetch(`/api/admin/audit-logs?${params.toString()}`);
+  },
+
+  getAuditStats: async () => {
+    return await apiFetch('/api/admin/audit-logs/stats');
+  },
+
+  exportAuditLogs: async (filters = {}) => {
+    try {
+      const token = getAuthToken();
+      const params = new URLSearchParams();
+      if (filters.userId) params.append('userId', filters.userId);
+      if (filters.action) params.append('action', filters.action);
+      if (filters.resource) params.append('resource', filters.resource);
+      if (filters.startDate) params.append('startDate', filters.startDate);
+      if (filters.endDate) params.append('endDate', filters.endDate);
+      if (filters.search) params.append('search', filters.search);
+      
+      const response = await fetch(`${API_CONFIG.baseUrl}/api/admin/audit-logs/export?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to export audit logs');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `audit-logs-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Export error:', error);
+      throw error;
+    }
+  },
+
+  // Analytics
+  getAnalytics: async () => {
+    return await apiFetch('/api/admin/analytics');
+  },
+
+  exportAnalytics: async () => {
+    try {
+      const token = getAuthToken();
+      const response = await fetch(`${API_CONFIG.baseUrl}/api/admin/analytics/export`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to export analytics');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `analytics-report-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Export error:', error);
+      throw error;
+    }
+  },
+
+  // Feedback Management
+  getAllFeedbackAdmin: async (status = null) => {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    const queryString = params.toString();
+    return await apiFetch(`/api/admin/feedback${queryString ? '?' + queryString : ''}`);
+  },
+
+  updateFeedbackStatusAdmin: async (id, status, response = null) => {
+    return await apiFetch(`/api/admin/feedback/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, response })
+    });
+  }
+};
+
+/**
  * Email API endpoints
  */
 export const EmailAPI = {
@@ -669,5 +830,26 @@ export const EmailAPI = {
   // Check SMTP configuration
   checkSMTPConfig: async () => {
     return await apiFetch('/api/email/smtp-config');
+  }
+};
+
+// AI Chat API
+export const AIChatAPI = {
+  // Send message to AI
+  sendMessage: async (message, history = []) => {
+    return await apiFetch('/api/ai-chat/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message, history })
+    });
+  },
+
+  // Get FAQ suggestions
+  getFAQs: async () => {
+    return await apiFetch('/api/ai-chat/faqs');
+  },
+
+  // Get available slots
+  getAvailableSlots: async () => {
+    return await apiFetch('/api/ai-chat/available-slots');
   }
 };

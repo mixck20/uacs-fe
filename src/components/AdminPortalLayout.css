@@ -1,0 +1,17 @@
+.admin-portal-layout {
+  min-height: 100vh;
+  background: #f5f7fb;
+  padding-top: 70px;
+}
+
+.admin-portal-content {
+  padding: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .admin-portal-content {
+    padding: 20px 15px;
+  }
+}

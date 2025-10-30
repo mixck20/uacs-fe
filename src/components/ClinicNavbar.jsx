@@ -132,6 +132,18 @@ const ClinicNavbar = ({ activePage, setActivePage, onLogout }) => {
         >
           Email
         </span>
+        <span 
+          className={`clinic-nav-link ${activePage === "schedule" ? "active" : ""}`}
+          onClick={() => handleNavClick("schedule")}
+        >
+          Schedule
+        </span>
+        <span 
+          className={`clinic-nav-link ${activePage === "settings" ? "active" : ""}`}
+          onClick={() => handleNavClick("settings")}
+        >
+          Settings
+        </span>
         <button className="clinic-logout-btn mobile-logout" onClick={onLogout}>
           Logout
         </button>

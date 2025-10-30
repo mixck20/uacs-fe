@@ -1,0 +1,662 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import ClinicNavbar from './ClinicNavbar';
+import './Schedule.css';
+
+const API_URL = 'https://uacs-be.vercel.app/api';
+
+const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout }) => {
+  const [schedule, setSchedule] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [editingStaff, setEditingStaff] = useState(null);
+  const [editingDoctor, setEditingDoctor] = useState(null);
+  const [showStaffModal, setShowStaffModal] = useState(false);
+  const [showDoctorModal, setShowDoctorModal] = useState(false);
+  const [newStaff, setNewStaff] = useState({
+    name: '',
+    role: 'physician',
+    designation: '',
+    dayOfDuty: '',
+    time: '',
+    schedule: ''
+  });
+  const [newDoctor, setNewDoctor] = useState({
+    name: '',
+    type: 'physician',
+    regularSchedule: '',
+    medicalExaminationSchedule: ''
+  });
+
+  useEffect(() => {
+    fetchSchedule();
+  }, []);
+
+  const fetchSchedule = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/schedule`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSchedule(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching schedule:', error);
+      setLoading(false);
+    }
+  };
+
+  const handleAddStaff = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`${API_URL}/schedule/staff`, newStaff, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setShowStaffModal(false);
+      setNewStaff({
+        name: '',
+        role: 'physician',
+        designation: '',
+        dayOfDuty: '',
+        time: '',
+        schedule: ''
+      });
+      fetchSchedule();
+    } catch (error) {
+      console.error('Error adding staff:', error);
+      alert('Error adding staff schedule');
+    }
+  };
+
+  const handleUpdateStaff = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`${API_URL}/schedule/staff/${id}`, editingStaff, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setEditingStaff(null);
+      fetchSchedule();
+    } catch (error) {
+      console.error('Error updating staff:', error);
+      alert('Error updating staff schedule');
+    }
+  };
+
+  const handleDeleteStaff = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this staff schedule?')) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_URL}/schedule/staff/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchSchedule();
+    } catch (error) {
+      console.error('Error deleting staff:', error);
+      alert('Error deleting staff schedule');
+    }
+  };
+
+  const handleAddDoctor = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`${API_URL}/schedule/doctor`, newDoctor, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setShowDoctorModal(false);
+      setNewDoctor({
+        name: '',
+        type: 'physician',
+        regularSchedule: '',
+        medicalExaminationSchedule: ''
+      });
+      fetchSchedule();
+    } catch (error) {
+      console.error('Error adding doctor:', error);
+      alert('Error adding doctor schedule');
+    }
+  };
+
+  const handleUpdateDoctor = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`${API_URL}/schedule/doctor/${id}`, editingDoctor, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setEditingDoctor(null);
+      fetchSchedule();
+    } catch (error) {
+      console.error('Error updating doctor:', error);
+      alert('Error updating doctor schedule');
+    }
+  };
+
+  const handleDeleteDoctor = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this doctor schedule?')) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_URL}/schedule/doctor/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchSchedule();
+    } catch (error) {
+      console.error('Error deleting doctor:', error);
+      alert('Error deleting doctor schedule');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="clinic-container">
+        <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
+        <div className="clinic-content">
+          <div className="loading-message">Loading schedule...</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="clinic-container">
+      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
+      <div className="clinic-content">
+        <div className="schedule-header">
+          <div className="header-content">
+            <h1 className="schedule-title">Medical and Dental Clinic Schedule Management</h1>
+            {schedule?.lastUpdated && (
+              <p className="schedule-subtitle">
+                Last updated: {new Date(schedule.lastUpdated).toLocaleString()}
+                {schedule.updatedBy && ` by ${schedule.updatedBy.name}`}
+              </p>
+            )}
+          </div>
+        </div>
+
+      <div className="schedule-sections">
+        {/* Staff Schedule Section */}
+        <div className="schedule-section">
+          <div className="section-header">
+            <h2>Medical and Dental Clinic Staff Schedule</h2>
+            <button className="add-btn" onClick={() => setShowStaffModal(true)}>
+              + Add Staff
+            </button>
+          </div>
+
+          {/* Physicians */}
+          <h3 style={{ color: '#00539C', marginTop: '20px' }}>University Physicians</h3>
+          <table className="schedule-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Day of Duty</th>
+                <th>Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {schedule?.staffSchedules?.filter(s => s.role === 'physician').length > 0 ? (
+                schedule.staffSchedules
+                  .filter(s => s.role === 'physician')
+                  .map((staff) => (
+                    <tr key={staff._id}>
+                      <td>
+                        {editingStaff?._id === staff._id ? (
+                          <input
+                            type="text"
+                            className="edit-input"
+                            value={editingStaff.name}
+                            onChange={(e) => setEditingStaff({ ...editingStaff, name: e.target.value })}
+                          />
+                        ) : (
+                          staff.name
+                        )}
+                      </td>
+                      <td>
+                        {editingStaff?._id === staff._id ? (
+                          <input
+                            type="text"
+                            className="edit-input"
+                            value={editingStaff.dayOfDuty}
+                            onChange={(e) => setEditingStaff({ ...editingStaff, dayOfDuty: e.target.value })}
+                          />
+                        ) : (
+                          staff.dayOfDuty
+                        )}
+                      </td>
+                      <td>
+                        {editingStaff?._id === staff._id ? (
+                          <input
+                            type="text"
+                            className="edit-input"
+                            value={editingStaff.time}
+                            onChange={(e) => setEditingStaff({ ...editingStaff, time: e.target.value })}
+                          />
+                        ) : (
+                          staff.time
+                        )}
+                      </td>
+                      <td>
+                        {editingStaff?._id === staff._id ? (
+                          <div className="action-buttons">
+                            <button className="save-btn" onClick={() => handleUpdateStaff(staff._id)}>
+                              Save
+                            </button>
+                            <button className="cancel-btn" onClick={() => setEditingStaff(null)}>
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="action-buttons">
+                            <button className="edit-btn" onClick={() => setEditingStaff(staff)}>
+                              Edit
+                            </button>
+                            <button className="delete-btn" onClick={() => handleDeleteStaff(staff._id)}>
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="no-data">No physicians added yet</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+
+          {/* Nurses */}
+          <h3 style={{ color: '#00539C', marginTop: '30px' }}>University Nurses</h3>
+          <table className="schedule-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Designation</th>
+                <th>Schedule</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {schedule?.staffSchedules?.filter(s => s.role === 'nurse').length > 0 ? (
+                schedule.staffSchedules
+                  .filter(s => s.role === 'nurse')
+                  .map((staff) => (
+                    <tr key={staff._id}>
+                      <td>
+                        {editingStaff?._id === staff._id ? (
+                          <input
+                            type="text"
+                            className="edit-input"
+                            value={editingStaff.name}
+                            onChange={(e) => setEditingStaff({ ...editingStaff, name: e.target.value })}
+                          />
+                        ) : (
+                          staff.name
+                        )}
+                      </td>
+                      <td>
+                        {editingStaff?._id === staff._id ? (
+                          <input
+                            type="text"
+                            className="edit-input"
+                            value={editingStaff.designation}
+                            onChange={(e) => setEditingStaff({ ...editingStaff, designation: e.target.value })}
+                          />
+                        ) : (
+                          staff.designation
+                        )}
+                      </td>
+                      <td>
+                        {editingStaff?._id === staff._id ? (
+                          <textarea
+                            className="edit-textarea"
+                            value={editingStaff.schedule}
+                            onChange={(e) => setEditingStaff({ ...editingStaff, schedule: e.target.value })}
+                          />
+                        ) : (
+                          <div style={{ whiteSpace: 'pre-line' }}>{staff.schedule}</div>
+                        )}
+                      </td>
+                      <td>
+                        {editingStaff?._id === staff._id ? (
+                          <div className="action-buttons">
+                            <button className="save-btn" onClick={() => handleUpdateStaff(staff._id)}>
+                              Save
+                            </button>
+                            <button className="cancel-btn" onClick={() => setEditingStaff(null)}>
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="action-buttons">
+                            <button className="edit-btn" onClick={() => setEditingStaff(staff)}>
+                              Edit
+                            </button>
+                            <button className="delete-btn" onClick={() => handleDeleteStaff(staff._id)}>
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="no-data">No nurses added yet</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Doctor Examination Schedule Section */}
+        <div className="schedule-section">
+          <div className="section-header">
+            <h2>Medical and Dental Examinations Schedule</h2>
+            <button className="add-btn" onClick={() => setShowDoctorModal(true)}>
+              + Add Doctor
+            </button>
+          </div>
+
+          {/* Physicians */}
+          <h3 style={{ color: '#00539C', marginTop: '20px' }}>Physicians</h3>
+          <table className="schedule-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Regular Schedule</th>
+                <th>Medical Examination Schedule</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {schedule?.doctorSchedules?.filter(d => d.type === 'physician').length > 0 ? (
+                schedule.doctorSchedules
+                  .filter(d => d.type === 'physician')
+                  .map((doctor) => (
+                    <tr key={doctor._id}>
+                      <td>
+                        {editingDoctor?._id === doctor._id ? (
+                          <input
+                            type="text"
+                            className="edit-input"
+                            value={editingDoctor.name}
+                            onChange={(e) => setEditingDoctor({ ...editingDoctor, name: e.target.value })}
+                          />
+                        ) : (
+                          doctor.name
+                        )}
+                      </td>
+                      <td>
+                        {editingDoctor?._id === doctor._id ? (
+                          <textarea
+                            className="edit-textarea"
+                            value={editingDoctor.regularSchedule}
+                            onChange={(e) => setEditingDoctor({ ...editingDoctor, regularSchedule: e.target.value })}
+                          />
+                        ) : (
+                          <div style={{ whiteSpace: 'pre-line' }}>{doctor.regularSchedule}</div>
+                        )}
+                      </td>
+                      <td>
+                        {editingDoctor?._id === doctor._id ? (
+                          <textarea
+                            className="edit-textarea"
+                            value={editingDoctor.medicalExaminationSchedule}
+                            onChange={(e) => setEditingDoctor({ ...editingDoctor, medicalExaminationSchedule: e.target.value })}
+                          />
+                        ) : (
+                          <div style={{ whiteSpace: 'pre-line' }}>{doctor.medicalExaminationSchedule}</div>
+                        )}
+                      </td>
+                      <td>
+                        {editingDoctor?._id === doctor._id ? (
+                          <div className="action-buttons">
+                            <button className="save-btn" onClick={() => handleUpdateDoctor(doctor._id)}>
+                              Save
+                            </button>
+                            <button className="cancel-btn" onClick={() => setEditingDoctor(null)}>
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="action-buttons">
+                            <button className="edit-btn" onClick={() => setEditingDoctor(doctor)}>
+                              Edit
+                            </button>
+                            <button className="delete-btn" onClick={() => handleDeleteDoctor(doctor._id)}>
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="no-data">No physicians added yet</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+
+          {/* Dentists */}
+          <h3 style={{ color: '#00539C', marginTop: '30px' }}>Dentists</h3>
+          <table className="schedule-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Regular Schedule</th>
+                <th>Medical Examination Schedule</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {schedule?.doctorSchedules?.filter(d => d.type === 'dentist').length > 0 ? (
+                schedule.doctorSchedules
+                  .filter(d => d.type === 'dentist')
+                  .map((doctor) => (
+                    <tr key={doctor._id}>
+                      <td>
+                        {editingDoctor?._id === doctor._id ? (
+                          <input
+                            type="text"
+                            className="edit-input"
+                            value={editingDoctor.name}
+                            onChange={(e) => setEditingDoctor({ ...editingDoctor, name: e.target.value })}
+                          />
+                        ) : (
+                          doctor.name
+                        )}
+                      </td>
+                      <td>
+                        {editingDoctor?._id === doctor._id ? (
+                          <textarea
+                            className="edit-textarea"
+                            value={editingDoctor.regularSchedule}
+                            onChange={(e) => setEditingDoctor({ ...editingDoctor, regularSchedule: e.target.value })}
+                          />
+                        ) : (
+                          <div style={{ whiteSpace: 'pre-line' }}>{doctor.regularSchedule}</div>
+                        )}
+                      </td>
+                      <td>
+                        {editingDoctor?._id === doctor._id ? (
+                          <textarea
+                            className="edit-textarea"
+                            value={editingDoctor.medicalExaminationSchedule}
+                            onChange={(e) => setEditingDoctor({ ...editingDoctor, medicalExaminationSchedule: e.target.value })}
+                          />
+                        ) : (
+                          <div style={{ whiteSpace: 'pre-line' }}>{doctor.medicalExaminationSchedule}</div>
+                        )}
+                      </td>
+                      <td>
+                        {editingDoctor?._id === doctor._id ? (
+                          <div className="action-buttons">
+                            <button className="save-btn" onClick={() => handleUpdateDoctor(doctor._id)}>
+                              Save
+                            </button>
+                            <button className="cancel-btn" onClick={() => setEditingDoctor(null)}>
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="action-buttons">
+                            <button className="edit-btn" onClick={() => setEditingDoctor(doctor)}>
+                              Edit
+                            </button>
+                            <button className="delete-btn" onClick={() => handleDeleteDoctor(doctor._id)}>
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="no-data">No dentists added yet</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Add Staff Modal */}
+      {showStaffModal && (
+        <div className="modal-overlay" onClick={() => setShowStaffModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Add Staff Schedule</h3>
+            <div className="form-group">
+              <label>Name *</label>
+              <input
+                type="text"
+                value={newStaff.name}
+                onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Role *</label>
+              <select
+                value={newStaff.role}
+                onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}
+              >
+                <option value="physician">Physician</option>
+                <option value="nurse">Nurse</option>
+              </select>
+            </div>
+            {newStaff.role === 'physician' ? (
+              <>
+                <div className="form-group">
+                  <label>Day of Duty</label>
+                  <input
+                    type="text"
+                    value={newStaff.dayOfDuty}
+                    onChange={(e) => setNewStaff({ ...newStaff, dayOfDuty: e.target.value })}
+                    placeholder="e.g., Monday and Tuesday"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Time</label>
+                  <input
+                    type="text"
+                    value={newStaff.time}
+                    onChange={(e) => setNewStaff({ ...newStaff, time: e.target.value })}
+                    placeholder="e.g., 8:00AM - 10:00AM"
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="form-group">
+                  <label>Designation</label>
+                  <input
+                    type="text"
+                    value={newStaff.designation}
+                    onChange={(e) => setNewStaff({ ...newStaff, designation: e.target.value })}
+                    placeholder="e.g., Grade School Clinic"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Schedule</label>
+                  <textarea
+                    value={newStaff.schedule}
+                    onChange={(e) => setNewStaff({ ...newStaff, schedule: e.target.value })}
+                    placeholder="e.g., Monday - Friday&#10;7:30AM - 4:30PM"
+                  />
+                </div>
+              </>
+            )}
+            <div className="modal-buttons">
+              <button className="cancel-btn" onClick={() => setShowStaffModal(false)}>
+                Cancel
+              </button>
+              <button className="submit-btn" onClick={handleAddStaff} disabled={!newStaff.name}>
+                Add Staff
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Doctor Modal */}
+      {showDoctorModal && (
+        <div className="modal-overlay" onClick={() => setShowDoctorModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Add Doctor Schedule</h3>
+            <div className="form-group">
+              <label>Name *</label>
+              <input
+                type="text"
+                value={newDoctor.name}
+                onChange={(e) => setNewDoctor({ ...newDoctor, name: e.target.value })}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Type *</label>
+              <select
+                value={newDoctor.type}
+                onChange={(e) => setNewDoctor({ ...newDoctor, type: e.target.value })}
+              >
+                <option value="physician">Physician</option>
+                <option value="dentist">Dentist</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Regular Schedule</label>
+              <textarea
+                value={newDoctor.regularSchedule}
+                onChange={(e) => setNewDoctor({ ...newDoctor, regularSchedule: e.target.value })}
+                placeholder="e.g., Wednesday&#10;8:00AM - 1:00PM"
+              />
+            </div>
+            <div className="form-group">
+              <label>Medical Examination Schedule</label>
+              <textarea
+                value={newDoctor.medicalExaminationSchedule}
+                onChange={(e) => setNewDoctor({ ...newDoctor, medicalExaminationSchedule: e.target.value })}
+                placeholder="e.g., Wednesday (walk in)&#10;9:00AM - 2:00PM"
+              />
+            </div>
+            <div className="modal-buttons">
+              <button className="cancel-btn" onClick={() => setShowDoctorModal(false)}>
+                Cancel
+              </button>
+              <button className="submit-btn" onClick={handleAddDoctor} disabled={!newDoctor.name}>
+                Add Doctor
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      </div>
+    </div>
+  );
+};
+
+export default Schedule;

@@ -18,6 +18,16 @@ import Appointment from "./components/Appointment";
 import Email from "./components/Email";
 import EHR from "./components/EHR";
 import CertificateManagement from "./components/CertificateManagement";
+import Schedule from "./components/Schedule";
+import UserSchedule from "./components/UserSchedule";
+import AdminDashboard from "./components/AdminDashboard";
+import UserManagement from "./components/UserManagement";
+import AuditLogs from "./components/AuditLogs";
+import AdminFeedback from "./components/AdminFeedback";
+import AdminSettings from "./components/AdminSettings";
+import ClinicSettings from "./components/ClinicSettings";
+import VerifyEmailChange from "./components/VerifyEmailChange";
+import VerifyPasswordChange from "./components/VerifyPasswordChange";
 
 
 function App() {
@@ -274,6 +284,18 @@ function App() {
               {...commonProps}
             />
           );
+        case 'schedule':
+          return (
+            <Schedule
+              {...commonProps}
+            />
+          );
+        case 'settings':
+          return (
+            <ClinicSettings
+              {...commonProps}
+            />
+          );
         case 'dashboard':
         default:
           return (
@@ -307,9 +329,24 @@ function App() {
             <SignupSuccess />
         } />
         <Route path="/verify/:token" element={<SignupSuccess />} />
+        <Route path="/verify-email-change/:token" element={<VerifyEmailChange />} />
+        <Route path="/verify-password-change/:token" element={<VerifyPasswordChange />} />
         <Route path="/*" element={
           !isLoggedIn ? 
             <Navigate to="/login" /> :
+            userRole === 'admin' ? (
+              <div className="app-container">
+                <Routes>
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/admin/users" element={<UserManagement />} />
+                  <Route path="/admin/audit-logs" element={<AuditLogs />} />
+                  <Route path="/admin/feedback" element={<AdminFeedback />} />
+                  <Route path="/admin/settings" element={<AdminSettings />} />
+                  <Route path="/" element={<Navigate to="/admin" />} />
+                  <Route path="*" element={<Navigate to="/admin" />} />
+                </Routes>
+              </div>
+            ) :
             ['student', 'faculty'].includes(userRole) ? (
               <div className="app-container">
                 <Routes>
@@ -344,6 +381,12 @@ function App() {
                       user={userData}
                       onLogout={handleLogout}
                       onUserUpdate={setUserData}
+                    />
+                  } />
+                  <Route path="/schedule" element={
+                    <UserSchedule
+                      user={userData}
+                      onLogout={handleLogout}
                     />
                   } />
                   <Route path="/" element={<Navigate to="/dashboard" />} />

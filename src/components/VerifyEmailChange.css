@@ -1,0 +1,69 @@
+.verify-email-change-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffeef5 0%, #fff 100%);
+}
+
+.verify-email-change-card {
+  background: white;
+  border-radius: 12px;
+  padding: 48px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+}
+
+.verify-email-change-card h2 {
+  color: #333;
+  margin-bottom: 16px;
+  font-size: 28px;
+}
+
+.verify-email-change-card p {
+  color: #666;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.verify-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #e51d5e;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 24px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.verify-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: bold;
+  margin: 0 auto 24px;
+  color: white;
+}
+
+.verify-icon.success {
+  background-color: #4caf50;
+}
+
+.verify-icon.error {
+  background-color: #f44336;
+}

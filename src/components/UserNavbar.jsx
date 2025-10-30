@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { FaBell, FaCheckCircle, FaTimesCircle, FaCalendarCheck, FaEnvelope } from "react-icons/fa";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FaBell, FaCheckCircle, FaTimesCircle, FaCalendarCheck, FaEnvelope, FaCog, FaUser, FaLock, FaSignOutAlt } from "react-icons/fa";
 import { NotificationsAPI } from "../api";
 import "./UserNavbar.css";
 
 const UserNavbar = ({ user, onLogout }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const notificationRef = React.useRef(null);
+  const settingsRef = React.useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setShowNotifications(false);
+      }
+      if (settingsRef.current && !settingsRef.current.contains(event.target)) {
+        setShowSettings(false);
       }
     };
 
@@ -221,15 +227,12 @@ const UserNavbar = ({ user, onLogout }) => {
           Feedback
         </Link>
         <Link 
-          to="/settings" 
-          className={`user-nav-link ${location.pathname === '/settings' ? 'active' : ''}`}
+          to="/schedule" 
+          className={`user-nav-link ${location.pathname === '/schedule' ? 'active' : ''}`}
           onClick={handleNavClick}
         >
-          Settings
+          Schedule
         </Link>
-        <button className="user-logout-btn mobile-logout" onClick={onLogout}>
-          Logout
-        </button>
       </div>
       
       <div className="user-nav-right">
@@ -296,10 +299,54 @@ const UserNavbar = ({ user, onLogout }) => {
             </div>
           )}
         </div>
-        
-        <button className="user-logout-btn desktop-logout" onClick={onLogout}>
-          Logout
-        </button>
+
+        {/* Settings Dropdown */}
+        <div className="user-settings-wrapper" ref={settingsRef}>
+          <button 
+            className="user-settings-btn"
+            onClick={() => setShowSettings(!showSettings)}
+            aria-label="Settings"
+          >
+            <FaCog />
+          </button>
+
+          {showSettings && (
+            <div className="user-settings-dropdown">
+              <div className="settings-user-info">
+                <div className="settings-user-avatar">
+                  <FaUser />
+                </div>
+                <div className="settings-user-details">
+                  <h4>{user?.firstName} {user?.lastName}</h4>
+                  <p>{user?.email}</p>
+                </div>
+              </div>
+              <div className="settings-menu">
+                <button 
+                  className="settings-menu-item"
+                  onClick={() => {
+                    navigate('/settings');
+                    setShowSettings(false);
+                  }}
+                >
+                  <FaCog />
+                  <span>Account Settings</span>
+                </button>
+                <div className="settings-divider"></div>
+                <button 
+                  className="settings-menu-item logout-item"
+                  onClick={() => {
+                    setShowSettings(false);
+                    onLogout();
+                  }}
+                >
+                  <FaSignOutAlt />
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );
