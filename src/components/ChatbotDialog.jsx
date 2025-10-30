@@ -5,19 +5,40 @@ import Swal from 'sweetalert2';
 import './ChatbotDialog.css';
 
 const ChatbotDialog = ({ isOpen, onClose }) => {
-  const [messages, setMessages] = useState([
+  const initialMessages = [
     {
       id: 1,
       sender: 'bot',
       text: 'Hi! I\'m Nursebot Assistant. I can help you with appointments, medicines, medical certificates, and clinic information. How can I assist you today?',
-      timestamp: new Date()
+      timestamp: new Date().toISOString()
     }
-  ]);
+  ];
+
+  const [messages, setMessages] = useState(() => {
+    // Load messages from localStorage on initial mount
+    const savedMessages = localStorage.getItem('chatbot_messages');
+    if (savedMessages) {
+      try {
+        return JSON.parse(savedMessages);
+      } catch (e) {
+        return initialMessages;
+      }
+    }
+    return initialMessages;
+  });
   const [input, setInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [faqs, setFaqs] = useState([]);
-  const [showFaqs, setShowFaqs] = useState(true);
+  const [showFaqs, setShowFaqs] = useState(() => {
+    const savedMessages = localStorage.getItem('chatbot_messages');
+    return !savedMessages || JSON.parse(savedMessages).length === 1;
+  });
   const messagesEndRef = useRef(null);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('chatbot_messages', JSON.stringify(messages));
+  }, [messages]);
 
   // Scroll to bottom of messages
   const scrollToBottom = () => {
@@ -49,6 +70,12 @@ const ChatbotDialog = ({ isOpen, onClose }) => {
     setShowFaqs(false);
   };
 
+  const handleClearChat = () => {
+    setMessages(initialMessages);
+    setShowFaqs(true);
+    localStorage.removeItem('chatbot_messages');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim() || isProcessing) return;
@@ -57,7 +84,7 @@ const ChatbotDialog = ({ isOpen, onClose }) => {
       id: messages.length + 1,
       sender: 'user',
       text: input.trim(),
-      timestamp: new Date()
+      timestamp: new Date().toISOString()
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -79,7 +106,7 @@ const ChatbotDialog = ({ isOpen, onClose }) => {
         id: messages.length + 2,
         sender: 'bot',
         text: response.message,
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
         context: response.context
       };
 
@@ -93,7 +120,7 @@ const ChatbotDialog = ({ isOpen, onClose }) => {
         text: error.message === 'User not found' 
           ? 'Please log in again to continue chatting.'
           : 'Sorry, I\'m having trouble processing your request. Please try again or contact the clinic directly at (555) 123-4567.',
-        timestamp: new Date()
+        timestamp: new Date().toISOString()
       };
 
       setMessages(prev => [...prev, errorMessage]);
@@ -121,9 +148,21 @@ const ChatbotDialog = ({ isOpen, onClose }) => {
           <FaRobot size={20} />
           <span>Nursebot Assistant</span>
         </div>
-        <button className="close-btn" onClick={onClose} aria-label="Close chatbot">
-          <FaTimes size={16} />
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {messages.length > 1 && (
+            <button 
+              className="close-btn" 
+              onClick={handleClearChat} 
+              aria-label="Clear chat"
+              title="Clear chat history"
+            >
+              🗑️
+            </button>
+          )}
+          <button className="close-btn" onClick={onClose} aria-label="Close chatbot">
+            <FaTimes size={16} />
+          </button>
+        </div>
       </div>
       
       <div className="chatbot-messages">
@@ -133,7 +172,7 @@ const ChatbotDialog = ({ isOpen, onClose }) => {
             <div className="message-content">
               <p style={{ whiteSpace: 'pre-wrap' }}>{message.text}</p>
               <small className="timestamp">
-                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </small>
             </div>
           </div>
