@@ -20,7 +20,7 @@ const UserDashboard = ({ user, appointments, announcements, medicalRecords, onLo
   const recentAnnouncements = announcements?.slice(0, 3) || [];
 
   return (
-    <UserPortalLayout user={user} onLogout={onLogout}>
+    <UserPortalLayout user={user} onLogout={onLogout} currentPage="dashboard">
       {/* Main Content */}
       <main className="dashboard-content">
         <div className="welcome-section">

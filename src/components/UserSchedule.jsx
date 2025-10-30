@@ -29,7 +29,7 @@ const UserSchedule = ({ user, onLogout }) => {
 
   if (loading) {
     return (
-      <UserPortalLayout user={user} onLogout={onLogout}>
+      <UserPortalLayout user={user} onLogout={onLogout} currentPage="schedule">
         <div className="loading-container">Loading clinic schedule...</div>
       </UserPortalLayout>
     );

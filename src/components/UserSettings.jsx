@@ -132,7 +132,7 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
   };
 
   return (
-    <UserPortalLayout user={user} onLogout={onLogout}>
+    <UserPortalLayout user={user} onLogout={onLogout} currentPage="settings">
       <div className="settings-page">
         <div className="settings-header">
           <h1>Settings</h1>

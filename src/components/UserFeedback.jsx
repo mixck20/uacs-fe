@@ -119,7 +119,7 @@ const UserFeedback = ({ user, onLogout }) => {
   };
 
   return (
-    <UserPortalLayout user={user} onLogout={onLogout}>
+    <UserPortalLayout user={user} onLogout={onLogout} currentPage="feedback">
       <div className="feedback-page">
         <div className="feedback-header">
           <div>

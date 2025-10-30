@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import UserNavbar from './UserNavbar';
 import { FaComments } from 'react-icons/fa';
 import ChatbotDialog from './ChatbotDialog';
 import './UserPortalLayout.css';
 
-const UserPortalLayout = ({ user, onLogout, children }) => {
+const UserPortalLayout = ({ user, onLogout, children, currentPage }) => {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+
+  // Close chatbot when page changes
+  useEffect(() => {
+    setIsChatbotOpen(false);
+  }, [currentPage]);
 
   const handleOpenChatbot = () => {
     setIsChatbotOpen(true);

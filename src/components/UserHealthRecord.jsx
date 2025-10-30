@@ -423,7 +423,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
 
   if (loading) {
     return (
-      <UserPortalLayout user={user} onLogout={onLogout}>
+      <UserPortalLayout user={user} onLogout={onLogout} currentPage="health-record">
         <div className="health-records-page">
           <div className="loading-state">Loading your health records...</div>
         </div>

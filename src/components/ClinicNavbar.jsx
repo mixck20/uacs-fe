@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaBell } from 'react-icons/fa';
+import { FaBell, FaCog } from 'react-icons/fa';
 import { NotificationsAPI } from '../api';
 import './ClinicNavbar.css';
 
@@ -142,7 +142,7 @@ const ClinicNavbar = ({ activePage, setActivePage, onLogout }) => {
           className={`clinic-nav-link ${activePage === "settings" ? "active" : ""}`}
           onClick={() => handleNavClick("settings")}
         >
-          Settings
+          <FaCog /> Settings
         </span>
         <button className="clinic-logout-btn mobile-logout" onClick={onLogout}>
           Logout

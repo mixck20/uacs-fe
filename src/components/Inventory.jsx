@@ -272,12 +272,12 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
         <div className="inventory-header">
           <div className="header-content">
             <h1 className="inventory-title">
-              <FaPills /> Medicine Inventory
+              Inventory
             </h1>
-            <p className="inventory-subtitle">Manage clinic medicine stock and supplies</p>
+            <p className="inventory-subtitle">Medical supplies, equipment, and resources management</p>
           </div>
           <button className="add-medicine-btn" onClick={() => setShowForm(true)}>
-            <FaPlus /> Add Medicine
+            <FaPlus /> Add Item
           </button>
         </div>
 
@@ -289,12 +289,12 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
             </div>
             <div className="stat-details">
               <div className="stat-number">{stats.total}</div>
-              <div className="stat-label">Total Medicines</div>
+              <div className="stat-label">Total Items</div>
             </div>
           </div>
           <div className="stat-card stat-available">
             <div className="stat-icon">
-              <FaPills />
+              <FaChartLine />
             </div>
             <div className="stat-details">
               <div className="stat-number">{stats.available}</div>

@@ -124,7 +124,11 @@
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  color: white;
+  color: white !important;
+}
+
+.stat-icon svg {
+  color: white !important;
 }
 
 .stat-today .stat-icon {

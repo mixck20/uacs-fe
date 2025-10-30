@@ -749,7 +749,7 @@ const UserAppointment = ({ user, onLogout }) => {
   };
 
   return (
-    <UserPortalLayout user={user} onLogout={onLogout}>
+    <UserPortalLayout user={user} onLogout={onLogout} currentPage="appointments">
       <div className="user-appointment-page">
         {/* Modern Header */}
         <div className="page-header">

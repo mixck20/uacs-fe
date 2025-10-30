@@ -70,12 +70,6 @@ const ChatbotDialog = ({ isOpen, onClose }) => {
     setShowFaqs(false);
   };
 
-  const handleClearChat = () => {
-    setMessages(initialMessages);
-    setShowFaqs(true);
-    localStorage.removeItem('chatbot_messages');
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim() || isProcessing) return;
@@ -148,21 +142,9 @@ const ChatbotDialog = ({ isOpen, onClose }) => {
           <FaRobot size={20} />
           <span>Nursebot Assistant</span>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          {messages.length > 1 && (
-            <button 
-              className="close-btn" 
-              onClick={handleClearChat} 
-              aria-label="Clear chat"
-              title="Clear chat history"
-            >
-              🗑️
-            </button>
-          )}
-          <button className="close-btn" onClick={onClose} aria-label="Close chatbot">
-            <FaTimes size={16} />
-          </button>
-        </div>
+        <button className="close-btn" onClick={onClose} aria-label="Close chatbot">
+          <FaTimes size={16} />
+        </button>
       </div>
       
       <div className="chatbot-messages">

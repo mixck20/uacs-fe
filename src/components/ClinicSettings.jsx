@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import ClinicNavbar from './ClinicNavbar';
 import { AuthAPI } from '../api';
 import Swal from 'sweetalert2';
-import { FaUser, FaEnvelope, FaLock, FaShieldAlt } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaShieldAlt, FaSignOutAlt } from 'react-icons/fa';
 import './ClinicSettings.css';
 
-function ClinicSettings() {
+function ClinicSettings({ onLogout }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
@@ -212,6 +212,12 @@ function ClinicSettings() {
               >
                 <FaShieldAlt /> Security
               </button>
+              <button
+                className={`settings-tab ${activeTab === 'logout' ? 'active' : ''}`}
+                onClick={() => setActiveTab('logout')}
+              >
+                <FaSignOutAlt /> Logout
+              </button>
             </div>
 
             {/* Profile Tab */}
@@ -337,6 +343,31 @@ function ClinicSettings() {
                       </button>
                     </div>
                   </form>
+                </div>
+              </div>
+            )}
+
+            {/* Logout Tab */}
+            {activeTab === 'logout' && (
+              <div className="settings-content">
+                <div className="settings-section">
+                  <h2>Logout</h2>
+                  <p className="section-description">Sign out of your account</p>
+
+                  <div className="logout-section">
+                    <div className="logout-info">
+                      <FaSignOutAlt size={48} color="#e51d5e" />
+                      <h3>Ready to leave?</h3>
+                      <p>Click the button below to safely log out of your account.</p>
+                    </div>
+
+                    <button 
+                      className="btn-logout" 
+                      onClick={onLogout}
+                    >
+                      <FaSignOutAlt /> Logout
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

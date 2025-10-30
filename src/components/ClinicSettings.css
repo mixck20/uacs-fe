@@ -220,6 +220,55 @@
   color: #64748b;
 }
 
+/* Logout Section */
+.clinic-settings .logout-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.clinic-settings .logout-info {
+  margin-bottom: 2rem;
+}
+
+.clinic-settings .logout-info h3 {
+  color: #1f2937;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem;
+}
+
+.clinic-settings .logout-info p {
+  color: #64748b;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.clinic-settings .btn-logout {
+  padding: 1rem 3rem;
+  background: linear-gradient(135deg, #e51d5e 0%, #d91756 100%);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 12px rgba(229, 29, 94, 0.3);
+}
+
+.clinic-settings .btn-logout:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(229, 29, 94, 0.4);
+  background: linear-gradient(135deg, #d91756 0%, #c21550 100%);
+}
+
 @media (max-width: 768px) {
   .clinic-settings .settings-content {
     padding: 1.5rem;
@@ -232,5 +281,16 @@
 
   .clinic-settings .settings-form {
     max-width: 100%;
+  }
+
+  .clinic-settings .logout-section {
+    padding: 2rem 1rem;
+  }
+
+  .clinic-settings .btn-logout {
+    width: 100%;
+    justify-content: center;
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
   }
 }
