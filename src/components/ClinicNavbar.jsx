@@ -139,10 +139,11 @@ const ClinicNavbar = ({ activePage, setActivePage, onLogout }) => {
           Schedule
         </span>
         <span 
-          className={`clinic-nav-link ${activePage === "settings" ? "active" : ""}`}
+          className={`clinic-nav-link clinic-nav-icon-only ${activePage === "settings" ? "active" : ""}`}
           onClick={() => handleNavClick("settings")}
+          title="Settings"
         >
-          <FaCog /> Settings
+          <FaCog />
         </span>
         <button className="clinic-logout-btn mobile-logout" onClick={onLogout}>
           Logout

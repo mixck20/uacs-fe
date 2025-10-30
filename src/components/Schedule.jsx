@@ -46,11 +46,18 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
   };
 
   const handleAddStaff = async () => {
+    if (!newStaff.name.trim()) {
+      alert('Please enter staff name');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`${API_URL}/schedule/staff`, newStaff, {
+      const response = await axios.post(`${API_URL}/schedule/staff`, newStaff, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      
+      console.log('Staff added successfully:', response.data);
       setShowStaffModal(false);
       setNewStaff({
         name: '',
@@ -61,9 +68,11 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
         schedule: ''
       });
       fetchSchedule();
+      alert('Staff schedule added successfully!');
     } catch (error) {
       console.error('Error adding staff:', error);
-      alert('Error adding staff schedule');
+      const errorMsg = error.response?.data?.message || error.message || 'Error adding staff schedule';
+      alert(errorMsg);
     }
   };
 
@@ -97,11 +106,18 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
   };
 
   const handleAddDoctor = async () => {
+    if (!newDoctor.name.trim()) {
+      alert('Please enter doctor name');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`${API_URL}/schedule/doctor`, newDoctor, {
+      const response = await axios.post(`${API_URL}/schedule/doctor`, newDoctor, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      
+      console.log('Doctor added successfully:', response.data);
       setShowDoctorModal(false);
       setNewDoctor({
         name: '',
@@ -110,9 +126,11 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
         medicalExaminationSchedule: ''
       });
       fetchSchedule();
+      alert('Doctor schedule added successfully!');
     } catch (error) {
       console.error('Error adding doctor:', error);
-      alert('Error adding doctor schedule');
+      const errorMsg = error.response?.data?.message || error.message || 'Error adding doctor schedule';
+      alert(errorMsg);
     }
   };
 

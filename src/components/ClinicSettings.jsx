@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import { FaUser, FaEnvelope, FaLock, FaShieldAlt, FaSignOutAlt } from 'react-icons/fa';
 import './ClinicSettings.css';
 
-function ClinicSettings({ onLogout }) {
+function ClinicSettings({ onLogout, activePage, setActivePage }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
@@ -182,7 +182,7 @@ function ClinicSettings({ onLogout }) {
   if (loading) {
     return (
       <div className="clinic-portal">
-        <ClinicNavbar />
+        <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
         <div className="clinic-settings">
           <div className="loading-spinner">Loading settings...</div>
         </div>
@@ -192,7 +192,7 @@ function ClinicSettings({ onLogout }) {
 
   return (
     <div className="clinic-portal">
-      <ClinicNavbar />
+      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
       <div className="clinic-settings">
         <div className="clinic-settings-container">
           <h1>Account Settings</h1>
