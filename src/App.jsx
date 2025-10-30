@@ -26,6 +26,7 @@ import AuditLogs from "./components/AuditLogs";
 import AdminFeedback from "./components/AdminFeedback";
 import AdminSettings from "./components/AdminSettings";
 import ClinicSettings from "./components/ClinicSettings";
+import DispensingHistory from "./components/DispensingHistory";
 import VerifyEmailChange from "./components/VerifyEmailChange";
 import VerifyPasswordChange from "./components/VerifyPasswordChange";
 
@@ -342,6 +343,7 @@ function App() {
                   <Route path="/admin/users" element={<UserManagement />} />
                   <Route path="/admin/audit-logs" element={<AuditLogs />} />
                   <Route path="/admin/feedback" element={<AdminFeedback />} />
+                  <Route path="/admin/dispensing" element={<DispensingHistory />} />
                   <Route path="/admin/settings" element={<AdminSettings />} />
                   <Route path="/" element={<Navigate to="/admin" />} />
                   <Route path="*" element={<Navigate to="/admin" />} />

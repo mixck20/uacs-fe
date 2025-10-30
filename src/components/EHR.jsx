@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import ClinicNavbar from "./ClinicNavbar";
 import "./EHR.css";
-import { PatientsAPI } from "../api";
-import { FaUser, FaCalendar, FaStethoscope, FaPills, FaNotesMedical, FaHeartbeat, FaPhone, FaFileMedical, FaTimes, FaPlus, FaFileExport } from "react-icons/fa";
+import { PatientsAPI, InventoryAPI } from "../api";
+import { FaUser, FaCalendar, FaStethoscope, FaPills, FaNotesMedical, FaHeartbeat, FaPhone, FaFileMedical, FaTimes, FaPlus, FaFileExport, FaTrash } from "react-icons/fa";
 import jsPDF from "jspdf";
+import Swal from "sweetalert2";
 
 function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout, user }) {
   const [search, setSearch] = useState("");
@@ -29,7 +30,12 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     notes: "",
   });
 
-  // --- Fetch patients from backend on mount ---
+  // Prescription state
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [inventoryItems, setInventoryItems] = useState([]);
+  const [autoDispense, setAutoDispense] = useState(true);
+
+  // --- Fetch patients and inventory from backend on mount ---
   useEffect(() => {
     const fetchPatients = async () => {
       try {
@@ -43,7 +49,18 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
       }
     };
 
+    const fetchInventory = async () => {
+      try {
+        const data = await InventoryAPI.list();
+        setInventoryItems(data || []);
+      } catch (err) {
+        console.error("Failed to fetch inventory:", err);
+        setInventoryItems([]);
+      }
+    };
+
     fetchPatients();
+    fetchInventory();
   }, []);
 
   // --- Fetch health record for selected patient ---
@@ -81,6 +98,37 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     setNewRecord({ ...newRecord, [name]: value });
   }
 
+  // --- Prescription management functions ---
+  function handleAddPrescription() {
+    setPrescriptions([...prescriptions, {
+      medication: "",
+      itemId: "",
+      dosage: "",
+      frequency: "",
+      instructions: "",
+      quantity: 1
+    }]);
+  }
+
+  function handleRemovePrescription(index) {
+    setPrescriptions(prescriptions.filter((_, i) => i !== index));
+  }
+
+  function handlePrescriptionChange(index, field, value) {
+    const updated = [...prescriptions];
+    updated[index][field] = value;
+    
+    // Auto-fill medication name when item is selected
+    if (field === 'itemId') {
+      const item = inventoryItems.find(i => i._id === value);
+      if (item) {
+        updated[index].medication = item.name;
+      }
+    }
+    
+    setPrescriptions(updated);
+  }
+
   // --- Add a new medical record via backend ---
   async function handleAddRecord() {
     if (!selectedPatient) return;
@@ -94,8 +142,64 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
       return;
     }
 
+    // Validate prescriptions if auto-dispense is enabled
+    if (autoDispense && prescriptions.length > 0) {
+      for (let i = 0; i < prescriptions.length; i++) {
+        const rx = prescriptions[i];
+        if (!rx.medication || !rx.dosage) {
+          alert(`Please fill in all required fields for prescription #${i + 1}`);
+          return;
+        }
+        if (rx.itemId && rx.quantity < 1) {
+          alert(`Please enter a valid quantity for ${rx.medication}`);
+          return;
+        }
+      }
+    }
+
     try {
-      const data = await PatientsAPI.addVisit(selectedPatient._id || selectedPatient.id, newRecord);
+      const recordData = {
+        ...newRecord,
+        prescriptions: prescriptions,
+        dispenseMedications: autoDispense ? prescriptions.filter(rx => rx.itemId).map(rx => ({
+          itemId: rx.itemId,
+          medication: rx.medication,
+          quantity: rx.quantity || 1
+        })) : undefined
+      };
+
+      const data = await PatientsAPI.addVisit(selectedPatient._id || selectedPatient.id, recordData);
+      
+      // Show dispensing results if any
+      if (data.dispensingResults) {
+        const successCount = data.dispensingResults.filter(r => r.success).length;
+        const failCount = data.dispensingResults.filter(r => !r.success).length;
+        
+        let message = `Visit record added successfully!\n\n`;
+        if (successCount > 0) {
+          message += `✅ ${successCount} medication(s) dispensed from inventory\n`;
+        }
+        if (failCount > 0) {
+          message += `⚠️ ${failCount} medication(s) failed to dispense:\n`;
+          data.dispensingResults.filter(r => !r.success).forEach(r => {
+            message += `   • ${r.medication}: ${r.message}\n`;
+          });
+        }
+        
+        await Swal.fire({
+          title: 'Record Added',
+          text: message,
+          icon: successCount > 0 ? 'success' : 'warning',
+          confirmButtonColor: '#4CAF50'
+        });
+      } else {
+        await Swal.fire({
+          title: 'Success!',
+          text: 'Visit record added successfully',
+          icon: 'success',
+          confirmButtonColor: '#4CAF50'
+        });
+      }
       
       // Update visits from backend response
       setSelectedPatient({
@@ -125,6 +229,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
         treatment: "",
         notes: "",
       });
+      setPrescriptions([]);
       setShowForm(false);
     } catch (err) {
       alert(err.message || 'Failed to add record');
@@ -717,6 +822,131 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                     rows="2"
                   />
                 </div>
+              </div>
+
+              <div className="form-section">
+                <div className="prescription-section-header">
+                  <h3 className="form-section-title"><FaPills /> Prescriptions</h3>
+                  <button type="button" className="add-prescription-btn" onClick={handleAddPrescription}>
+                    <FaPlus /> Add Medication
+                  </button>
+                </div>
+
+                {prescriptions.length > 0 && (
+                  <div className="prescriptions-form-list">
+                    {prescriptions.map((rx, index) => (
+                      <div key={index} className="prescription-form-item">
+                        <div className="prescription-item-header">
+                          <span className="prescription-number">Medication #{index + 1}</span>
+                          <button 
+                            type="button" 
+                            className="remove-prescription-btn"
+                            onClick={() => handleRemovePrescription(index)}
+                          >
+                            <FaTrash /> Remove
+                          </button>
+                        </div>
+
+                        <div className="form-row">
+                          <div className="form-group">
+                            <label>Select from Inventory (Optional)</label>
+                            <select
+                              value={rx.itemId}
+                              onChange={(e) => handlePrescriptionChange(index, 'itemId', e.target.value)}
+                            >
+                              <option value="">-- Manual Entry / Not in Stock --</option>
+                              {inventoryItems
+                                .filter(item => item.category === 'Medicine' && item.quantity > 0)
+                                .map(item => (
+                                  <option key={item._id} value={item._id}>
+                                    {item.name} (Available: {item.quantity})
+                                  </option>
+                                ))}
+                            </select>
+                            {rx.itemId && (
+                              <small className="form-hint">
+                                Will be dispensed from inventory when saved
+                              </small>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="form-row">
+                          <div className="form-group">
+                            <label>Medication Name <span className="required">*</span></label>
+                            <input
+                              type="text"
+                              value={rx.medication}
+                              onChange={(e) => handlePrescriptionChange(index, 'medication', e.target.value)}
+                              placeholder="e.g., Biogesic"
+                              required
+                            />
+                          </div>
+                          <div className="form-group">
+                            <label>Dosage <span className="required">*</span></label>
+                            <input
+                              type="text"
+                              value={rx.dosage}
+                              onChange={(e) => handlePrescriptionChange(index, 'dosage', e.target.value)}
+                              placeholder="e.g., 500mg"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div className="form-row">
+                          <div className="form-group">
+                            <label>Frequency</label>
+                            <input
+                              type="text"
+                              value={rx.frequency}
+                              onChange={(e) => handlePrescriptionChange(index, 'frequency', e.target.value)}
+                              placeholder="e.g., 3 times a day"
+                            />
+                          </div>
+                          {rx.itemId && (
+                            <div className="form-group">
+                              <label>Quantity to Dispense <span className="required">*</span></label>
+                              <input
+                                type="number"
+                                min="1"
+                                value={rx.quantity}
+                                onChange={(e) => handlePrescriptionChange(index, 'quantity', parseInt(e.target.value) || 1)}
+                                placeholder="1"
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="form-group">
+                          <label>Instructions</label>
+                          <textarea
+                            value={rx.instructions}
+                            onChange={(e) => handlePrescriptionChange(index, 'instructions', e.target.value)}
+                            placeholder="e.g., Take after meals"
+                            rows="2"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {prescriptions.some(rx => rx.itemId) && (
+                  <div className="auto-dispense-option">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={autoDispense}
+                        onChange={(e) => setAutoDispense(e.target.checked)}
+                      />
+                      <span>Automatically dispense medications from inventory</span>
+                    </label>
+                    <small className="form-hint">
+                      Medications will be deducted from inventory and recorded in dispensing history
+                    </small>
+                  </div>
+                )}
               </div>
 
               <div className="ehr-modal-actions">
