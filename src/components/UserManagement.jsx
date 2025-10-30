@@ -14,7 +14,7 @@ function UserManagement() {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create'); // 'create' | 'edit' | 'view'
   const [selectedUser, setSelectedUser] = useState(null);
-  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
+  const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 });
   const [form, setForm] = useState({
     name: '',
     email: '',

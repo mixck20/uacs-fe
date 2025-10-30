@@ -24,6 +24,8 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [form, setForm] = useState({
     name: "",
     quantity: "",
@@ -252,6 +254,18 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
     item.manufacturer?.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Pagination
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const paginatedItems = filteredItems.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
+
   const stats = {
     total: items.length,
     available: items.filter(item => item.quantity > lowStockThreshold).length,
@@ -345,7 +359,7 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
               {search && <small>Try adjusting your search</small>}
             </div>
           ) : (
-            filteredItems.map((item) => {
+            paginatedItems.map((item) => {
               const isLowStock = item.quantity <= lowStockThreshold && item.quantity > 0;
               const isOutOfStock = item.quantity === 0;
               const daysUntilExpiry = item.expiryDate
@@ -459,6 +473,29 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
             })
           )}
         </div>
+
+        {/* Pagination */}
+        {filteredItems.length > itemsPerPage && (
+          <div className="pagination">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(prev => prev - 1)}
+              className="pagination-btn"
+            >
+              Previous
+            </button>
+            <span className="pagination-info">
+              Page {currentPage} of {totalPages} ({filteredItems.length} total)
+            </span>
+            <button
+              disabled={currentPage >= totalPages}
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              className="pagination-btn"
+            >
+              Next
+            </button>
+          </div>
+        )}
 
         {/* Add/Edit Medicine Modal */}
         {showForm && (

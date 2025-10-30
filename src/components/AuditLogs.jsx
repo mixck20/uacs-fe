@@ -16,7 +16,7 @@ function AuditLogs() {
     endDate: '',
     search: ''
   });
-  const [pagination, setPagination] = useState({ page: 1, limit: 50, total: 0 });
+  const [pagination, setPagination] = useState({ page: 1, limit: 15, total: 0 });
   const [stats, setStats] = useState(null);
 
   useEffect(() => {

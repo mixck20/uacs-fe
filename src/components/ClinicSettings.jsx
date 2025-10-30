@@ -5,8 +5,8 @@ import Swal from 'sweetalert2';
 import { FaUser, FaEnvelope, FaLock, FaShieldAlt, FaSignOutAlt } from 'react-icons/fa';
 import './ClinicSettings.css';
 
-function ClinicSettings({ onLogout, activePage, setActivePage, user }) {
-  const [user, setUser] = useState(null);
+function ClinicSettings({ onLogout, activePage, setActivePage, user: userProp }) {
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
   
@@ -31,7 +31,7 @@ function ClinicSettings({ onLogout, activePage, setActivePage, user }) {
   const fetchUserProfile = async () => {
     try {
       const userData = JSON.parse(localStorage.getItem('user') || '{}');
-      setUser(userData);
+      setCurrentUser(userData);
       setProfileData({
         name: userData.name || '',
         email: userData.email || '',
@@ -48,7 +48,7 @@ function ClinicSettings({ onLogout, activePage, setActivePage, user }) {
     e.preventDefault();
     
     // Check if email changed - require password
-    if (profileData.email !== user.email && !profileData.currentPassword) {
+    if (profileData.email !== currentUser.email && !profileData.currentPassword) {
       Swal.fire({
         icon: 'warning',
         title: 'Password Required',
@@ -61,7 +61,7 @@ function ClinicSettings({ onLogout, activePage, setActivePage, user }) {
     try {
       const result = await Swal.fire({
         title: 'Update Profile?',
-        text: profileData.email !== user.email 
+        text: profileData.email !== currentUser.email 
           ? 'A verification email will be sent to your new email address'
           : 'Are you sure you want to update your profile?',
         icon: 'question',
@@ -75,7 +75,7 @@ function ClinicSettings({ onLogout, activePage, setActivePage, user }) {
 
       const updateData = {
         name: profileData.name,
-        ...(profileData.email !== user.email && {
+        ...(profileData.email !== currentUser.email && {
           email: profileData.email,
           currentPassword: profileData.currentPassword
         })
@@ -84,17 +84,17 @@ function ClinicSettings({ onLogout, activePage, setActivePage, user }) {
       await AuthAPI.updateProfile(updateData);
 
       // Update local storage
-      const updatedUser = { ...user, name: profileData.name };
-      if (profileData.email === user.email) {
+      const updatedUser = { ...currentUser, name: profileData.name };
+      if (profileData.email === currentUser.email) {
         updatedUser.email = profileData.email;
       }
       localStorage.setItem('user', JSON.stringify(updatedUser));
-      setUser(updatedUser);
+      setCurrentUser(updatedUser);
 
       Swal.fire({
         icon: 'success',
         title: 'Profile Updated!',
-        text: profileData.email !== user.email
+        text: profileData.email !== currentUser.email
           ? 'Please check your new email to verify the change'
           : 'Your profile has been updated successfully',
         confirmButtonColor: '#e51d5e'
@@ -182,7 +182,7 @@ function ClinicSettings({ onLogout, activePage, setActivePage, user }) {
   if (loading) {
     return (
       <div className="clinic-portal">
-        <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} user={user} />
+        <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} user={userProp} />
         <div className="clinic-settings">
           <div className="loading-spinner">Loading settings...</div>
         </div>
@@ -192,7 +192,7 @@ function ClinicSettings({ onLogout, activePage, setActivePage, user }) {
 
   return (
     <div className="clinic-portal">
-      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} />
+      <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} user={userProp} />
       <div className="clinic-settings">
         <div className="clinic-settings-container">
           <h1>Account Settings</h1>

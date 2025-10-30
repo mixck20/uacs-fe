@@ -2502,3 +2502,55 @@ textarea:focus {
     width: 100%;
   }
 }
+ 
+ / *   P a g i n a t i o n   * /  
+ . p a g i n a t i o n   {  
+     d i s p l a y :   f l e x ;  
+     j u s t i f y - c o n t e n t :   c e n t e r ;  
+     a l i g n - i t e m s :   c e n t e r ;  
+     g a p :   2 0 p x ;  
+     m a r g i n - t o p :   2 r e m ;  
+     p a d d i n g :   2 0 p x ;  
+     b a c k g r o u n d :   w h i t e ;  
+     b o r d e r - r a d i u s :   1 2 p x ;  
+     b o x - s h a d o w :   0   4 p x   1 5 p x   r g b a ( 0 ,   0 ,   0 ,   0 . 1 ) ;  
+ }  
+ 
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 2rem;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-btn {
+  padding: 10px 20px;
+  border: 2px solid #e51d5e;
+  background: white;
+  color: #e51d5e;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #e51d5e;
+  color: white;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  color: #374151;
+  font-weight: 600;
+}

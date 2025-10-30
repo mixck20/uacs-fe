@@ -19,6 +19,8 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
   const [unreadMessages, setUnreadMessages] = useState({}); // Track unread messages per appointment
   const [activeFilter, setActiveFilter] = useState('pending');
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [showHealthRecordModal, setShowHealthRecordModal] = useState(false);
   const [healthRecordForm, setHealthRecordForm] = useState({
@@ -1066,6 +1068,18 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
       );
     });
 
+  // Pagination
+  const totalPages = Math.ceil(filteredAppointments.length / itemsPerPage);
+  const paginatedAppointments = filteredAppointments.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to page 1 when filter or search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeFilter, searchTerm]);
+
   const pendingAppointments = appointments.filter(apt => apt.status === "Pending");
   const confirmedAppointments = appointments.filter(apt => apt.status === "Confirmed");
   const completedAppointments = appointments.filter(apt => apt.status === "Completed");
@@ -1218,7 +1232,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               <p>Try adjusting your filters or search terms</p>
             </div>
           ) : (
-            filteredAppointments.map(appointment => (
+            paginatedAppointments.map(appointment => (
               <div key={appointment.id} className={`appointment-card appointment-${appointment.status?.toLowerCase()}`}>
                 <div className="appointment-card-header">
                   <div className="appointment-type-badge">
@@ -1407,6 +1421,29 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
             ))
           )}
         </div>
+
+        {/* Pagination */}
+        {filteredAppointments.length > itemsPerPage && (
+          <div className="pagination">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(prev => prev - 1)}
+              className="pagination-btn"
+            >
+              Previous
+            </button>
+            <span className="pagination-info">
+              Page {currentPage} of {totalPages} ({filteredAppointments.length} total)
+            </span>
+            <button
+              disabled={currentPage >= totalPages}
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              className="pagination-btn"
+            >
+              Next
+            </button>
+          </div>
+        )}
 
         {/* Chat Interface */}
         {showChat && selectedRequest && (
