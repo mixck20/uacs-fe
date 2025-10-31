@@ -225,21 +225,8 @@ const UserAppointment = ({ user, onLogout }) => {
     }
 
     if (name === 'preferredTime') {
-      const timeValue = value;
-      const [hours, minutes] = timeValue.split(':').map(Number);
-      
-      // Check if time is within clinic hours (9 AM to 5 PM)
-      if (hours < 9 || hours >= 17) {
-        Swal.fire({
-          title: "Invalid Time",
-          text: "Please select a time between 9:00 AM and 5:00 PM",
-          icon: "warning"
-        });
-        return;
-      }
-
       // Check if selected date is today and time has already passed
-      if (formData.preferredDate) {
+      if (formData.preferredDate && value) {
         const selectedDate = new Date(formData.preferredDate);
         const today = new Date();
         
@@ -249,9 +236,10 @@ const UserAppointment = ({ user, onLogout }) => {
         
         if (selectedDate.getTime() === today.getTime()) {
           // Selected date is today, check if time has passed
+          const [hours] = value.split(':').map(Number);
           const currentTime = new Date();
           const selectedTime = new Date();
-          selectedTime.setHours(hours, minutes, 0, 0);
+          selectedTime.setHours(hours, 0, 0, 0);
           
           if (selectedTime <= currentTime) {
             Swal.fire({
@@ -630,15 +618,21 @@ const UserAppointment = ({ user, onLogout }) => {
             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
               New Preferred Time
             </label>
-            <input 
-              type="time" 
+            <select 
               id="reschedule-time" 
-              min="09:00"
-              max="17:00"
-              step="900"
               style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; font-size: 0.95rem;"
-            />
-            <small style="color: #666; font-size: 0.85rem;">Clinic hours: 9:00 AM - 5:00 PM</small>
+            >
+              <option value="">Select time</option>
+              <option value="09:00">9:00 AM</option>
+              <option value="10:00">10:00 AM</option>
+              <option value="11:00">11:00 AM</option>
+              <option value="12:00">12:00 PM</option>
+              <option value="13:00">1:00 PM</option>
+              <option value="14:00">2:00 PM</option>
+              <option value="15:00">3:00 PM</option>
+              <option value="16:00">4:00 PM</option>
+            </select>
+            <small style="color: #666; font-size: 0.85rem;">Clinic hours: 9:00 AM - 4:00 PM</small>
           </div>
           <div>
             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
@@ -889,18 +883,24 @@ const UserAppointment = ({ user, onLogout }) => {
                   </div>
                   <div className="form-group">
                     <label>Preferred Time</label>
-                    <input
-                      type="time"
+                    <select
                       name="preferredTime"
                       value={formData.preferredTime}
                       onChange={handleFormChange}
-                      min="09:00"
-                      max="17:00"
-                      step="900" // 15-minute intervals
                       required
-                    />
+                    >
+                      <option value="">Select time</option>
+                      <option value="09:00">9:00 AM</option>
+                      <option value="10:00">10:00 AM</option>
+                      <option value="11:00">11:00 AM</option>
+                      <option value="12:00">12:00 PM</option>
+                      <option value="13:00">1:00 PM</option>
+                      <option value="14:00">2:00 PM</option>
+                      <option value="15:00">3:00 PM</option>
+                      <option value="16:00">4:00 PM</option>
+                    </select>
                     <small className="time-note">
-                      Clinic hours: 9:00 AM - 5:00 PM, Monday to Friday
+                      Clinic hours: 9:00 AM - 4:00 PM, Monday to Friday
                     </small>
                   </div>
                 </div>
