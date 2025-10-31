@@ -420,12 +420,12 @@ const UserHealthRecord = ({ user, onLogout }) => {
     const result = await Swal.fire({
       title: 'Request Medical Certificate',
       html: `
-        <div style="text-align: left; margin-top: 1rem; overflow-x: hidden;">
-          <label style="display: block; margin-bottom: 0.75rem; font-weight: 600; font-size: 1rem; color: #333;">
+        <div style="text-align: left; margin-top: 1rem; overflow-x: hidden; max-height: 70vh; overflow-y: auto;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.95rem; color: #333;">
             Select Health Record(s) *
           </label>
           <div style="
-            max-height: 300px; 
+            max-height: 200px; 
             overflow-y: auto; 
             overflow-x: hidden;
             border: 1px solid #e0e0e5; 
@@ -436,17 +436,14 @@ const UserHealthRecord = ({ user, onLogout }) => {
           ">
             ${visitsHtml}
           </div>
-          <p style="font-size: 0.85rem; color: #666; margin: 0 0 1.5rem 0; font-style: italic; display: flex; align-items: center; gap: 0.5rem;">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="14" height="14" fill="#666" style="flex-shrink: 0;">
-              <path d="M280 64h40c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128C0 92.7 28.7 64 64 64h40 9.6C121 27.5 153.3 0 192 0s71 27.5 78.4 64H280zM64 112c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320c8.8 0 16-7.2 16-16V128c0-8.8-7.2-16-16-16H304v24c0 13.3-10.7 24-24 24H192 104c-13.3 0-24-10.7-24-24V112H64zm128-8a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/>
-            </svg>
-            Select one or more clinic visits to include in your certificate
+          <p style="font-size: 0.8rem; color: #666; margin: 0 0 1rem 0; font-style: italic;">
+            Select one or more clinic visits
           </p>
           
-          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.95rem; color: #333;">
             Purpose of Certificate *
           </label>
-          <select id="certificate-purpose" class="swal2-input" style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 8px; font-size: 0.95rem;">
+          <select id="certificate-purpose" style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 8px; font-size: 0.95rem; margin-bottom: 1rem; background: white;">
             <option value="">Select purpose...</option>
             <option value="Sick Leave">Sick Leave</option>
             <option value="School Excuse">School Excuse</option>
@@ -455,18 +452,17 @@ const UserHealthRecord = ({ user, onLogout }) => {
             <option value="Other">Other</option>
           </select>
           
-          <label style="display: block; margin-top: 1rem; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.95rem; color: #333;">
             Additional Notes (Optional)
           </label>
           <textarea 
             id="certificate-notes" 
-            class="swal2-textarea" 
             placeholder="Any additional information or special requests..."
-            style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 8px; font-size: 0.95rem; min-height: 80px; resize: vertical;"
+            style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 8px; font-size: 0.95rem; min-height: 70px; resize: vertical; font-family: inherit;"
           ></textarea>
         </div>
       `,
-      width: '600px',
+      width: '550px',
       showCancelButton: true,
       confirmButtonText: 'Submit Request',
       cancelButtonText: 'Cancel',
