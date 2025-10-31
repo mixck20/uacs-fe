@@ -93,10 +93,8 @@ function App() {
       // Continue with cleanup even if API call fails
     }
     
-    // Clear all authentication data
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('userRole');
+    // Clear all localStorage data (authentication and app data)
+    localStorage.clear();
     
     // Reset all state
     setIsLoggedIn(false);

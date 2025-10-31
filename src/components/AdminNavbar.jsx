@@ -33,10 +33,8 @@ function AdminNavbar() {
       // Continue with cleanup even if API call fails
     }
     
-    // Clear all authentication data
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('userRole');
+    // Clear all localStorage data (authentication and app data)
+    localStorage.clear();
     
     // Force navigation to login with full page reload
     window.location.href = '/login';
