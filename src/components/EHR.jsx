@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ClinicNavbar from "./ClinicNavbar";
 import "./EHR.css";
 import { PatientsAPI, InventoryAPI } from "../api";
-import { FaUser, FaCalendar, FaStethoscope, FaPills, FaNotesMedical, FaHeartbeat, FaPhone, FaFileMedical, FaTimes, FaPlus, FaFileExport, FaTrash } from "react-icons/fa";
+import { FaUser, FaCalendar, FaStethoscope, FaPills, FaNotesMedical, FaHeartbeat, FaPhone, FaFileMedical, FaTimes, FaPlus, FaFileExport, FaTrash, FaEye } from "react-icons/fa";
 import jsPDF from "jspdf";
 import Swal from "sweetalert2";
 
@@ -11,6 +11,8 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedVisit, setSelectedVisit] = useState(null);
 
   // EHR record form state
   const [newRecord, setNewRecord] = useState({
@@ -127,6 +129,12 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     }
     
     setPrescriptions(updated);
+  }
+
+  // --- Open visit details modal ---
+  function handleViewDetails(visit) {
+    setSelectedVisit(visit);
+    setShowDetailsModal(true);
   }
 
   // --- Add a new medical record via backend ---
@@ -574,9 +582,18 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                               <FaCalendar />
                               <span>{new Date(visit.date).toLocaleDateString()}</span>
                             </div>
-                            {visit.appointmentId && (
-                              <span className="appointment-badge">From Appointment</span>
-                            )}
+                            <div className="record-header-actions">
+                              {visit.appointmentId && (
+                                <span className="appointment-badge">From Appointment</span>
+                              )}
+                              <button 
+                                className="view-details-btn" 
+                                onClick={() => handleViewDetails(visit)}
+                                title="View Full Details"
+                              >
+                                <FaEye /> View Details
+                              </button>
+                            </div>
                           </div>
                           
                           <div className="record-body">
@@ -955,6 +972,202 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                 </button>
                 <button className="ehr-btn save-btn" onClick={handleAddRecord}>
                   Save Record
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* View Details Modal */}
+        {showDetailsModal && selectedVisit && (
+          <div className="ehr-modal">
+            <div className="ehr-modal-content">
+              <div className="modal-header">
+                <h2>Complete Medical Record</h2>
+                <button className="close-modal-btn" onClick={() => setShowDetailsModal(false)}>
+                  <FaTimes />
+                </button>
+              </div>
+
+              {/* Visit Date */}
+              <div className="form-section">
+                <h3 className="form-section-title">Visit Information</h3>
+                <div className="detail-row">
+                  <span className="detail-label"><FaCalendar /> Visit Date:</span>
+                  <span className="detail-value">{new Date(selectedVisit.date).toLocaleDateString()}</span>
+                </div>
+                {selectedVisit.appointmentId && (
+                  <div className="detail-row">
+                    <span className="detail-label">Source:</span>
+                    <span className="detail-value appointment-badge">From Appointment</span>
+                  </div>
+                )}
+                {selectedVisit.addedBy && (
+                  <div className="detail-row">
+                    <span className="detail-label">Added By:</span>
+                    <span className="detail-value">{selectedVisit.addedBy.name || 'Staff'}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Basic Information */}
+              <div className="form-section">
+                <h3 className="form-section-title">Basic Information</h3>
+                {selectedVisit.age && (
+                  <div className="detail-row">
+                    <span className="detail-label">Age:</span>
+                    <span className="detail-value">{selectedVisit.age} years</span>
+                  </div>
+                )}
+                {selectedVisit.courseYearSection && (
+                  <div className="detail-row">
+                    <span className="detail-label">Course, Year & Section:</span>
+                    <span className="detail-value">{selectedVisit.courseYearSection}</span>
+                  </div>
+                )}
+                {selectedVisit.physician && (
+                  <div className="detail-row">
+                    <span className="detail-label">Physician:</span>
+                    <span className="detail-value">{selectedVisit.physician}</span>
+                  </div>
+                )}
+                {selectedVisit.nurse && (
+                  <div className="detail-row">
+                    <span className="detail-label">Nurse:</span>
+                    <span className="detail-value">{selectedVisit.nurse}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* PE Findings */}
+              {(selectedVisit.height || selectedVisit.weight || selectedVisit.bloodPressure || selectedVisit.lmp) && (
+                <div className="form-section">
+                  <h3 className="form-section-title">P.E. FINDINGS</h3>
+                  <div className="details-grid">
+                    {selectedVisit.height && (
+                      <div className="detail-box">
+                        <span className="detail-label">Height (HT)</span>
+                        <span className="detail-value">{selectedVisit.height}</span>
+                      </div>
+                    )}
+                    {selectedVisit.weight && (
+                      <div className="detail-box">
+                        <span className="detail-label">Weight (WT)</span>
+                        <span className="detail-value">{selectedVisit.weight}</span>
+                      </div>
+                    )}
+                    {selectedVisit.bloodPressure && (
+                      <div className="detail-box">
+                        <span className="detail-label">Blood Pressure (BP)</span>
+                        <span className="detail-value">{selectedVisit.bloodPressure}</span>
+                      </div>
+                    )}
+                    {selectedVisit.lmp && (
+                      <div className="detail-box">
+                        <span className="detail-label">LMP (for female)</span>
+                        <span className="detail-value">{selectedVisit.lmp}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Vital Signs */}
+              {selectedVisit.vitalSigns && (
+                <div className="form-section">
+                  <h3 className="form-section-title"><FaHeartbeat /> Vital Signs</h3>
+                  <div className="details-grid">
+                    {selectedVisit.vitalSigns.bloodPressure && (
+                      <div className="detail-box">
+                        <span className="detail-label">Blood Pressure</span>
+                        <span className="detail-value">{selectedVisit.vitalSigns.bloodPressure}</span>
+                      </div>
+                    )}
+                    {selectedVisit.vitalSigns.temperature && (
+                      <div className="detail-box">
+                        <span className="detail-label">Temperature</span>
+                        <span className="detail-value">{selectedVisit.vitalSigns.temperature}</span>
+                      </div>
+                    )}
+                    {selectedVisit.vitalSigns.heartRate && (
+                      <div className="detail-box">
+                        <span className="detail-label">Heart Rate</span>
+                        <span className="detail-value">{selectedVisit.vitalSigns.heartRate}</span>
+                      </div>
+                    )}
+                    {selectedVisit.vitalSigns.weight && (
+                      <div className="detail-box">
+                        <span className="detail-label">Weight</span>
+                        <span className="detail-value">{selectedVisit.vitalSigns.weight}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Clinical Assessment */}
+              <div className="form-section">
+                <h3 className="form-section-title">Clinical Assessment</h3>
+                {selectedVisit.diagnosis && (
+                  <div className="detail-section">
+                    <h4><FaStethoscope /> Diagnosis</h4>
+                    <p className="detail-text">{selectedVisit.diagnosis}</p>
+                  </div>
+                )}
+                {selectedVisit.treatment && (
+                  <div className="detail-section">
+                    <h4><FaNotesMedical /> Treatment</h4>
+                    <p className="detail-text">{selectedVisit.treatment}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Prescriptions */}
+              {selectedVisit.prescriptions && selectedVisit.prescriptions.length > 0 && (
+                <div className="form-section">
+                  <h3 className="form-section-title"><FaPills /> Prescriptions</h3>
+                  <div className="prescriptions-details-list">
+                    {selectedVisit.prescriptions.map((rx, idx) => (
+                      <div key={idx} className="prescription-detail-card">
+                        <div className="prescription-detail-header">
+                          <FaPills className="prescription-icon" />
+                          <span className="prescription-name">{rx.medication}</span>
+                        </div>
+                        <div className="prescription-detail-body">
+                          <div className="prescription-detail-item">
+                            <span className="label">Dosage:</span>
+                            <span className="value">{rx.dosage}</span>
+                          </div>
+                          {rx.frequency && (
+                            <div className="prescription-detail-item">
+                              <span className="label">Frequency:</span>
+                              <span className="value">{rx.frequency}</span>
+                            </div>
+                          )}
+                          {rx.instructions && (
+                            <div className="prescription-detail-item">
+                              <span className="label">Instructions:</span>
+                              <span className="value">{rx.instructions}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Additional Notes */}
+              {selectedVisit.notes && (
+                <div className="form-section">
+                  <h3 className="form-section-title">Additional Notes</h3>
+                  <p className="detail-text notes-text">{selectedVisit.notes}</p>
+                </div>
+              )}
+
+              <div className="ehr-modal-actions">
+                <button className="ehr-btn cancel-btn" onClick={() => setShowDetailsModal(false)}>
+                  Close
                 </button>
               </div>
             </div>

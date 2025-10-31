@@ -1065,3 +1065,204 @@
     justify-content: center;
   }
 }
+
+/* View Details Button */
+.record-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.view-details-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.view-details-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* Details Modal Styles */
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f3f7;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail-value {
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.detail-box {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-box .detail-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.detail-box .detail-value {
+  font-size: 1.125rem;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.detail-section {
+  margin-bottom: 20px;
+}
+
+.detail-section h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  color: #e51d5e;
+  font-weight: 600;
+}
+
+.detail-section h4 svg {
+  font-size: 1.1rem;
+}
+
+.detail-text {
+  color: #475569;
+  line-height: 1.6;
+  margin: 0;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border-left: 4px solid #e51d5e;
+}
+
+/* Prescription Details */
+.prescriptions-details-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.prescription-detail-card {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.prescription-detail-header {
+  background: linear-gradient(135deg, #e51d5e 0%, #ff6b9d 100%);
+  color: white;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.prescription-icon {
+  font-size: 1.25rem;
+}
+
+.prescription-name {
+  flex: 1;
+}
+
+.prescription-detail-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.prescription-detail-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.prescription-detail-item .label {
+  font-weight: 600;
+  color: #64748b;
+  min-width: 100px;
+}
+
+.prescription-detail-item .value {
+  color: #1e293b;
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .record-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .record-header-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .view-details-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prescription-detail-item {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .prescription-detail-item .label {
+    min-width: auto;
+  }
+}
