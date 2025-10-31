@@ -325,13 +325,17 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
                 <tbody>
                   {currentRecords.map((record, index) => (
                     <tr key={index}>
-                      <td className="date-cell">
-                        {new Date(record.dispensedAt).toLocaleDateString()}
-                        <span className="time">{new Date(record.dispensedAt).toLocaleTimeString()}</span>
+                      <td>
+                        <div className="date-cell">
+                          {new Date(record.dispensedAt).toLocaleDateString()}
+                          <span className="time">{new Date(record.dispensedAt).toLocaleTimeString()}</span>
+                        </div>
                       </td>
-                      <td className="medication-cell">
-                        <FaPills className="med-icon" />
-                        {record.itemName || 'Unknown'}
+                      <td>
+                        <div className="medication-cell">
+                          <FaPills className="med-icon" />
+                          {record.itemName || 'Unknown'}
+                        </div>
                       </td>
                       <td className="quantity-cell">{record.quantity}</td>
                       <td>{record.patientName || 'N/A'}</td>

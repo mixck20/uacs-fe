@@ -279,11 +279,11 @@
   white-space: nowrap;
 }
 
-.dispensing-table th:nth-child(1) { width: 140px; } /* Date & Time */
-.dispensing-table th:nth-child(2) { width: 150px; } /* Medication */
-.dispensing-table th:nth-child(3) { width: 90px; }  /* Quantity */
+.dispensing-table th:nth-child(1) { width: 160px; } /* Date & Time */
+.dispensing-table th:nth-child(2) { width: 180px; } /* Medication */
+.dispensing-table th:nth-child(3) { width: 100px; } /* Quantity */
 .dispensing-table th:nth-child(4) { width: 180px; } /* Patient */
-.dispensing-table th:nth-child(5) { width: 120px; } /* Student ID */
+.dispensing-table th:nth-child(5) { width: 130px; } /* Student ID */
 .dispensing-table th:nth-child(6) { width: 150px; } /* Dispensed By */
 .dispensing-table th:nth-child(7) { width: 180px; } /* Reason */
 .dispensing-table th:nth-child(8) { width: 200px; } /* Notes */
@@ -301,41 +301,45 @@
   padding: 14px 12px;
   color: #334155;
   font-size: 0.9rem;
-  vertical-align: top;
+  vertical-align: middle;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .date-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 120px;
+  display: block !important;
+  min-width: 140px;
 }
 
 .date-cell .time {
+  display: block;
   font-size: 0.75rem;
   color: #94a3b8;
   font-weight: 500;
+  margin-top: 4px;
 }
 
 .medication-cell {
   font-weight: 600;
   color: #1e293b;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  line-height: 1.4;
+  display: block !important;
+  line-height: 1.6;
+  word-wrap: break-word;
 }
 
 .medication-cell .med-icon {
+  display: inline-block;
   color: #e51d5e;
   font-size: 1rem;
-  flex-shrink: 0;
+  margin-right: 6px;
+  vertical-align: middle;
 }
 
 .quantity-cell {
   font-weight: 700;
   color: #3b82f6;
-  text-align: center;
+  text-align: center !important;
   font-size: 1.1rem;
 }
 
