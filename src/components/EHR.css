@@ -249,6 +249,27 @@
   box-shadow: 0 6px 16px rgba(229, 29, 94, 0.4);
 }
 
+/* Make Add First Record button bigger */
+.empty-state .ehr-btn.add-btn {
+  padding: 1.25rem 3rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  border-radius: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 8px 20px rgba(229, 29, 94, 0.3);
+}
+
+.empty-state .ehr-btn.add-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(229, 29, 94, 0.4);
+}
+
+.empty-state .ehr-btn.add-btn svg {
+  font-size: 1.5rem;
+}
+
 .ehr-btn.export-btn {
   background: white;
   color: #64748b;
