@@ -796,6 +796,133 @@ const UserHealthRecord = ({ user, onLogout }) => {
                         <p className="record-notes">{visit.notes}</p>
                       </div>
                     )}
+
+                    <div className="record-actions">
+                      <button 
+                        className="view-details-btn"
+                        onClick={() => {
+                          Swal.fire({
+                            title: 'Visit Details',
+                            html: `
+                              <div style="text-align: left; padding: 1rem;">
+                                <div style="margin-bottom: 1.5rem;">
+                                  <h4 style="color: #e51d5e; margin-bottom: 0.5rem;">Date & Time</h4>
+                                  <p style="margin: 0; font-size: 0.95rem;">${new Date(visit.date).toLocaleString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}</p>
+                                </div>
+                                
+                                ${visit.appointmentId ? `
+                                  <div style="margin-bottom: 1.5rem;">
+                                    <h4 style="color: #e51d5e; margin-bottom: 0.5rem;">Related Appointment</h4>
+                                    <p style="margin: 0; font-size: 0.95rem;">
+                                      ${new Date(visit.appointmentId.date).toLocaleDateString()} at ${visit.appointmentId.time}
+                                      ${visit.appointmentId.type ? ` • ${visit.appointmentId.type}` : ''}
+                                    </p>
+                                  </div>
+                                ` : ''}
+                                
+                                ${visit.age ? `
+                                  <div style="margin-bottom: 1.5rem;">
+                                    <h4 style="color: #e51d5e; margin-bottom: 0.5rem;">Age at Visit</h4>
+                                    <p style="margin: 0; font-size: 0.95rem;">${visit.age} years old</p>
+                                  </div>
+                                ` : ''}
+                                
+                                ${visit.courseYearSection ? `
+                                  <div style="margin-bottom: 1.5rem;">
+                                    <h4 style="color: #e51d5e; margin-bottom: 0.5rem;">Course/Year/Section</h4>
+                                    <p style="margin: 0; font-size: 0.95rem;">${visit.courseYearSection}</p>
+                                  </div>
+                                ` : ''}
+                                
+                                ${visit.physician ? `
+                                  <div style="margin-bottom: 1.5rem;">
+                                    <h4 style="color: #e51d5e; margin-bottom: 0.5rem;">Physician</h4>
+                                    <p style="margin: 0; font-size: 0.95rem;">${visit.physician}</p>
+                                  </div>
+                                ` : ''}
+                                
+                                ${visit.nurse ? `
+                                  <div style="margin-bottom: 1.5rem;">
+                                    <h4 style="color: #e51d5e; margin-bottom: 0.5rem;">Nurse</h4>
+                                    <p style="margin: 0; font-size: 0.95rem;">${visit.nurse}</p>
+                                  </div>
+                                ` : ''}
+                                
+                                ${visit.vitalSigns && Object.keys(visit.vitalSigns).length > 0 ? `
+                                  <div style="margin-bottom: 1.5rem;">
+                                    <h4 style="color: #e51d5e; margin-bottom: 0.5rem;">Vital Signs</h4>
+                                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; font-size: 0.95rem;">
+                                      ${visit.vitalSigns.bloodPressure ? `<div><strong>BP:</strong> ${visit.vitalSigns.bloodPressure}</div>` : ''}
+                                      ${visit.vitalSigns.temperature ? `<div><strong>Temp:</strong> ${visit.vitalSigns.temperature}°</div>` : ''}
+                                      ${visit.vitalSigns.heartRate ? `<div><strong>HR:</strong> ${visit.vitalSigns.heartRate} bpm</div>` : ''}
+                                      ${visit.vitalSigns.weight ? `<div><strong>Weight:</strong> ${visit.vitalSigns.weight} kg</div>` : ''}
+                                      ${visit.vitalSigns.height ? `<div><strong>Height:</strong> ${visit.vitalSigns.height} cm</div>` : ''}
+                                    </div>
+                                  </div>
+                                ` : ''}
+                                
+                                ${visit.height || visit.weight || visit.bloodPressure ? `
+                                  <div style="margin-bottom: 1.5rem;">
+                                    <h4 style="color: #e51d5e; margin-bottom: 0.5rem;">Physical Exam Findings</h4>
+                                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; font-size: 0.95rem;">
+                                      ${visit.height ? `<div><strong>Height:</strong> ${visit.height}</div>` : ''}
+                                      ${visit.weight ? `<div><strong>Weight:</strong> ${visit.weight}</div>` : ''}
+                                      ${visit.bloodPressure ? `<div><strong>BP:</strong> ${visit.bloodPressure}</div>` : ''}
+                                    </div>
+                                  </div>
+                                ` : ''}
+                                
+                                ${visit.diagnosis ? `
+                                  <div style="margin-bottom: 1.5rem;">
+                                    <h4 style="color: #e51d5e; margin-bottom: 0.5rem;">Diagnosis</h4>
+                                    <p style="margin: 0; font-size: 0.95rem; white-space: pre-wrap;">${visit.diagnosis}</p>
+                                  </div>
+                                ` : ''}
+                                
+                                ${visit.treatment ? `
+                                  <div style="margin-bottom: 1.5rem;">
+                                    <h4 style="color: #e51d5e; margin-bottom: 0.5rem;">Treatment</h4>
+                                    <p style="margin: 0; font-size: 0.95rem; white-space: pre-wrap;">${visit.treatment}</p>
+                                  </div>
+                                ` : ''}
+                                
+                                ${visit.prescriptions && visit.prescriptions.length > 0 ? `
+                                  <div style="margin-bottom: 1.5rem;">
+                                    <h4 style="color: #e51d5e; margin-bottom: 0.5rem;">Prescriptions</h4>
+                                    <ul style="margin: 0.5rem 0; padding-left: 1.5rem; font-size: 0.95rem;">
+                                      ${visit.prescriptions.map(rx => `
+                                        <li style="margin-bottom: 0.5rem;">
+                                          <strong>${rx.medication || 'N/A'}</strong> - ${rx.dosage || 'N/A'}
+                                          ${rx.instructions || rx.frequency ? `<br/><span style="color: #666; font-size: 0.9rem;">${rx.frequency || rx.instructions || 'As directed'}</span>` : ''}
+                                        </li>
+                                      `).join('')}
+                                    </ul>
+                                  </div>
+                                ` : ''}
+                                
+                                ${visit.notes ? `
+                                  <div style="margin-bottom: 1.5rem;">
+                                    <h4 style="color: #e51d5e; margin-bottom: 0.5rem;">Additional Notes</h4>
+                                    <p style="margin: 0; font-size: 0.95rem; white-space: pre-wrap;">${visit.notes}</p>
+                                  </div>
+                                ` : ''}
+                              </div>
+                            `,
+                            width: '650px',
+                            confirmButtonColor: '#e51d5e',
+                            confirmButtonText: 'Close'
+                          });
+                        }}
+                      >
+                        <FaClipboardList /> View Details
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

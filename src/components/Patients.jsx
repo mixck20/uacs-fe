@@ -512,10 +512,6 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
               <div className="patient-card-body">
                 <h3 className="patient-name">{patient.fullName || patient.name}</h3>
                 <div className="patient-info-row">
-                  <span className="patient-label">ID:</span>
-                  <span className="patient-value">{patient.studentId || patient.schoolId || 'N/A'}</span>
-                </div>
-                <div className="patient-info-row">
                   <span className="patient-label">Email:</span>
                   <span className="patient-value">{patient.email}</span>
                 </div>
@@ -539,7 +535,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                   className="patient-view-btn"
                   onClick={() => setSelectedPatient(patient)}
                 >
-                  <FaEye /> View Details
+                  <FaEye /> Health Record
                 </button>
                 {showArchived ? (
                   <button 
@@ -808,9 +804,6 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                   </div>
                   <div className="patient-details-info">
                     <h2>{selectedPatient.fullName || selectedPatient.name}</h2>
-                    <span className={`patient-badge ${selectedPatient.role === 'Student' ? 'badge-student' : 'badge-faculty'}`}>
-                      {selectedPatient.role || 'Student'}
-                    </span>
                   </div>
                 </div>
 
