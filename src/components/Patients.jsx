@@ -535,7 +535,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                   className="patient-view-btn"
                   onClick={() => setSelectedPatient(patient)}
                 >
-                  <FaEye /> Health Record
+                  <FaEye /> View Details
                 </button>
                 {showArchived ? (
                   <button 

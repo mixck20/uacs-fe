@@ -15,7 +15,6 @@ import UserSettings from "./components/UserSettings";
 import Patients from "./components/Patients";
 import Inventory from "./components/Inventory";
 import Appointment from "./components/Appointment";
-import Email from "./components/Email";
 import EHR from "./components/EHR";
 import CertificateManagement from "./components/CertificateManagement";
 import Schedule from "./components/Schedule";
@@ -269,15 +268,6 @@ function App() {
               patients={patients}
               appointments={appointments}
               setAppointments={setAppointments}
-            />
-          );
-        case 'email':
-          return (
-            <Email
-              {...commonProps}
-              patients={patients}
-              appointments={appointments}
-              inventory={inventory}
             />
           );
         case 'certificates':

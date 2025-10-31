@@ -140,12 +140,6 @@ const ClinicNavbar = ({ activePage, setActivePage, onLogout, user }) => {
           Certificates
         </span>
         <span 
-          className={`clinic-nav-link ${activePage === "email" ? "active" : ""}`}
-          onClick={() => handleNavClick("email")}
-        >
-          Email
-        </span>
-        <span 
           className={`clinic-nav-link ${activePage === "schedule" ? "active" : ""}`}
           onClick={() => handleNavClick("schedule")}
         >
