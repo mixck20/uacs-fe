@@ -432,3 +432,18 @@
     height: 28px !important;
   }
 }
+
+/* Hide input/textarea in feedback success alert */
+.feedback-success-alert input,
+.feedback-success-alert textarea,
+.feedback-success-alert select,
+.feedback-success-alert .swal2-input,
+.feedback-success-alert .swal2-textarea {
+  display: none !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  visibility: hidden !important;
+}
+
