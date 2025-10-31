@@ -769,17 +769,29 @@ export const AdminAPI = {
   },
 
   // Feedback Management
-  getAllFeedbackAdmin: async (status = null) => {
+  getAllFeedbackAdmin: async (status = null, type = null) => {
     const params = new URLSearchParams();
     if (status) params.append('status', status);
+    if (type) params.append('type', type);
     const queryString = params.toString();
-    return await apiFetch(`/api/admin/feedback${queryString ? '?' + queryString : ''}`);
+    return await apiFetch(`/api/feedback/all${queryString ? '?' + queryString : ''}`);
   },
 
-  updateFeedbackStatusAdmin: async (id, status, response = null) => {
-    return await apiFetch(`/api/admin/feedback/${id}/status`, {
+  getFeedbackStatsAdmin: async () => {
+    return await apiFetch('/api/feedback/stats');
+  },
+
+  updateFeedbackStatusAdmin: async (id, status) => {
+    return await apiFetch(`/api/feedback/${id}/status`, {
       method: 'PUT',
-      body: JSON.stringify({ status, response })
+      body: JSON.stringify({ status })
+    });
+  },
+
+  respondToFeedbackAdmin: async (id, response) => {
+    return await apiFetch(`/api/feedback/${id}/respond`, {
+      method: 'POST',
+      body: JSON.stringify({ response })
     });
   }
 };

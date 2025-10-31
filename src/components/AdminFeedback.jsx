@@ -20,7 +20,8 @@ function AdminFeedback() {
     try {
       setLoading(true);
       const data = await AdminAPI.getAllFeedbackAdmin(statusFilter);
-      setFeedbackList(data.feedback || []);
+      console.log('Fetched feedback:', data);
+      setFeedbackList(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching feedback:', error);
       Swal.fire('Error', error.message || 'Failed to load feedback', 'error');
@@ -38,15 +39,16 @@ function AdminFeedback() {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
+        const userName = feedback.userId ? `${feedback.userId.firstName} ${feedback.userId.lastName}` : 'Anonymous';
         
         return [
           `${year}-${month}-${day}`,
-          `"${(feedback.userId?.name || 'Anonymous').replace(/"/g, '""')}"`,
+          `"${userName.replace(/"/g, '""')}"`,
           feedback.userId?.email || 'N/A',
           feedback.type || 'N/A',
           feedback.status || 'pending',
           `"${(feedback.subject || 'N/A').replace(/"/g, '""')}"`,
-          `"${(feedback.message || '').replace(/"/g, '""')}"`,
+          `"${(feedback.feedback || '').replace(/"/g, '""')}"`,
           feedback.rating || 'N/A'
         ].join(',');
       }).join('\n');
@@ -98,17 +100,17 @@ function AdminFeedback() {
     switch (status) {
       case 'pending': return 'warning';
       case 'reviewed': return 'info';
+      case 'responded': return 'success';
       case 'resolved': return 'success';
-      case 'dismissed': return 'error';
       default: return 'default';
     }
   };
 
   const getTypeColor = (type) => {
     switch (type) {
-      case 'complaint': return 'red';
-      case 'suggestion': return 'blue';
-      case 'praise': return 'green';
+      case 'general': return 'purple';
+      case 'service': return 'blue';
+      case 'suggestion': return 'green';
       default: return 'purple';
     }
   };
@@ -130,8 +132,8 @@ function AdminFeedback() {
             <option value="">All Status</option>
             <option value="pending">Pending</option>
             <option value="reviewed">Reviewed</option>
+            <option value="responded">Responded</option>
             <option value="resolved">Resolved</option>
-            <option value="dismissed">Dismissed</option>
           </select>
         </div>
 
@@ -158,17 +160,22 @@ function AdminFeedback() {
                 </div>
 
                 <div className="feedback-message">
-                  {feedback.message.substring(0, 150)}
-                  {feedback.message.length > 150 && '...'}
+                  {feedback.feedback ? feedback.feedback.substring(0, 150) : 'No message'}
+                  {feedback.feedback && feedback.feedback.length > 150 && '...'}
                 </div>
 
                 <div className="feedback-meta">
                   <div>
-                    <small>From: {feedback.userId?.name || 'Anonymous'}</small>
+                    <small>From: {feedback.userId ? `${feedback.userId.firstName} ${feedback.userId.lastName}` : 'Anonymous'}</small>
                   </div>
                   <div>
                     <small>{new Date(feedback.createdAt).toLocaleDateString()}</small>
                   </div>
+                  {feedback.rating && (
+                    <div>
+                      <small>Rating: {feedback.rating}/5 ⭐</small>
+                    </div>
+                  )}
                 </div>
 
                 <div className="feedback-actions">
@@ -176,20 +183,12 @@ function AdminFeedback() {
                     View Details
                   </button>
                   {feedback.status === 'pending' && (
-                    <>
-                      <button
-                        className="btn-resolve"
-                        onClick={() => handleUpdateStatus(feedback._id, 'resolved')}
-                      >
-                        <FaCheck /> Resolve
-                      </button>
-                      <button
-                        className="btn-dismiss"
-                        onClick={() => handleUpdateStatus(feedback._id, 'dismissed')}
-                      >
-                        <FaTimes /> Dismiss
-                      </button>
-                    </>
+                    <button
+                      className="btn-resolve"
+                      onClick={() => handleUpdateStatus(feedback._id, 'reviewed')}
+                    >
+                      <FaCheck /> Mark Reviewed
+                    </button>
                   )}
                 </div>
               </div>
@@ -222,13 +221,30 @@ function AdminFeedback() {
                 </div>
 
                 <div className="detail-row">
-                  <strong>Message:</strong>
-                  <p>{selectedFeedback.message}</p>
+                  <strong>Feedback:</strong>
+                  <p>{selectedFeedback.feedback}</p>
                 </div>
+
+                {selectedFeedback.rating && (
+                  <div className="detail-row">
+                    <strong>Rating:</strong>
+                    <p>{selectedFeedback.rating}/5 ⭐</p>
+                  </div>
+                )}
+
+                {selectedFeedback.serviceDate && (
+                  <div className="detail-row">
+                    <strong>Service Date:</strong>
+                    <p>{new Date(selectedFeedback.serviceDate).toLocaleDateString()}</p>
+                  </div>
+                )}
 
                 <div className="detail-row">
                   <strong>From:</strong>
-                  <p>{selectedFeedback.userId?.name || 'Anonymous'} ({selectedFeedback.userId?.email || 'N/A'})</p>
+                  <p>
+                    {selectedFeedback.userId ? `${selectedFeedback.userId.firstName} ${selectedFeedback.userId.lastName}` : 'Anonymous'} 
+                    {selectedFeedback.userId?.email && ` (${selectedFeedback.userId.email})`}
+                  </p>
                 </div>
 
                 <div className="detail-row">
@@ -236,31 +252,34 @@ function AdminFeedback() {
                   <p>{new Date(selectedFeedback.createdAt).toLocaleString()}</p>
                 </div>
 
-                {selectedFeedback.adminResponse && (
+                {selectedFeedback.response && (
                   <div className="detail-row admin-response">
-                    <strong>Admin Response:</strong>
-                    <p>{selectedFeedback.adminResponse}</p>
+                    <strong>Clinic Response:</strong>
+                    <p>{selectedFeedback.response}</p>
+                    {selectedFeedback.respondedAt && (
+                      <small>Responded on {new Date(selectedFeedback.respondedAt).toLocaleString()}</small>
+                    )}
                   </div>
                 )}
 
                 <div className="modal-actions">
                   {selectedFeedback.status === 'pending' && (
-                    <>
-                      <button
-                        className="btn-resolve"
-                        onClick={() => handleUpdateStatus(selectedFeedback._id, 'resolved')}
-                      >
-                        <FaCheck /> Mark as Resolved
-                      </button>
-                      <button
-                        className="btn-dismiss"
-                        onClick={() => handleUpdateStatus(selectedFeedback._id, 'dismissed')}
-                      >
-                        <FaTimes /> Dismiss
-                      </button>
-                    </>
+                    <button
+                      className="btn-resolve"
+                      onClick={() => handleUpdateStatus(selectedFeedback._id, 'reviewed')}
+                    >
+                      <FaCheck /> Mark as Reviewed
+                    </button>
                   )}
-                  {selectedFeedback.status === 'resolved' && (
+                  {selectedFeedback.status === 'reviewed' && (
+                    <button
+                      className="btn-resolve"
+                      onClick={() => handleUpdateStatus(selectedFeedback._id, 'resolved')}
+                    >
+                      <FaCheck /> Mark as Resolved
+                    </button>
+                  )}
+                  {(selectedFeedback.status === 'resolved' || selectedFeedback.status === 'responded') && (
                     <button
                       className="btn-secondary"
                       onClick={() => handleUpdateStatus(selectedFeedback._id, 'pending')}
