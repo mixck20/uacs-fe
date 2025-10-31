@@ -22,11 +22,12 @@ const UserHealthRecord = ({ user, onLogout }) => {
       const data = await PatientsAPI.getMyRecords();
       setPatientRecord(data);
     } catch (error) {
-      console.error('Error loading health records:', error);
-      if (error.message.includes('No patient record found')) {
-        // User hasn't had any appointments yet
+      if (error.message.includes('No patient record found') || error.message.includes('404')) {
+        // User hasn't had any clinic visits yet - this is normal
+        console.log('ℹ️ No patient record found yet - user has not visited clinic');
         setPatientRecord(null);
       } else {
+        console.error('Error loading health records:', error);
         Swal.fire({
           title: 'Error',
           text: 'Failed to load health records',
