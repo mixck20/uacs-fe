@@ -136,6 +136,12 @@
   width: 2.5rem !important;
   height: 2.5rem !important;
   display: block !important;
+  fill: #e51d5e !important;
+  color: #e51d5e !important;
+}
+
+.stat-icon * {
+  color: #e51d5e !important;
 }
 
 .stat-content {
