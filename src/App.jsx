@@ -88,26 +88,28 @@ function App() {
   const handleLogout = async () => {
     try {
       await AuthAPI.logout();
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('userRole');
-      
-      setIsLoggedIn(false);
-      setUserRole(null);
-      setAuthPage("login");
-      setActivePage("dashboard");
-      setPatients([]);
-      setInventory([]);
-      setAppointments([]);
-      
-      // Force page refresh to clear any remaining state
-      window.location.reload();
     } catch (error) {
-      console.error('Logout error:', error);
-      // Still clear everything even if the API call fails
-      localStorage.clear();
-      window.location.reload();
+      console.error('Logout API error:', error);
+      // Continue with cleanup even if API call fails
     }
+    
+    // Clear all authentication data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('userRole');
+    
+    // Reset all state
+    setIsLoggedIn(false);
+    setUserRole(null);
+    setUserData(null);
+    setAuthPage("login");
+    setActivePage("dashboard");
+    setPatients([]);
+    setInventory([]);
+    setAppointments([]);
+    
+    // Force navigation to login and refresh
+    window.location.href = '/login';
   };
 
   const handlePageChange = (newPage) => {

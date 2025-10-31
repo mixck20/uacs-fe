@@ -28,11 +28,18 @@ function AdminNavbar() {
   const handleLogout = async () => {
     try {
       await AuthAPI.logout();
-      navigate('/login');
     } catch (error) {
-      console.error('Logout error:', error);
-      navigate('/login');
+      console.error('Logout API error:', error);
+      // Continue with cleanup even if API call fails
     }
+    
+    // Clear all authentication data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('userRole');
+    
+    // Force navigation to login with full page reload
+    window.location.href = '/login';
   };
 
   const isActive = (path) => location.pathname === path;
