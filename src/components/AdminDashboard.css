@@ -121,7 +121,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.stat-icon {
+.admin-dashboard .stat-icon {
   color: #e51d5e !important;
   font-size: 2.5rem !important;
   width: 2.5rem !important;
@@ -132,7 +132,7 @@
   flex-shrink: 0;
 }
 
-.stat-icon svg {
+.admin-dashboard .stat-icon svg {
   width: 2.5rem !important;
   height: 2.5rem !important;
   display: block !important;
@@ -140,7 +140,7 @@
   color: #e51d5e !important;
 }
 
-.stat-icon * {
+.admin-dashboard .stat-icon * {
   color: #e51d5e !important;
 }
 
