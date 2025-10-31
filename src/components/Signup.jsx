@@ -25,13 +25,25 @@ const Signup = () => {
     lastName: "",
     gender: "",
     role: "",
-    courseYear: "", // For students
+    department: "",
     email: "",
     idNumber: "",
     password: "",
     confirmPassword: "",
     emailUpdates: false,
   });
+
+  const departments = [
+    "College of Accountancy",
+    "College of Hospitality and Tourism Management",
+    "School of Business and Public Administration",
+    "Institute of Theology and Religious Studies",
+    "School of Education",
+    "College of Nursing and Pharmacy",
+    "School of Arts and Sciences",
+    "College of Engineering and Architecture",
+    "College of Information Technology"
+  ];
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -80,9 +92,9 @@ const Signup = () => {
         emailUpdates: form.emailUpdates
       };
 
-      // Add courseYear only for students
-      if (form.role === 'Student' && form.courseYear) {
-        payload.courseYear = form.courseYear.trim();
+      // Add department for both students and faculty
+      if (form.department) {
+        payload.department = form.department;
       }
 
       const data = await publicApiFetch('/api/auth/register', {
@@ -100,7 +112,7 @@ const Signup = () => {
         lastName: "",
         gender: "",
         role: "",
-        courseYear: "",
+        department: "",
         email: "",
         idNumber: "",
         password: "",
@@ -217,20 +229,24 @@ const Signup = () => {
                 </div>
               </div>
 
-              {/* Course/Year field - only for students */}
-              {form.role === 'Student' && (
+              {/* Department field */}
+              {form.role && (
                 <div className="signup-row">
                   <div className="signup-input-container">
-                    <input
-                      type="text"
-                      name="courseYear"
-                      placeholder="Course & Year (e.g., BSIT 3rd Year)"
-                      value={form.courseYear}
+                    <select
+                      name="department"
+                      value={form.department}
                       onChange={handleChange}
-                      className="signup-input"
+                      className="signup-input signup-select"
                       required
-                    />
+                    >
+                      <option value="" disabled>Select Department</option>
+                      {departments.map((dept) => (
+                        <option key={dept} value={dept}>{dept}</option>
+                      ))}
+                    </select>
                     <FaGraduationCap className="signup-input-icon" />
+                    <FaChevronDown className="signup-select-arrow" />
                   </div>
                 </div>
               )}

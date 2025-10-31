@@ -20,9 +20,20 @@ function UserManagement() {
     email: '',
     password: '',
     role: 'student',
-    courseYear: '',
     department: ''
   });
+
+  const departments = [
+    "College of Accountancy",
+    "College of Hospitality and Tourism Management",
+    "School of Business and Public Administration",
+    "Institute of Theology and Religious Studies",
+    "School of Education",
+    "College of Nursing and Pharmacy",
+    "School of Arts and Sciences",
+    "College of Engineering and Architecture",
+    "College of Information Technology"
+  ];
 
   useEffect(() => {
     fetchUsers();
@@ -51,7 +62,7 @@ function UserManagement() {
   const handleExportUsers = async () => {
     try {
       // Create CSV from current users data
-      const csvHeader = 'Name,Email,Role,Status,Course/Year,Department,Registered Date\n';
+      const csvHeader = 'Name,Email,Role,Status,Department,Registered Date\n';
       const csvRows = users.map(user => {
         const date = new Date(user.createdAt);
         const year = date.getFullYear();
@@ -63,7 +74,6 @@ function UserManagement() {
           user.email || 'N/A',
           user.role || 'N/A',
           user.isVerified ? 'Active' : 'Inactive',
-          user.courseYear || 'N/A',
           user.department || 'N/A',
           `${year}-${month}-${day}`
         ].join(',');
@@ -234,7 +244,6 @@ function UserManagement() {
       email: user.email,
       password: '',
       role: user.role,
-      courseYear: user.courseYear || '',
       department: user.department || ''
     });
     setModalMode('edit');
@@ -247,7 +256,6 @@ function UserManagement() {
       email: '',
       password: '',
       role: 'student',
-      courseYear: '',
       department: ''
     });
     setSelectedUser(null);
@@ -313,7 +321,7 @@ function UserManagement() {
                   <th>Name</th>
                   <th>Email</th>
                   <th>Role</th>
-                  <th>Course/Year</th>
+                  <th>Department</th>
                   <th>Status</th>
                   <th>Verified</th>
                   <th>Created</th>
@@ -330,7 +338,7 @@ function UserManagement() {
                         {user.role}
                       </span>
                     </td>
-                    <td>{user.courseYear || '-'}</td>
+                    <td>{user.department || '-'}</td>
                     <td>
                       <span className={`status-badge ${user.accountStatus || 'active'}`}>
                         {user.accountStatus || 'active'}
@@ -436,7 +444,7 @@ function UserManagement() {
                     <strong>Verified:</strong> {selectedUser.isVerified ? 'Yes' : 'No'}
                   </div>
                   <div className="detail-row">
-                    <strong>Course/Year:</strong> {selectedUser.courseYear || 'N/A'}
+                    <strong>Department:</strong> {selectedUser.department || 'N/A'}
                   </div>
                   <div className="detail-row">
                     <strong>Created:</strong> {new Date(selectedUser.createdAt).toLocaleString()}
@@ -504,25 +512,18 @@ function UserManagement() {
                   </div>
 
                   <div className="form-group">
-                    <label>Course/Year</label>
-                    <input
-                      type="text"
-                      name="courseYear"
-                      value={form.courseYear}
+                    <label>Department *</label>
+                    <select 
+                      name="department" 
+                      value={form.department} 
                       onChange={handleFormChange}
-                      placeholder="e.g., BSCS 3"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Department</label>
-                    <input
-                      type="text"
-                      name="department"
-                      value={form.department}
-                      onChange={handleFormChange}
-                      placeholder="e.g., Computer Science"
-                    />
+                      required
+                    >
+                      <option value="">Select Department</option>
+                      {departments.map((dept) => (
+                        <option key={dept} value={dept}>{dept}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="modal-actions">
