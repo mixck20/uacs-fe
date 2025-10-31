@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ClinicNavbar from "./ClinicNavbar";
 import "./EHR.css";
 import { PatientsAPI, InventoryAPI } from "../api";
-import { FaUser, FaCalendar, FaStethoscope, FaPills, FaNotesMedical, FaHeartbeat, FaPhone, FaFileMedical, FaTimes, FaPlus, FaFileExport, FaTrash, FaEye } from "react-icons/fa";
+import { FaUser, FaCalendar, FaStethoscope, FaPills, FaNotesMedical, FaHeartbeat, FaPhone, FaFileMedical, FaTimes, FaPlus, FaFileExport, FaTrash, FaEye, FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
 import jsPDF from "jspdf";
 import Swal from "sweetalert2";
 
@@ -185,10 +185,10 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
         
         let message = `Visit record added successfully!\n\n`;
         if (successCount > 0) {
-          message += `✅ ${successCount} medication(s) dispensed from inventory\n`;
+          message += `${successCount} medication(s) dispensed from inventory\n`;
         }
         if (failCount > 0) {
-          message += `⚠️ ${failCount} medication(s) failed to dispense:\n`;
+          message += `${failCount} medication(s) failed to dispense:\n`;
           data.dispensingResults.filter(r => !r.success).forEach(r => {
             message += `   • ${r.medication}: ${r.message}\n`;
           });

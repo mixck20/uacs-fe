@@ -5,7 +5,7 @@ import {
   FaCalendarPlus, FaPhone, FaCheck, FaTimes, FaCommentDots, FaUser, 
   FaClock, FaVideo, FaMicrophone, FaCalendar, FaFilter, FaStethoscope,
   FaMapMarkerAlt, FaEnvelope, FaLink, FaPaperPlane, FaEllipsisV, FaSearch,
-  FaFileAlt, FaNotesMedical
+  FaFileAlt, FaNotesMedical, FaCalendarAlt
 } from "react-icons/fa";
 import { AppointmentsAPI, ChatAPI, PatientsAPI } from "../api";
 import Swal from "sweetalert2";
@@ -1354,7 +1354,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
                   {/* Pending reschedule requests */}
                   {appointment.rescheduleRequests && appointment.rescheduleRequests.some(r => r.status === 'pending') && (
                     <div className="reschedule-alert">
-                      <span>📅 Reschedule request pending</span>
+                      <span><FaCalendarAlt /> Reschedule request pending</span>
                       <div className="reschedule-actions">
                         {appointment.rescheduleRequests.filter(r => r.status === 'pending').map(request => (
                           <div key={request._id} className="reschedule-request">

@@ -346,7 +346,7 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
       closeDispenseModal();
 
       const message = response.lowStockAlert 
-        ? `Item dispensed successfully! ⚠️ Low stock alert sent - only ${response.item.quantity} remaining.`
+        ? `Item dispensed successfully! Low stock alert sent - only ${response.item.quantity} remaining.`
         : "Item dispensed successfully!";
 
       Swal.fire({

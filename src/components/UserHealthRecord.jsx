@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaFileAlt, FaDownload, FaShare, FaLock, FaCalendar, FaCapsules, FaNotesMedical, FaHeartbeat, FaUser, FaStethoscope, FaAllergies, FaTint, FaFilePdf, FaFileExcel, FaCertificate, FaPhone } from "react-icons/fa";
+import { FaFileAlt, FaDownload, FaShare, FaLock, FaCalendar, FaCapsules, FaNotesMedical, FaHeartbeat, FaUser, FaStethoscope, FaAllergies, FaTint, FaFilePdf, FaFileExcel, FaCertificate, FaPhone, FaClipboardList } from "react-icons/fa";
 import UserPortalLayout from "./UserPortalLayout";
 import { PatientsAPI, CertificateAPI } from "../api";
 import Swal from "sweetalert2";
@@ -401,7 +401,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
             />
             <div style="flex: 1; min-width: 0; overflow: hidden;">
               <div style="font-weight: 600; color: #e51d5e; margin-bottom: 0.35rem; font-size: 0.95rem;">
-                📅 ${visitDate}
+                ${visitDate}
               </div>
               <div style="font-size: 0.875rem; color: #555; margin-bottom: 0.25rem; word-wrap: break-word; overflow-wrap: break-word;">
                 <strong style="color: #333;">Diagnosis:</strong> ${truncateDiagnosis}
@@ -436,8 +436,11 @@ const UserHealthRecord = ({ user, onLogout }) => {
           ">
             ${visitsHtml}
           </div>
-          <p style="font-size: 0.85rem; color: #666; margin: 0 0 1.5rem 0; font-style: italic;">
-            📋 Select one or more clinic visits to include in your certificate
+          <p style="font-size: 0.85rem; color: #666; margin: 0 0 1.5rem 0; font-style: italic; display: flex; align-items: center; gap: 0.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="14" height="14" fill="#666" style="flex-shrink: 0;">
+              <path d="M280 64h40c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128C0 92.7 28.7 64 64 64h40 9.6C121 27.5 153.3 0 192 0s71 27.5 78.4 64H280zM64 112c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320c8.8 0 16-7.2 16-16V128c0-8.8-7.2-16-16-16H304v24c0 13.3-10.7 24-24 24H192 104c-13.3 0-24-10.7-24-24V112H64zm128-8a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/>
+            </svg>
+            Select one or more clinic visits to include in your certificate
           </p>
           
           <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
@@ -465,7 +468,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
       `,
       width: '600px',
       showCancelButton: true,
-      confirmButtonText: '📤 Submit Request',
+      confirmButtonText: 'Submit Request',
       cancelButtonText: 'Cancel',
       confirmButtonColor: '#e51d5e',
       customClass: {
