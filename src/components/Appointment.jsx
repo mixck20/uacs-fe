@@ -1292,6 +1292,28 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
                     {appointment.status}
                   </div>
 
+                  {/* Cancellation Reason */}
+                  {appointment.status === 'Cancelled' && appointment.cancelReason && (
+                    <div className="cancellation-section">
+                      <div className="cancellation-header">
+                        <FaTimes className="cancel-icon" />
+                        <strong>Cancellation Reason</strong>
+                      </div>
+                      <p className="cancel-reason-text">{appointment.cancelReason}</p>
+                      {appointment.cancelledAt && (
+                        <p className="cancel-date">
+                          Cancelled on {new Date(appointment.cancelledAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   {/* Online Consultation Features */}
                   {appointment.type === 'Online Consultation' && (
                     <div className="online-consultation-section">
