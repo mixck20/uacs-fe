@@ -352,11 +352,85 @@ const UserHealthRecord = ({ user, onLogout }) => {
 
   // Request Medical Certificate
   const requestMedicalCertificate = async () => {
+    // Check if there are any health records
+    if (!patientRecord || !patientRecord.visits || patientRecord.visits.length === 0) {
+      Swal.fire({
+        title: 'No Health Records',
+        text: 'You need to have at least one clinic visit before requesting a medical certificate.',
+        icon: 'info'
+      });
+      return;
+    }
+
+    // Create visit options HTML
+    const visitsHtml = patientRecord.visits.map((visit, index) => {
+      const visitDate = new Date(visit.date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      const diagnosis = visit.diagnosis || 'General consultation';
+      return `
+        <div style="
+          border: 2px solid #e0e0e5;
+          border-radius: 8px;
+          padding: 1rem;
+          margin-bottom: 0.75rem;
+          text-align: left;
+          cursor: pointer;
+          transition: all 0.2s;
+        " 
+        class="visit-option"
+        onmouseover="this.style.borderColor='#e51d5e'; this.style.backgroundColor='#fff5f9';"
+        onmouseout="this.style.borderColor='#e0e0e5'; this.style.backgroundColor='white';"
+        >
+          <label style="display: flex; align-items: start; gap: 0.75rem; cursor: pointer;">
+            <input 
+              type="checkbox" 
+              name="selected-visits" 
+              value="${visit._id || index}" 
+              style="margin-top: 0.25rem; cursor: pointer; width: 18px; height: 18px;"
+            />
+            <div style="flex: 1;">
+              <div style="font-weight: 600; color: #e51d5e; margin-bottom: 0.25rem;">
+                ${visitDate}
+              </div>
+              <div style="font-size: 0.9rem; color: #666;">
+                <strong>Diagnosis:</strong> ${diagnosis}
+              </div>
+              ${visit.treatment ? `
+                <div style="font-size: 0.85rem; color: #888; margin-top: 0.25rem;">
+                  <strong>Treatment:</strong> ${visit.treatment}
+                </div>
+              ` : ''}
+            </div>
+          </label>
+        </div>
+      `;
+    }).join('');
+
     const result = await Swal.fire({
       title: 'Request Medical Certificate',
       html: `
         <div style="text-align: left; margin-top: 1rem;">
-          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">
+          <label style="display: block; margin-bottom: 0.75rem; font-weight: 600; font-size: 1rem;">
+            Select Health Record(s) *
+          </label>
+          <div style="
+            max-height: 300px; 
+            overflow-y: auto; 
+            border: 1px solid #e0e0e5; 
+            border-radius: 8px; 
+            padding: 0.5rem;
+            background: #fafafa;
+          ">
+            ${visitsHtml}
+          </div>
+          <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; font-style: italic;">
+            Select one or more clinic visits to include in your medical certificate
+          </p>
+          
+          <label style="display: block; margin-top: 1.5rem; margin-bottom: 0.5rem; font-weight: 600;">
             Purpose of Certificate *
           </label>
           <select id="certificate-purpose" class="swal2-input" style="width: 100%;">
@@ -374,21 +448,32 @@ const UserHealthRecord = ({ user, onLogout }) => {
           <textarea 
             id="certificate-notes" 
             class="swal2-textarea" 
-            placeholder="Any additional information..."
+            placeholder="Any additional information or special requests..."
             style="width: 100%;"
           ></textarea>
         </div>
       `,
+      width: '600px',
       showCancelButton: true,
       confirmButtonText: 'Submit Request',
       confirmButtonColor: '#e51d5e',
       preConfirm: () => {
+        const selectedVisits = Array.from(document.querySelectorAll('input[name="selected-visits"]:checked'))
+          .map(checkbox => checkbox.value);
         const purpose = document.getElementById('certificate-purpose').value;
+        
+        if (selectedVisits.length === 0) {
+          Swal.showValidationMessage('Please select at least one health record');
+          return false;
+        }
+        
         if (!purpose) {
           Swal.showValidationMessage('Please select a purpose');
           return false;
         }
+        
         return {
+          visitIds: selectedVisits,
           purpose,
           notes: document.getElementById('certificate-notes').value
         };
@@ -397,10 +482,22 @@ const UserHealthRecord = ({ user, onLogout }) => {
 
     if (result.isConfirmed) {
       try {
-        await CertificateAPI.requestCertificate(result.value.purpose, result.value.notes);
+        await CertificateAPI.requestCertificate(
+          result.value.purpose, 
+          result.value.notes,
+          result.value.visitIds
+        );
         Swal.fire({
           title: 'Request Submitted!',
-          html: 'Your medical certificate request has been submitted to the clinic. You will be notified once it is ready.',
+          html: `
+            <p>Your medical certificate request has been submitted to the clinic.</p>
+            <p style="margin-top: 1rem; color: #666;">
+              <strong>${result.value.visitIds.length}</strong> health record(s) selected for certification
+            </p>
+            <p style="margin-top: 0.5rem; color: #666;">
+              You will be notified once it is ready for download.
+            </p>
+          `,
           icon: 'success'
         });
       } catch (error) {

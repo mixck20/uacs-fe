@@ -336,6 +336,12 @@ const CertificateManagement = ({ setActivePage, activePage, onLogout, user }) =>
                   <p><strong>Name:</strong> {selectedCertificate.patientId?.fullName || 'N/A'}</p>
                   <p><strong>Student ID:</strong> {selectedCertificate.patientId?.studentId || 'N/A'}</p>
                   <p><strong>Purpose:</strong> {selectedCertificate.purpose}</p>
+                  {selectedCertificate.visitIds && selectedCertificate.visitIds.length > 0 && (
+                    <p><strong>Selected Health Records:</strong> {selectedCertificate.visitIds.length} visit(s) selected</p>
+                  )}
+                  {selectedCertificate.requestNotes && (
+                    <p><strong>Additional Notes:</strong> {selectedCertificate.requestNotes}</p>
+                  )}
                 </div>
 
                 <form onSubmit={(e) => { e.preventDefault(); handleIssueCertificate(); }}>

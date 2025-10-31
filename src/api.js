@@ -503,10 +503,10 @@ export const ChatAPI = {
  */
 export const CertificateAPI = {
   // User: Request a certificate
-  requestCertificate: async (purpose, requestNotes) => {
+  requestCertificate: async (purpose, requestNotes, visitIds = []) => {
     return await apiFetch('/api/certificates/request', {
       method: 'POST',
-      body: JSON.stringify({ purpose, requestNotes })
+      body: JSON.stringify({ purpose, requestNotes, visitIds })
     });
   },
 
