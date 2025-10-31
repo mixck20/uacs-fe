@@ -616,7 +616,7 @@
 }
 
 .pdf-btn {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
 }
 
 .pdf-btn:hover {
@@ -625,7 +625,7 @@
 }
 
 .excel-btn {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
 }
 
 .excel-btn:hover {
@@ -741,4 +741,35 @@
     justify-content: center;
     min-width: auto;
   }
+}
+
+/* Certificate Request Modal Improvements */
+.certificate-request-modal .swal2-popup {
+  overflow-x: hidden !important;
+}
+
+.certificate-popup {
+  max-width: 600px !important;
+  overflow: hidden !important;
+}
+
+.certificate-confirm-btn {
+  padding: 0.75rem 1.5rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+
+.certificate-cancel-btn {
+  padding: 0.75rem 1.5rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+
+/* Fix any SweetAlert2 overflow issues */
+.swal2-container .swal2-popup {
+  overflow-x: hidden !important;
+}
+
+.swal2-html-container {
+  overflow-x: hidden !important;
 }

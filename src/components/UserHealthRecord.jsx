@@ -370,37 +370,45 @@ const UserHealthRecord = ({ user, onLogout }) => {
         day: 'numeric'
       });
       const diagnosis = visit.diagnosis || 'General consultation';
+      const treatment = visit.treatment || '';
+      
+      // Truncate long text to prevent overflow
+      const truncateDiagnosis = diagnosis.length > 100 ? diagnosis.substring(0, 100) + '...' : diagnosis;
+      const truncateTreatment = treatment.length > 80 ? treatment.substring(0, 80) + '...' : treatment;
+      
       return `
         <div style="
           border: 2px solid #e0e0e5;
-          border-radius: 8px;
-          padding: 1rem;
+          border-radius: 10px;
+          padding: 0.875rem;
           margin-bottom: 0.75rem;
           text-align: left;
           cursor: pointer;
           transition: all 0.2s;
+          background: white;
+          overflow: hidden;
         " 
         class="visit-option"
         onmouseover="this.style.borderColor='#e51d5e'; this.style.backgroundColor='#fff5f9';"
         onmouseout="this.style.borderColor='#e0e0e5'; this.style.backgroundColor='white';"
         >
-          <label style="display: flex; align-items: start; gap: 0.75rem; cursor: pointer;">
+          <label style="display: flex; align-items: start; gap: 0.75rem; cursor: pointer; width: 100%;">
             <input 
               type="checkbox" 
               name="selected-visits" 
               value="${visit._id || index}" 
-              style="margin-top: 0.25rem; cursor: pointer; width: 18px; height: 18px;"
+              style="margin-top: 0.25rem; cursor: pointer; width: 18px; height: 18px; flex-shrink: 0;"
             />
-            <div style="flex: 1;">
-              <div style="font-weight: 600; color: #e51d5e; margin-bottom: 0.25rem;">
-                ${visitDate}
+            <div style="flex: 1; min-width: 0; overflow: hidden;">
+              <div style="font-weight: 600; color: #e51d5e; margin-bottom: 0.35rem; font-size: 0.95rem;">
+                📅 ${visitDate}
               </div>
-              <div style="font-size: 0.9rem; color: #666;">
-                <strong>Diagnosis:</strong> ${diagnosis}
+              <div style="font-size: 0.875rem; color: #555; margin-bottom: 0.25rem; word-wrap: break-word; overflow-wrap: break-word;">
+                <strong style="color: #333;">Diagnosis:</strong> ${truncateDiagnosis}
               </div>
               ${visit.treatment ? `
-                <div style="font-size: 0.85rem; color: #888; margin-top: 0.25rem;">
-                  <strong>Treatment:</strong> ${visit.treatment}
+                <div style="font-size: 0.825rem; color: #666; margin-top: 0.25rem; word-wrap: break-word; overflow-wrap: break-word;">
+                  <strong style="color: #444;">Treatment:</strong> ${truncateTreatment}
                 </div>
               ` : ''}
             </div>
@@ -412,28 +420,30 @@ const UserHealthRecord = ({ user, onLogout }) => {
     const result = await Swal.fire({
       title: 'Request Medical Certificate',
       html: `
-        <div style="text-align: left; margin-top: 1rem;">
-          <label style="display: block; margin-bottom: 0.75rem; font-weight: 600; font-size: 1rem;">
+        <div style="text-align: left; margin-top: 1rem; overflow-x: hidden;">
+          <label style="display: block; margin-bottom: 0.75rem; font-weight: 600; font-size: 1rem; color: #333;">
             Select Health Record(s) *
           </label>
           <div style="
             max-height: 300px; 
             overflow-y: auto; 
+            overflow-x: hidden;
             border: 1px solid #e0e0e5; 
             border-radius: 8px; 
             padding: 0.5rem;
             background: #fafafa;
+            margin-bottom: 0.5rem;
           ">
             ${visitsHtml}
           </div>
-          <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; font-style: italic;">
-            Select one or more clinic visits to include in your medical certificate
+          <p style="font-size: 0.85rem; color: #666; margin: 0 0 1.5rem 0; font-style: italic;">
+            📋 Select one or more clinic visits to include in your certificate
           </p>
           
-          <label style="display: block; margin-top: 1.5rem; margin-bottom: 0.5rem; font-weight: 600;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
             Purpose of Certificate *
           </label>
-          <select id="certificate-purpose" class="swal2-input" style="width: 100%;">
+          <select id="certificate-purpose" class="swal2-input" style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 8px; font-size: 0.95rem;">
             <option value="">Select purpose...</option>
             <option value="Sick Leave">Sick Leave</option>
             <option value="School Excuse">School Excuse</option>
@@ -442,21 +452,28 @@ const UserHealthRecord = ({ user, onLogout }) => {
             <option value="Other">Other</option>
           </select>
           
-          <label style="display: block; margin-top: 1rem; margin-bottom: 0.5rem; font-weight: 600;">
-            Additional Notes
+          <label style="display: block; margin-top: 1rem; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+            Additional Notes (Optional)
           </label>
           <textarea 
             id="certificate-notes" 
             class="swal2-textarea" 
             placeholder="Any additional information or special requests..."
-            style="width: 100%;"
+            style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 8px; font-size: 0.95rem; min-height: 80px; resize: vertical;"
           ></textarea>
         </div>
       `,
       width: '600px',
       showCancelButton: true,
-      confirmButtonText: 'Submit Request',
+      confirmButtonText: '📤 Submit Request',
+      cancelButtonText: 'Cancel',
       confirmButtonColor: '#e51d5e',
+      customClass: {
+        container: 'certificate-request-modal',
+        popup: 'certificate-popup',
+        confirmButton: 'certificate-confirm-btn',
+        cancelButton: 'certificate-cancel-btn'
+      },
       preConfirm: () => {
         const selectedVisits = Array.from(document.querySelectorAll('input[name="selected-visits"]:checked'))
           .map(checkbox => checkbox.value);
