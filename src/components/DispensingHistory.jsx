@@ -316,7 +316,6 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
                     <th>Medication</th>
                     <th>Quantity</th>
                     <th>Patient</th>
-                    <th>Student ID</th>
                     <th>Dispensed By</th>
                     <th>Reason</th>
                     <th>Notes</th>
@@ -339,7 +338,6 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
                       </td>
                       <td className="quantity-cell">{record.quantity}</td>
                       <td>{record.patientName || 'N/A'}</td>
-                      <td className="student-id-cell">{record.studentId || 'N/A'}</td>
                       <td>{record.dispensedBy?.name || 'Unknown'}</td>
                       <td className="reason-cell">{record.reason || 'N/A'}</td>
                       <td className="notes-cell">{record.notes || '-'}</td>
