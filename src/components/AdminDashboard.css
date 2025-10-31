@@ -140,10 +140,6 @@
   color: #e51d5e !important;
 }
 
-.admin-dashboard .stat-icon * {
-  color: #e51d5e !important;
-}
-
 .stat-content {
   flex: 1;
   display: flex;
