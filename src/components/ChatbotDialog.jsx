@@ -15,8 +15,18 @@ const ChatbotDialog = ({ isOpen, onClose }) => {
   ];
 
   const [messages, setMessages] = useState(() => {
-    // Load messages from localStorage on initial mount
+    // Check if this is a fresh session (no user stored yet or just logged in)
     const savedMessages = localStorage.getItem('chatbot_messages');
+    const savedUserId = localStorage.getItem('chatbot_user_id');
+    const currentUserId = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).id : null;
+    
+    // If user changed or no saved user, reset messages
+    if (!savedUserId || savedUserId !== String(currentUserId)) {
+      localStorage.setItem('chatbot_user_id', String(currentUserId));
+      return initialMessages;
+    }
+    
+    // Load saved messages for same user
     if (savedMessages) {
       try {
         return JSON.parse(savedMessages);
@@ -37,7 +47,9 @@ const ChatbotDialog = ({ isOpen, onClose }) => {
 
   // Save messages to localStorage whenever they change
   useEffect(() => {
+    const currentUserId = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).id : null;
     localStorage.setItem('chatbot_messages', JSON.stringify(messages));
+    localStorage.setItem('chatbot_user_id', String(currentUserId));
   }, [messages]);
 
   // Scroll to bottom of messages
