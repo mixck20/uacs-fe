@@ -61,8 +61,9 @@ const UserFeedback = ({ user, onLogout }) => {
         title: 'Feedback Submitted!',
         text: 'Thank you for your feedback. We appreciate your input.',
         confirmButtonColor: '#e51d5e',
-        showConfirmButton: true,
-        confirmButtonText: 'OK'
+        confirmButtonText: 'OK',
+        input: null,
+        showCancelButton: false
       });
 
       // Reset form
