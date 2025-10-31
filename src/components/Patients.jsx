@@ -42,7 +42,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     return (
       (p.fullName || p.name || '').toLowerCase().includes(searchLower) ||
       (p.schoolId || '').toLowerCase().includes(searchLower) ||
-      (p.courseYear || '').toLowerCase().includes(searchLower)
+      (p.department || '').toLowerCase().includes(searchLower)
     );
   });
 
@@ -141,7 +141,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         'Gender': patient.gender || 'N/A',
         'Date of Birth': patient.dateOfBirth ? new Date(patient.dateOfBirth).toLocaleDateString() : 'N/A',
         'Contact Number': patient.contactNumber || patient.contact || 'N/A',
-        'Course/Year': patient.courseYear || patient.userId?.courseYear || 'N/A',
+        'Department': patient.department || patient.userId?.department || 'N/A',
         'Address': patient.address || 'N/A',
         'Emergency Contact': patient.emergencyContact?.name || 'N/A',
         'Emergency Phone': patient.emergencyContact?.phone || 'N/A',
@@ -234,8 +234,8 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
           `Contact: ${patient.contactNumber || patient.contact || 'N/A'}`,
         ];
 
-        if (patient.courseYear || patient.userId?.courseYear) {
-          details.push(`Course: ${patient.courseYear || patient.userId?.courseYear}`);
+        if (patient.department || patient.userId?.department) {
+          details.push(`Department: ${patient.department || patient.userId?.department}`);
         }
 
         if (patient.visits && patient.visits.length > 0) {
@@ -515,10 +515,10 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                   <span className="patient-label">Email:</span>
                   <span className="patient-value">{patient.email}</span>
                 </div>
-                {patient.userId && patient.userId.courseYear && (
+                {patient.userId && patient.userId.department && (
                   <div className="patient-info-row">
-                    <span className="patient-label">Course:</span>
-                    <span className="patient-value">{patient.userId.courseYear}</span>
+                    <span className="patient-label">Department:</span>
+                    <span className="patient-value">{patient.userId.department}</span>
                   </div>
                 )}
                 <div className="patient-info-row">
@@ -823,8 +823,8 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                       <span className="detail-value">{selectedPatient.sex || selectedPatient.gender || 'N/A'}</span>
                     </div>
                     <div className="patient-details-row">
-                      <span className="detail-label">Course/Year:</span>
-                      <span className="detail-value">{selectedPatient.courseYear || 'N/A'}</span>
+                      <span className="detail-label">Department:</span>
+                      <span className="detail-value">{selectedPatient.department || 'N/A'}</span>
                     </div>
                     <div className="patient-details-row">
                       <span className="detail-label">Blood Type:</span>

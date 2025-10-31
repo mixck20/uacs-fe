@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FaUser, FaSignOutAlt, FaCog, FaUsers, FaChartLine, FaFileAlt, FaComments, FaPills } from 'react-icons/fa';
+import { FaUser, FaSignOutAlt, FaCog, FaUsers, FaChartLine, FaFileAlt, FaComments, FaPills, FaBuilding } from 'react-icons/fa';
 import { AuthAPI } from '../api';
 import './AdminNavbar.css';
 
@@ -56,6 +56,12 @@ function AdminNavbar() {
             className={isActive('/admin/users') ? 'active' : ''}
           >
             <FaUsers /> Users
+          </Link>
+          <Link 
+            to="/admin/departments" 
+            className={isActive('/admin/departments') ? 'active' : ''}
+          >
+            <FaBuilding /> Departments
           </Link>
           <Link 
             to="/admin/audit-logs" 

@@ -91,7 +91,7 @@ const ClinicDashboard = ({ setActivePage, activePage, sidebarOpen, setSidebarOpe
           'School ID': p.schoolId || 'N/A',
           'Gender': p.gender || 'N/A',
           'Role': p.role || 'N/A',
-          'Course/Year': p.courseYear || 'N/A',
+          'Department': p.department || 'N/A',
           'Contact': p.contact || 'N/A',
           'Email': p.email || 'N/A',
           'Address': p.address || 'N/A',

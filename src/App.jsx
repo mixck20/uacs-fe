@@ -24,6 +24,7 @@ import UserManagement from "./components/UserManagement";
 import AuditLogs from "./components/AuditLogs";
 import AdminFeedback from "./components/AdminFeedback";
 import AdminSettings from "./components/AdminSettings";
+import DepartmentAnalytics from "./components/DepartmentAnalytics";
 import ClinicSettings from "./components/ClinicSettings";
 import DispensingHistory from "./components/DispensingHistory";
 import VerifyEmailChange from "./components/VerifyEmailChange";
@@ -331,6 +332,7 @@ function App() {
                 <Routes>
                   <Route path="/admin" element={<AdminDashboard />} />
                   <Route path="/admin/users" element={<UserManagement />} />
+                  <Route path="/admin/departments" element={<DepartmentAnalytics />} />
                   <Route path="/admin/audit-logs" element={<AuditLogs />} />
                   <Route path="/admin/feedback" element={<AdminFeedback />} />
                   <Route path="/admin/dispensing" element={<DispensingHistory />} />
