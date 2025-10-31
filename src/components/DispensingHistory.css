@@ -249,17 +249,23 @@
   background: white;
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: visible;
 }
 
 .dispensing-table {
   width: 100%;
+  min-width: 1200px;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .dispensing-table thead {
   background: linear-gradient(135deg, #fef2f7 0%, #fff 100%);
   border-bottom: 2px solid #fce7f3;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .dispensing-table th {
@@ -270,7 +276,17 @@
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
+
+.dispensing-table th:nth-child(1) { width: 140px; } /* Date & Time */
+.dispensing-table th:nth-child(2) { width: 150px; } /* Medication */
+.dispensing-table th:nth-child(3) { width: 90px; }  /* Quantity */
+.dispensing-table th:nth-child(4) { width: 180px; } /* Patient */
+.dispensing-table th:nth-child(5) { width: 120px; } /* Student ID */
+.dispensing-table th:nth-child(6) { width: 150px; } /* Dispensed By */
+.dispensing-table th:nth-child(7) { width: 180px; } /* Reason */
+.dispensing-table th:nth-child(8) { width: 200px; } /* Notes */
 
 .dispensing-table tbody tr {
   border-bottom: 1px solid #f1f5f9;
@@ -282,20 +298,23 @@
 }
 
 .dispensing-table td {
-  padding: 16px 12px;
+  padding: 14px 12px;
   color: #334155;
   font-size: 0.9rem;
+  vertical-align: top;
 }
 
 .date-cell {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  min-width: 120px;
 }
 
 .date-cell .time {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #94a3b8;
+  font-weight: 500;
 }
 
 .medication-cell {
@@ -304,38 +323,43 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  line-height: 1.4;
 }
 
 .medication-cell .med-icon {
   color: #e51d5e;
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .quantity-cell {
   font-weight: 700;
   color: #3b82f6;
   text-align: center;
+  font-size: 1.1rem;
 }
 
 .student-id-cell {
   font-family: 'Courier New', monospace;
   font-weight: 600;
   color: #64748b;
+  font-size: 0.85rem;
 }
 
 .reason-cell {
-  max-width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: #475569;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .notes-cell {
-  max-width: 150px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   color: #64748b;
   font-style: italic;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  font-size: 0.85rem;
 }
 
 /* Empty & Loading States */
@@ -456,6 +480,10 @@
 }
 
 @media (max-width: 768px) {
+  .dispensing-content {
+    padding: 100px 16px 24px 16px;
+  }
+
   .dispensing-title {
     font-size: 1.75rem;
   }
@@ -491,10 +519,17 @@
   /* Make table scrollable on mobile */
   .records-table-container {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .dispensing-table {
-    min-width: 900px;
+    min-width: 1200px;
+  }
+
+  .dispensing-table th,
+  .dispensing-table td {
+    padding: 10px 8px;
+    font-size: 0.8rem;
   }
 }
 

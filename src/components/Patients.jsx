@@ -808,7 +808,6 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                   </div>
                   <div className="patient-details-info">
                     <h2>{selectedPatient.fullName || selectedPatient.name}</h2>
-                    <p className="patient-details-id">ID: {selectedPatient.schoolId}</p>
                     <span className={`patient-badge ${selectedPatient.role === 'Student' ? 'badge-student' : 'badge-faculty'}`}>
                       {selectedPatient.role || 'Student'}
                     </span>
