@@ -21,9 +21,23 @@ function AdminDashboard() {
       setLoading(true);
       setError('');
       
+      // Check if user is authenticated
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Not authenticated. Please log in.');
+        setLoading(false);
+        return;
+      }
+      
       const [analyticsData, auditData] = await Promise.all([
-        AdminAPI.getAnalytics(),
-        AdminAPI.getAuditStats()
+        AdminAPI.getAnalytics().catch(err => {
+          console.error('Analytics error:', err);
+          return null;
+        }),
+        AdminAPI.getAuditStats().catch(err => {
+          console.error('Audit stats error:', err);
+          return null;
+        })
       ]);
 
       setAnalytics(analyticsData);
