@@ -449,9 +449,6 @@ const UserHealthRecord = ({ user, onLogout }) => {
             <button className="export-btn excel-btn" onClick={exportToExcel}>
               <FaFileExcel /> Export Excel
             </button>
-            <button className="export-btn certificate-btn" onClick={requestMedicalCertificate}>
-              <FaCertificate /> Request Certificate
-            </button>
           </div>
         </div>
 
@@ -542,6 +539,22 @@ const UserHealthRecord = ({ user, onLogout }) => {
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Request Medical Certificate Section */}
+            <div className="certificate-request-section">
+              <div className="certificate-info">
+                <div className="certificate-icon-wrapper">
+                  <FaCertificate />
+                </div>
+                <div className="certificate-text">
+                  <h3>Need a Medical Certificate?</h3>
+                  <p>Request an official medical certificate based on your health records for school, work, or other purposes.</p>
+                </div>
+              </div>
+              <button className="request-certificate-btn" onClick={requestMedicalCertificate}>
+                <FaCertificate /> Request Medical Certificate
+              </button>
             </div>
 
             {/* Categories */}
