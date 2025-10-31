@@ -56,11 +56,13 @@ const UserFeedback = ({ user, onLogout }) => {
         serviceDate: feedbackType === 'service' ? formData.serviceDate : null
       });
 
-      Swal.fire({
+      await Swal.fire({
         icon: 'success',
         title: 'Feedback Submitted!',
         text: 'Thank you for your feedback. We appreciate your input.',
-        confirmButtonColor: '#e51d5e'
+        confirmButtonColor: '#e51d5e',
+        showConfirmButton: true,
+        confirmButtonText: 'OK'
       });
 
       // Reset form
