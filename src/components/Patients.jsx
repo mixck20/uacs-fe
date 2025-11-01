@@ -832,7 +832,17 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                     </div>
                     <div className="patient-details-row">
                       <span className="detail-label">Department:</span>
-                      <span className="detail-value">{selectedPatient.department || 'N/A'}</span>
+                      <span className="detail-value">
+                        {selectedPatient.userId?.department || selectedPatient.department || 'N/A'}
+                      </span>
+                    </div>
+                    <div className="patient-details-row">
+                      <span className="detail-label">Course/Year/Section:</span>
+                      <span className="detail-value">
+                        {selectedPatient.userId?.course && selectedPatient.userId?.yearLevel
+                          ? `${selectedPatient.userId.course} ${selectedPatient.userId.yearLevel}${selectedPatient.userId.section ? selectedPatient.userId.section : ''}`
+                          : selectedPatient.userId?.courseYear || selectedPatient.courseYearSection || 'N/A'}
+                      </span>
                     </div>
                     <div className="patient-details-row">
                       <span className="detail-label">Blood Type:</span>
