@@ -98,7 +98,7 @@ const UserDashboard = ({ user, onLogout }) => {
           <button className="action-button" onClick={() => navigate('/schedule')}>
             <FaUserMd /> Request Online Consultation
           </button>
-          <button className="action-button" onClick={() => navigate('/certificates')}>
+          <button className="action-button" onClick={() => navigate('/records')}>
             <FaFileMedical /> Request Medical Certificate
           </button>
         </div>
