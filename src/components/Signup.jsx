@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Signup.css";
 import Swal from "sweetalert2";
 import { publicApiFetch } from "../api";
@@ -15,8 +15,9 @@ import {
   FaEyeSlash
 } from "react-icons/fa";
 import uacsLogo from "../assets/uacs logo.png";
-
 import { useNavigate } from "react-router-dom";
+import { DEPARTMENTS, getCoursesByDepartment, YEAR_LEVELS } from "../constants/academic";
+import { formatCourseYearSection } from "../utils/formatAcademic";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -26,27 +27,34 @@ const Signup = () => {
     gender: "",
     role: "",
     department: "",
+    course: "",
+    yearLevel: "",
+    section: "",
     email: "",
     password: "",
     confirmPassword: "",
     emailUpdates: false,
   });
 
-  const departments = [
-    "College of Accountancy",
-    "College of Hospitality and Tourism Management",
-    "School of Business and Public Administration",
-    "Institute of Theology and Religious Studies",
-    "School of Education",
-    "College of Nursing and Pharmacy",
-    "School of Arts and Sciences",
-    "College of Engineering and Architecture",
-    "College of Information Technology"
-  ];
+  const [availableCourses, setAvailableCourses] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Update available courses when department changes
+  useEffect(() => {
+    if (form.department) {
+      const courses = getCoursesByDepartment(form.department);
+      setAvailableCourses(courses);
+      // Reset course if it's not available in new department
+      if (form.course && !courses.find(c => c.code === form.course)) {
+        setForm(prev => ({ ...prev, course: "" }));
+      }
+    } else {
+      setAvailableCourses([]);
+    }
+  }, [form.department]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -90,9 +98,22 @@ const Signup = () => {
         emailUpdates: form.emailUpdates
       };
 
-      // Add department for both students and faculty
+      // Add academic info for students and faculty
       if (form.department) {
         payload.department = form.department;
+      }
+      if (form.course) {
+        payload.course = form.course;
+      }
+      if (form.yearLevel) {
+        payload.yearLevel = parseInt(form.yearLevel);
+      }
+      if (form.section) {
+        payload.section = form.section.trim().toUpperCase();
+      }
+      // Generate legacy courseYear field for backwards compatibility
+      if (form.course && form.yearLevel) {
+        payload.courseYear = formatCourseYearSection(form.course, parseInt(form.yearLevel), form.section);
       }
 
       const data = await publicApiFetch('/api/auth/register', {
@@ -111,6 +132,9 @@ const Signup = () => {
         gender: "",
         role: "",
         department: "",
+        course: "",
+        yearLevel: "",
+        section: "",
         email: "",
         password: "",
         confirmPassword: "",
@@ -226,26 +250,89 @@ const Signup = () => {
                 </div>
               </div>
 
-              {/* Department field */}
+              {/* Academic Information - Only for Students/Faculty */}
               {form.role && (
-                <div className="signup-row">
-                  <div className="signup-input-container">
-                    <select
-                      name="department"
-                      value={form.department}
-                      onChange={handleChange}
-                      className="signup-input signup-select"
-                      required
-                    >
-                      <option value="" disabled>Select Department</option>
-                      {departments.map((dept) => (
-                        <option key={dept} value={dept}>{dept}</option>
-                      ))}
-                    </select>
-                    <FaGraduationCap className="signup-input-icon" />
-                    <FaChevronDown className="signup-select-arrow" />
+                <>
+                  {/* Department */}
+                  <div className="signup-row">
+                    <div className="signup-input-container">
+                      <select
+                        name="department"
+                        value={form.department}
+                        onChange={handleChange}
+                        className="signup-input signup-select"
+                        required
+                      >
+                        <option value="" disabled>Select Department</option>
+                        {DEPARTMENTS.map((dept) => (
+                          <option key={dept.code} value={dept.code}>{dept.name}</option>
+                        ))}
+                      </select>
+                      <FaGraduationCap className="signup-input-icon" />
+                      <FaChevronDown className="signup-select-arrow" />
+                    </div>
                   </div>
-                </div>
+
+                  {/* Course (only show if department selected) */}
+                  {form.department && (
+                    <div className="signup-row">
+                      <div className="signup-input-container">
+                        <select
+                          name="course"
+                          value={form.course}
+                          onChange={handleChange}
+                          className="signup-input signup-select"
+                          required
+                        >
+                          <option value="" disabled>Select Course</option>
+                          {availableCourses.map((course) => (
+                            <option key={course.code} value={course.code}>
+                              {course.code} - {course.name}
+                            </option>
+                          ))}
+                        </select>
+                        <FaGraduationCap className="signup-input-icon" />
+                        <FaChevronDown className="signup-select-arrow" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Year Level and Section */}
+                  {form.course && (
+                    <div className="signup-row">
+                      <div className="signup-input-container">
+                        <select
+                          name="yearLevel"
+                          value={form.yearLevel}
+                          onChange={handleChange}
+                          className="signup-input signup-select"
+                          required
+                        >
+                          <option value="" disabled>Year Level</option>
+                          {YEAR_LEVELS.map((year) => (
+                            <option key={year.value} value={year.value}>
+                              {year.label}
+                            </option>
+                          ))}
+                        </select>
+                        <FaGraduationCap className="signup-input-icon" />
+                        <FaChevronDown className="signup-select-arrow" />
+                      </div>
+                      <div className="signup-input-container">
+                        <input
+                          type="text"
+                          name="section"
+                          placeholder="Section (optional, e.g., A, B, 1)"
+                          value={form.section}
+                          onChange={handleChange}
+                          className="signup-input"
+                          maxLength="2"
+                        />
+                        <FaGraduationCap className="signup-input-icon" />
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
 
               <div className="signup-row">
