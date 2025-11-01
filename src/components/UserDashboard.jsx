@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaCalendar, FaBell, FaFileMedical, FaHistory, FaUserMd, FaComments, FaSpinner, FaCheckCircle, FaClock, FaExclamationCircle } from "react-icons/fa";
-import { getRelativeTime, formatDate } from "../utils/timeUtils";
-import { PatientsAPI, FeedbackAPI } from "../api";
+import { FaCalendar, FaFileMedical, FaHistory, FaUserMd, FaSpinner, FaCheckCircle, FaClock, FaExclamationCircle } from "react-icons/fa";
+import { formatDate } from "../utils/timeUtils";
+import { PatientsAPI } from "../api";
 import UserPortalLayout from "./UserPortalLayout";
 import "./UserDashboard.css";
 
@@ -10,9 +10,6 @@ const UserDashboard = ({ user, onLogout }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
-  const [feedback, setFeedback] = useState("");
-  const [submittingFeedback, setSubmittingFeedback] = useState(false);
-  const [feedbackMessage, setFeedbackMessage] = useState({ type: "", text: "" });
 
   // Fetch dashboard data on mount
   useEffect(() => {
@@ -39,35 +36,6 @@ const UserDashboard = ({ user, onLogout }) => {
       new Date(apt.date) >= now && apt.status !== "Completed" && apt.status !== "Cancelled"
     );
   }, [dashboardData?.appointments]);
-
-  // Get recent notifications
-  const recentNotifications = useMemo(() => {
-    return dashboardData?.notifications?.slice(0, 3) || [];
-  }, [dashboardData?.notifications]);
-
-  const handleFeedbackSubmit = async () => {
-    if (!feedback.trim()) {
-      setFeedbackMessage({ type: "error", text: "Please enter your feedback" });
-      return;
-    }
-
-    try {
-      setSubmittingFeedback(true);
-      await FeedbackAPI.submitFeedback({
-        category: "general",
-        subject: "User Feedback",
-        message: feedback,
-        priority: "medium"
-      });
-      setFeedbackMessage({ type: "success", text: "Feedback submitted successfully!" });
-      setFeedback("");
-      setTimeout(() => setFeedbackMessage({ type: "", text: "" }), 3000);
-    } catch (error) {
-      setFeedbackMessage({ type: "error", text: error.message || "Failed to submit feedback" });
-    } finally {
-      setSubmittingFeedback(false);
-    }
-  };
 
   const getStatusIcon = (status) => {
     switch(status?.toLowerCase()) {
@@ -117,10 +85,6 @@ const UserDashboard = ({ user, onLogout }) => {
               <div className="stat-item">
                 <span className="stat-number">{dashboardData.stats.pendingCertificates}</span>
                 <span className="stat-label">Pending Certificates</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">{dashboardData.stats.unreadNotifications}</span>
-                <span className="stat-label">Notifications</span>
               </div>
             </div>
           )}
@@ -172,29 +136,6 @@ const UserDashboard = ({ user, onLogout }) => {
             </div>
           </div>
 
-          {/* Recent Notifications */}
-          <div className="dashboard-card">
-            <div className="card-header">
-              <h2><FaBell /> Recent Notifications</h2>
-              <Link to="/notifications" className="view-all">View All</Link>
-            </div>
-            <div className="card-content">
-              {recentNotifications.length > 0 ? (
-                recentNotifications.map(notif => (
-                  <div key={notif._id} className={`notification-item ${!notif.read ? 'unread' : ''}`}>
-                    <div className="notification-header">
-                      <h3>{notif.title}</h3>
-                      <small>{getRelativeTime(new Date(notif.createdAt))}</small>
-                    </div>
-                    <p>{notif.message}</p>
-                  </div>
-                ))
-              ) : (
-                <p className="no-records">No notifications</p>
-              )}
-            </div>
-          </div>
-
           {/* Recent Medical History */}
           <div className="dashboard-card">
             <div className="card-header">
@@ -237,7 +178,7 @@ const UserDashboard = ({ user, onLogout }) => {
                   <div key={cert._id} className="certificate-item">
                     <div className="certificate-info">
                       <div className="certificate-purpose">{cert.purpose}</div>
-                      <small>Requested: {getRelativeTime(new Date(cert.requestedAt))}</small>
+                      <small>Requested: {formatDate(new Date(cert.requestedAt))}</small>
                     </div>
                     <div className="certificate-status-badge">
                       {getStatusIcon(cert.status)}
@@ -248,34 +189,6 @@ const UserDashboard = ({ user, onLogout }) => {
               ) : (
                 <p className="no-records">No certificate requests</p>
               )}
-            </div>
-          </div>
-
-          {/* Feedback Section */}
-          <div className="dashboard-card">
-            <div className="card-header">
-              <h2><FaComments /> Service Feedback</h2>
-            </div>
-            <div className="card-content">
-              {feedbackMessage.text && (
-                <div className={`feedback-message ${feedbackMessage.type}`}>
-                  {feedbackMessage.text}
-                </div>
-              )}
-              <textarea 
-                placeholder="Share your experience with our clinic services or report any issues..." 
-                className="feedback-input"
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-                disabled={submittingFeedback}
-              />
-              <button 
-                className="submit-feedback" 
-                onClick={handleFeedbackSubmit}
-                disabled={submittingFeedback}
-              >
-                {submittingFeedback ? <FaSpinner className="spinner" /> : 'Submit Feedback'}
-              </button>
             </div>
           </div>
         </div>
