@@ -25,28 +25,53 @@ body, html {
   overflow-x: hidden;
 }
 
-/* Hide phantom input/textarea in SweetAlert2 popups that don't explicitly use them */
-.swal2-popup:not(.swal2-show-input) .swal2-input,
-.swal2-popup:not(.swal2-show-input) .swal2-textarea,
-.swal2-popup:not(.swal2-show-textarea) .swal2-input,
-.swal2-popup:not(.swal2-show-textarea) .swal2-textarea {
+/* CRITICAL: Hide phantom input/textarea in SweetAlert2 popups that don't explicitly use them */
+/* These rules must override any other SweetAlert styling */
+.swal2-popup .swal2-input,
+.swal2-popup .swal2-textarea,
+.swal2-container .swal2-input,
+.swal2-container .swal2-textarea {
   display: none !important;
   height: 0 !important;
+  max-height: 0 !important;
   padding: 0 !important;
   margin: 0 !important;
+  border: none !important;
   visibility: hidden !important;
+  opacity: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  pointer-events: none !important;
 }
 
-/* Hide any stray input/textarea in success/error/warning/info alerts */
-.swal2-icon-success ~ .swal2-html-container input,
-.swal2-icon-success ~ .swal2-html-container textarea,
-.swal2-icon-error ~ .swal2-html-container input,
-.swal2-icon-error ~ .swal2-html-container textarea,
-.swal2-icon-warning ~ .swal2-html-container input,
-.swal2-icon-warning ~ .swal2-html-container textarea,
-.swal2-icon-info ~ .swal2-html-container input,
-.swal2-icon-info ~ .swal2-html-container textarea {
+/* Only show when explicitly configured to show input/textarea */
+.swal2-popup.swal2-show-input .swal2-input,
+.swal2-popup.swal2-show-textarea .swal2-textarea {
+  display: block !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: 0.75rem !important;
+  margin: 1rem 0 !important;
+  border: 1px solid #d9d9d9 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  pointer-events: auto !important;
+}
+
+/* Hide any stray input/textarea in simple alerts (success/error/warning/info) */
+.swal2-icon-success ~ .swal2-html-container .swal2-input,
+.swal2-icon-success ~ .swal2-html-container .swal2-textarea,
+.swal2-icon-error ~ .swal2-html-container .swal2-input,
+.swal2-icon-error ~ .swal2-html-container .swal2-textarea,
+.swal2-icon-warning ~ .swal2-html-container .swal2-input,
+.swal2-icon-warning ~ .swal2-html-container .swal2-textarea,
+.swal2-icon-info ~ .swal2-html-container .swal2-input,
+.swal2-icon-info ~ .swal2-html-container .swal2-textarea,
+.swal2-icon-question ~ .swal2-html-container .swal2-input,
+.swal2-icon-question ~ .swal2-html-container .swal2-textarea {
   display: none !important;
   height: 0 !important;
   visibility: hidden !important;
+  opacity: 0 !important;
 }

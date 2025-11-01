@@ -833,8 +833,10 @@
   padding: 0 1rem !important;
 }
 
-/* Fix select dropdown in modal */
-.swal2-popup select {
+/* Fix select dropdown in certificate request modal ONLY */
+.certificate-request-modal select,
+.swal2-popup.swal2-show-select select,
+.swal2-html-container select {
   display: block !important;
   width: 100% !important;
   padding: 0.75rem !important;
@@ -845,7 +847,9 @@
   cursor: pointer !important;
 }
 
-.swal2-popup textarea {
+/* Style textarea ONLY when it's intentionally shown in certificate modal */
+.certificate-request-modal textarea,
+.swal2-html-container textarea:not(.swal2-textarea) {
   display: block !important;
   width: 100% !important;
   padding: 0.75rem !important;
