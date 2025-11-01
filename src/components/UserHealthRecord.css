@@ -81,10 +81,11 @@
 
 .records-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   gap: 1.5rem;
   padding: 0;
   background: transparent;
+  align-items: start;
 }
 
 .no-records-message {
@@ -130,6 +131,8 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  min-height: 400px;
+  height: 100%;
 }
 
 .record-card:hover {
@@ -302,7 +305,8 @@
 }
 
 .record-section {
-  padding-top: 1rem;
+  padding-top: 0.5rem;
+  flex: 1 0 auto;
 }
 
 .record-section h4 {
@@ -319,6 +323,7 @@
   color: #475569;
   line-height: 1.6;
   margin: 0;
+  min-height: 1.5rem;
 }
 
 .record-notes {
@@ -326,12 +331,13 @@
   padding: 1rem;
   border-radius: 0.5rem;
   border-left: 3px solid #e51d5e;
+  min-height: 3rem;
 }
 
 /* Record Actions */
 .record-actions {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
+  margin-top: auto;
+  padding-top: 1.5rem;
   border-top: 1px solid #f1f5f9;
   display: flex;
   justify-content: flex-end;
@@ -412,18 +418,28 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  min-height: 3rem;
 }
 
 .prescriptions-list li {
-  background: #f8fafc;
+  background: #f0fdf4;
   padding: 1rem;
   border-radius: 0.5rem;
   margin-bottom: 0.75rem;
   border-left: 3px solid #10b981;
+  min-height: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .prescriptions-list li:last-child {
   margin-bottom: 0;
+}
+
+.prescriptions-list li strong {
+  color: #065f46;
+  font-weight: 600;
 }
 
 .rx-instructions {
@@ -431,36 +447,42 @@
   font-size: 0.875rem;
   margin-top: 0.5rem;
   font-style: italic;
+  line-height: 1.4;
 }
 
 /* Vitals Grid */
 .vitals-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.75rem;
 }
 
 .vital-item {
-  background: #f8fafc;
-  padding: 1rem;
+  background: #f0f9ff;
+  padding: 0.875rem;
   border-radius: 0.5rem;
   text-align: center;
+  border: 1px solid #bae6fd;
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
 }
 
 .vital-label {
   display: block;
-  font-size: 0.8rem;
-  color: #64748b;
+  font-size: 0.75rem;
+  color: #0369a1;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 0.5rem;
 }
 
 .vital-value {
   display: block;
-  font-size: 1.25rem;
-  color: #1e293b;
+  font-size: 1.1rem;
+  color: #0c4a6e;
   font-weight: 700;
 }
 
