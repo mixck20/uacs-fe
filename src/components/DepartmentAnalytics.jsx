@@ -50,25 +50,41 @@ function DepartmentAnalytics() {
   };
 
   const calculateDepartmentStats = (usersData, patientsData) => {
+    console.log('📊 Calculating department stats...');
+    console.log('Users data:', usersData.length, 'users');
+    console.log('Patients data:', patientsData.length, 'patients');
+    
+    // Debug: Check a sample patient structure
+    if (patientsData.length > 0) {
+      console.log('Sample patient:', {
+        fullName: patientsData[0].fullName,
+        hasUserId: !!patientsData[0].userId,
+        userIdDepartment: patientsData[0].userId?.department,
+        visitsCount: patientsData[0].visits?.length || 0
+      });
+    }
+    
     const stats = departments.map(department => {
       // Count registered users by department
       const registeredUsers = usersData.filter(user => 
         user.department === department
       ).length;
 
-      // Count patients by department (from userId.department or direct department field)
-      const patientsCount = patientsData.filter(patient => 
-        patient.department === department || 
+      // Get patients linked to users in this department
+      const departmentPatients = patientsData.filter(patient => 
         patient.userId?.department === department
-      ).length;
+      );
+
+      const patientsCount = departmentPatients.length;
 
       // Count total visits from patients in this department
-      const totalVisits = patientsData
-        .filter(patient => 
-          patient.department === department || 
-          patient.userId?.department === department
-        )
-        .reduce((sum, patient) => sum + (patient.visits?.length || 0), 0);
+      const totalVisits = departmentPatients.reduce((sum, patient) => 
+        sum + (patient.visits?.length || 0), 0
+      );
+
+      if (registeredUsers > 0 || patientsCount > 0) {
+        console.log(`${department}: ${registeredUsers} users, ${patientsCount} patients, ${totalVisits} visits`);
+      }
 
       return {
         department,
