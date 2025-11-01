@@ -25,6 +25,37 @@ body, html {
   overflow-x: hidden;
 }
 
+/* Global Export Button Styles */
+/* CSV Export Buttons - Green */
+.csv-export-btn,
+button.csv-export-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3) !important;
+}
+
+.csv-export-btn:hover,
+button.csv-export-btn:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+/* PDF Export Buttons - Red */
+.pdf-export-btn,
+button.pdf-export-btn {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
+}
+
+.pdf-export-btn:hover,
+button.pdf-export-btn:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4) !important;
+  transform: translateY(-2px);
+}
+
 /* CRITICAL: Hide phantom input/textarea in SweetAlert2 popups that don't explicitly use them */
 /* These rules must override any other SweetAlert styling */
 .swal2-popup .swal2-input,

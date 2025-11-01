@@ -556,11 +556,11 @@ const UserHealthRecord = ({ user, onLogout }) => {
             </p>
           </div>
           <div className="header-actions">
-            <button className="export-btn pdf-btn" onClick={exportToPDF}>
+            <button className="export-btn pdf-export-btn" onClick={exportToPDF}>
               <FaFilePdf /> Export PDF
             </button>
-            <button className="export-btn excel-btn" onClick={exportToExcel}>
-              <FaFileExcel /> Export Excel
+            <button className="export-btn csv-export-btn" onClick={exportToExcel}>
+              <FaFileExcel /> Export CSV
             </button>
           </div>
         </div>

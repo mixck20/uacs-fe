@@ -185,7 +185,7 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
             </h1>
             <p className="dispensing-subtitle">Complete medication distribution records</p>
           </div>
-          <button className="export-btn" onClick={exportToCSV}>
+          <button className="export-btn csv-export-btn" onClick={exportToCSV}>
             <FaFileExcel /> Export to CSV
           </button>
         </div>

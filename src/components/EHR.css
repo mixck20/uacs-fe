@@ -270,16 +270,7 @@
   font-size: 1.5rem;
 }
 
-.ehr-btn.export-btn {
-  background: white;
-  color: #64748b;
-  border: 2px solid #e2e8f0;
-}
-
-.ehr-btn.export-btn:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-}
+/* Color handled by global .pdf-export-btn in App.css */
 
 /* Medical History Section */
 .medical-history-section {

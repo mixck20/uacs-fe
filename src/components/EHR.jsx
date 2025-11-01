@@ -549,7 +549,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                     <button className="ehr-btn add-btn" onClick={() => setShowForm(true)}>
                       <FaPlus /> Add Record
                     </button>
-                    <button className="ehr-btn export-btn" onClick={handleExportPDF}>
+                    <button className="ehr-btn export-btn pdf-export-btn" onClick={handleExportPDF}>
                       <FaFileExport /> Export PDF
                     </button>
                   </div>

@@ -153,8 +153,8 @@ function DepartmentAnalytics() {
             <h1><FaBuilding /> Department Analytics</h1>
             <p className="page-subtitle">Patient distribution across departments</p>
           </div>
-          <button className="export-btn" onClick={exportToExcel}>
-            <FaFileDownload /> Export to Excel
+          <button className="export-btn csv-export-btn" onClick={exportToExcel}>
+            <FaFileDownload /> Export to CSV
           </button>
         </div>
 
