@@ -13,8 +13,10 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
   const [profileData, setProfileData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
+    department: user?.department || '',
     course: user?.course || '',
-    year: user?.year || '',
+    yearLevel: user?.yearLevel || '',
+    section: user?.section || '',
     contactNumber: user?.contactNumber || '',
     emailUpdates: user?.emailUpdates || false
   });
@@ -206,6 +208,21 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
                   <small className="field-note">Email cannot be changed</small>
                 </div>
 
+                <div className="form-group">
+                  <label htmlFor="department">Department</label>
+                  <input
+                    type="text"
+                    id="department"
+                    name="department"
+                    value={profileData.department}
+                    onChange={handleProfileChange}
+                    placeholder="e.g., College of Computer Studies"
+                    disabled
+                    className="disabled-input"
+                  />
+                  <small className="field-note">Department cannot be changed</small>
+                </div>
+
                 <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="course">Course</label>
@@ -215,25 +232,41 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
                       name="course"
                       value={profileData.course}
                       onChange={handleProfileChange}
-                      placeholder="e.g., BS Computer Science"
+                      placeholder="e.g., BSIT"
+                      disabled
+                      className="disabled-input"
                     />
+                    <small className="field-note">Course cannot be changed</small>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="year">Year Level</label>
+                    <label htmlFor="yearLevel">Year Level</label>
                     <select
-                      id="year"
-                      name="year"
-                      value={profileData.year}
+                      id="yearLevel"
+                      name="yearLevel"
+                      value={profileData.yearLevel}
                       onChange={handleProfileChange}
                     >
                       <option value="">Select Year</option>
-                      <option value="1st Year">1st Year</option>
-                      <option value="2nd Year">2nd Year</option>
-                      <option value="3rd Year">3rd Year</option>
-                      <option value="4th Year">4th Year</option>
-                      <option value="5th Year">5th Year</option>
+                      <option value="1">1st Year</option>
+                      <option value="2">2nd Year</option>
+                      <option value="3">3rd Year</option>
+                      <option value="4">4th Year</option>
+                      <option value="5">5th Year</option>
                     </select>
                   </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="section">Section</label>
+                  <input
+                    type="text"
+                    id="section"
+                    name="section"
+                    value={profileData.section}
+                    onChange={handleProfileChange}
+                    placeholder="e.g., A, B, 1 (optional)"
+                    maxLength="5"
+                  />
                 </div>
 
                 <div className="form-group">
