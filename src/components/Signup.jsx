@@ -27,7 +27,6 @@ const Signup = () => {
     role: "",
     department: "",
     email: "",
-    idNumber: "",
     password: "",
     confirmPassword: "",
     emailUpdates: false,
@@ -87,7 +86,6 @@ const Signup = () => {
         gender: form.gender,
         role: form.role,
         email: form.email.trim().toLowerCase(),
-        idNumber: form.idNumber.trim(),
         password: form.password,
         emailUpdates: form.emailUpdates
       };
@@ -114,7 +112,6 @@ const Signup = () => {
         role: "",
         department: "",
         email: "",
-        idNumber: "",
         password: "",
         confirmPassword: "",
         emailUpdates: false,
@@ -263,20 +260,6 @@ const Signup = () => {
                     required
                   />
                   <FaEnvelope className="signup-input-icon" />
-                </div>
-              </div>
-
-              <div className="signup-row">
-                <div className="signup-input-container">
-                  <input
-                    type="text"
-                    name="idNumber"
-                    placeholder="Student/Faculty Number ID (Optional)"
-                    value={form.idNumber}
-                    onChange={handleChange}
-                    className="signup-input"
-                  />
-                  <FaIdCard className="signup-input-icon" />
                 </div>
               </div>
 
