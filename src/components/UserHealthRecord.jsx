@@ -11,9 +11,11 @@ const UserHealthRecord = ({ user, onLogout }) => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [patientRecord, setPatientRecord] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [myCertificates, setMyCertificates] = useState([]);
 
   useEffect(() => {
     loadHealthRecords();
+    loadMyCertificates();
   }, []);
 
   const loadHealthRecords = async () => {
@@ -36,6 +38,15 @@ const UserHealthRecord = ({ user, onLogout }) => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadMyCertificates = async () => {
+    try {
+      const certificates = await CertificateAPI.getMyCertificates();
+      setMyCertificates(certificates);
+    } catch (error) {
+      console.error('Error loading certificates:', error);
     }
   };
 
@@ -357,6 +368,18 @@ const UserHealthRecord = ({ user, onLogout }) => {
 
   // Request Medical Certificate
   const requestMedicalCertificate = async () => {
+    // Check if there are any pending certificate requests
+    const hasPendingRequest = myCertificates.some(cert => cert.status === 'pending');
+    if (hasPendingRequest) {
+      Swal.fire({
+        title: 'Pending Request Exists',
+        text: 'You already have a pending medical certificate request. Please wait for it to be processed before submitting a new request.',
+        icon: 'warning',
+        confirmButtonColor: '#e51d5e'
+      });
+      return;
+    }
+
     // Check if there are any health records
     if (!patientRecord || !patientRecord.visits || patientRecord.visits.length === 0) {
       Swal.fire({
@@ -508,6 +531,10 @@ const UserHealthRecord = ({ user, onLogout }) => {
           result.value.notes,
           result.value.visitIds
         );
+        
+        // Reload certificates to update pending status
+        await loadMyCertificates();
+        
         Swal.fire({
           title: 'Request Submitted!',
           html: `
