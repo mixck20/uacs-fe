@@ -83,7 +83,8 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         firstName: form.firstName.trim(),
         middleName: form.middleName.trim(),
         fullName: fullName,
-        studentId: "",
+        // Don't send studentId if empty - let backend handle it as null
+        ...(form.studentId && form.studentId.trim() ? { studentId: form.studentId.trim() } : {}),
         email: form.email.trim().toLowerCase(),
         contactNumber: form.cellNumber || "",
         cellNumber: form.cellNumber || "",
