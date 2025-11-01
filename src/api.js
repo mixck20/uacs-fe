@@ -194,6 +194,10 @@ export const PatientsAPI = {
     return await apiFetch('/api/patients/my-records');
   },
 
+  getDashboard: async () => {
+    return await apiFetch('/api/patients/dashboard');
+  },
+
   create: async (patientData) => {
     return await apiFetch('/api/patients', {
       method: 'POST',
