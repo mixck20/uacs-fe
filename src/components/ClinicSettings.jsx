@@ -246,14 +246,14 @@ function ClinicSettings({ onLogout, activePage, setActivePage, user: userProp })
                         onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
                         required
                       />
-                      {profileData.email !== user?.email && (
+                      {profileData.email !== currentUser?.email && (
                         <small className="form-hint">
                           A verification email will be sent to the new address
                         </small>
                       )}
                     </div>
 
-                    {profileData.email !== user?.email && (
+                    {profileData.email !== currentUser?.email && (
                       <div className="form-group">
                         <label><FaLock /> Current Password (required for email change)</label>
                         <input
@@ -278,12 +278,12 @@ function ClinicSettings({ onLogout, activePage, setActivePage, user: userProp })
                   <div className="account-info">
                     <div className="info-item">
                       <span className="info-label">Role:</span>
-                      <span className="info-value">{user?.role || 'N/A'}</span>
+                      <span className="info-value">{currentUser?.role || 'N/A'}</span>
                     </div>
                     <div className="info-item">
                       <span className="info-label">Account Status:</span>
-                      <span className={`info-badge ${user?.isVerified ? 'verified' : 'unverified'}`}>
-                        {user?.isVerified ? 'Verified' : 'Unverified'}
+                      <span className={`info-badge ${currentUser?.isVerified ? 'verified' : 'unverified'}`}>
+                        {currentUser?.isVerified ? 'Verified' : 'Unverified'}
                       </span>
                     </div>
                   </div>
