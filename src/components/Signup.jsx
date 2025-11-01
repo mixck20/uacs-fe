@@ -35,25 +35,10 @@ const Signup = () => {
     emailUpdates: false,
   });
 
-  const [availableCourses, setAvailableCourses] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // Update available courses when department changes
-  useEffect(() => {
-    if (form.department) {
-      const courses = getCoursesByDepartment(form.department);
-      setAvailableCourses(courses);
-      // Reset course if it's not available in new department
-      if (form.course && !courses.find(c => c.code === form.course)) {
-        setForm(prev => ({ ...prev, course: "" }));
-      }
-    } else {
-      setAvailableCourses([]);
-    }
-  }, [form.department]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
