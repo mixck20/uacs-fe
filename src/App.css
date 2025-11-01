@@ -56,53 +56,22 @@ button.pdf-export-btn:hover {
   transform: translateY(-2px);
 }
 
-/* CRITICAL: Hide phantom input/textarea in SweetAlert2 popups that don't explicitly use them */
-/* These rules must override any other SweetAlert styling */
-.swal2-popup .swal2-input,
-.swal2-popup .swal2-textarea,
-.swal2-container .swal2-input,
-.swal2-container .swal2-textarea {
+/* Hide phantom input/textarea ONLY in simple icon-based alerts */
+/* This prevents empty inputs from appearing in success/error/warning/info messages */
+/* But allows inputs in prompts (Swal.fire with input property) */
+
+.swal2-icon-success ~ .swal2-input,
+.swal2-icon-success ~ .swal2-textarea,
+.swal2-icon-error ~ .swal2-input,
+.swal2-icon-error ~ .swal2-textarea,
+.swal2-icon-warning ~ .swal2-input,
+.swal2-icon-warning ~ .swal2-textarea,
+.swal2-icon-info ~ .swal2-input,
+.swal2-icon-info ~ .swal2-textarea {
   display: none !important;
   height: 0 !important;
-  max-height: 0 !important;
   padding: 0 !important;
   margin: 0 !important;
-  border: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  overflow: hidden !important;
-  position: absolute !important;
-  pointer-events: none !important;
-}
-
-/* Only show when explicitly configured to show input/textarea */
-.swal2-popup.swal2-show-input .swal2-input,
-.swal2-popup.swal2-show-textarea .swal2-textarea {
-  display: block !important;
-  height: auto !important;
-  max-height: none !important;
-  padding: 0.75rem !important;
-  margin: 1rem 0 !important;
-  border: 1px solid #d9d9d9 !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important;
-  pointer-events: auto !important;
-}
-
-/* Hide any stray input/textarea in simple alerts (success/error/warning/info) */
-.swal2-icon-success ~ .swal2-html-container .swal2-input,
-.swal2-icon-success ~ .swal2-html-container .swal2-textarea,
-.swal2-icon-error ~ .swal2-html-container .swal2-input,
-.swal2-icon-error ~ .swal2-html-container .swal2-textarea,
-.swal2-icon-warning ~ .swal2-html-container .swal2-input,
-.swal2-icon-warning ~ .swal2-html-container .swal2-textarea,
-.swal2-icon-info ~ .swal2-html-container .swal2-input,
-.swal2-icon-info ~ .swal2-html-container .swal2-textarea,
-.swal2-icon-question ~ .swal2-html-container .swal2-input,
-.swal2-icon-question ~ .swal2-html-container .swal2-textarea {
-  display: none !important;
-  height: 0 !important;
   visibility: hidden !important;
   opacity: 0 !important;
 }
