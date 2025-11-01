@@ -46,12 +46,17 @@ const UserHealthRecord = ({ user, onLogout }) => {
     const pageHeight = doc.internal.pageSize.getHeight();
     let yPos = 20;
 
+    // Add logo
+    const logo = new Image();
+    logo.src = '/logo.png';
+    doc.addImage(logo, 'PNG', 15, 15, 20, 20);
+
     // Header
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(229, 29, 94);
-    doc.text('UNIVERSITY OF THE ASSUMPTION', pageWidth / 2, yPos, { align: 'center' });
-    yPos += 8;
+    doc.setTextColor(0, 0, 0);
+    doc.text('UNIVERSITY OF THE ASSUMPTION', pageWidth / 2, yPos + 5, { align: 'center' });
+    yPos += 13;
     doc.setFontSize(12);
     doc.setTextColor(60);
     doc.text('CLINIC - PERSONAL HEALTH RECORDS', pageWidth / 2, yPos, { align: 'center' });
@@ -143,7 +148,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
 
         doc.setFontSize(12);
         doc.setFont("helvetica", "bold");
-        doc.setTextColor(229, 29, 94);
+        doc.setTextColor(0, 0, 0);
         doc.text(`Visit #${index + 1}`, 20, yPos);
         yPos += 7;
 

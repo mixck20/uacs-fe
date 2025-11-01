@@ -255,12 +255,19 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     const pageHeight = doc.internal.pageSize.getHeight();
     let yPos = 20;
 
+    // Add logo
+    const logo = new Image();
+    logo.src = '/logo.png';
+    doc.addImage(logo, 'PNG', 15, 15, 20, 20);
+
     // Header
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
-    doc.text("UNIVERSITY OF THE ASSUMPTION", pageWidth / 2, yPos, { align: "center" });
-    yPos += 8;
+    doc.setTextColor(0, 0, 0);
+    doc.text("UNIVERSITY OF THE ASSUMPTION", pageWidth / 2, yPos + 5, { align: "center" });
+    yPos += 13;
     doc.setFontSize(12);
+    doc.setTextColor(60);
     doc.text("CLINIC ELECTRONIC HEALTH RECORD", pageWidth / 2, yPos, { align: "center" });
     yPos += 15;
 
