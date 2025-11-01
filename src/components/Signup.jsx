@@ -16,7 +16,7 @@ import {
 } from "react-icons/fa";
 import uacsLogo from "../assets/uacs logo.png";
 import { useNavigate } from "react-router-dom";
-import { DEPARTMENTS, getCoursesByDepartment, YEAR_LEVELS } from "../constants/academic";
+import { COURSES, getDepartmentFromCourse, YEAR_LEVELS } from "../constants/academic";
 import { formatCourseYearSection } from "../utils/formatAcademic";
 
 const Signup = () => {
@@ -26,7 +26,6 @@ const Signup = () => {
     lastName: "",
     gender: "",
     role: "",
-    department: "",
     course: "",
     yearLevel: "",
     section: "",
@@ -98,12 +97,14 @@ const Signup = () => {
         emailUpdates: form.emailUpdates
       };
 
-      // Add academic info for students and faculty
-      if (form.department) {
-        payload.department = form.department;
-      }
+      // Add academic information if provided
       if (form.course) {
         payload.course = form.course;
+        // Auto-populate department from course
+        const department = getDepartmentFromCourse(form.course);
+        if (department) {
+          payload.department = department;
+        }
       }
       if (form.yearLevel) {
         payload.yearLevel = parseInt(form.yearLevel);
@@ -131,7 +132,6 @@ const Signup = () => {
         lastName: "",
         gender: "",
         role: "",
-        department: "",
         course: "",
         yearLevel: "",
         section: "",
@@ -253,49 +253,27 @@ const Signup = () => {
               {/* Academic Information - Only for Students/Faculty */}
               {form.role && (
                 <>
-                  {/* Department */}
+                  {/* Course */}
                   <div className="signup-row">
                     <div className="signup-input-container">
                       <select
-                        name="department"
-                        value={form.department}
+                        name="course"
+                        value={form.course}
                         onChange={handleChange}
                         className="signup-input signup-select"
                         required
                       >
-                        <option value="" disabled>Select Department</option>
-                        {DEPARTMENTS.map((dept) => (
-                          <option key={dept.code} value={dept.code}>{dept.name}</option>
+                        <option value="" disabled>Select Course</option>
+                        {COURSES.map((course) => (
+                          <option key={course.code} value={course.code}>
+                            {course.code} - {course.name}
+                          </option>
                         ))}
                       </select>
                       <FaGraduationCap className="signup-input-icon" />
                       <FaChevronDown className="signup-select-arrow" />
                     </div>
                   </div>
-
-                  {/* Course (only show if department selected) */}
-                  {form.department && (
-                    <div className="signup-row">
-                      <div className="signup-input-container">
-                        <select
-                          name="course"
-                          value={form.course}
-                          onChange={handleChange}
-                          className="signup-input signup-select"
-                          required
-                        >
-                          <option value="" disabled>Select Course</option>
-                          {availableCourses.map((course) => (
-                            <option key={course.code} value={course.code}>
-                              {course.code} - {course.name}
-                            </option>
-                          ))}
-                        </select>
-                        <FaGraduationCap className="signup-input-icon" />
-                        <FaChevronDown className="signup-select-arrow" />
-                      </div>
-                    </div>
-                  )}
 
                   {/* Year Level and Section */}
                   {form.course && (
