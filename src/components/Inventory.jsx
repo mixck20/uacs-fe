@@ -492,8 +492,8 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
               const daysUntilExpiry = item.expiryDate
                 ? Math.floor((new Date(item.expiryDate) - new Date()) / (1000 * 60 * 60 * 24))
                 : null;
-              const isExpiringSoon = daysUntilExpiry !== null && daysUntilExpiry >= 0 && daysUntilExpiry <= 30;
-              const isExpired = daysUntilExpiry !== null && daysUntilExpiry < 0;
+              const isExpiringSoon = daysUntilExpiry !== null && daysUntilExpiry > 0 && daysUntilExpiry <= 30;
+              const isExpired = daysUntilExpiry !== null && daysUntilExpiry <= 0;
 
               return (
                 <div
