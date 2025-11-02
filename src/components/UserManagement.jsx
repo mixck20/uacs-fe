@@ -176,23 +176,45 @@ function UserManagement() {
   const handleResetPassword = async (userId, userName) => {
     const { value: newPassword } = await Swal.fire({
       title: 'Reset Password',
-      text: `Enter new password for ${userName}`,
-      input: 'password',
-      inputPlaceholder: 'Enter new password',
+      html: `
+        <div style="text-align: left; margin: 20px 0;">
+          <p style="margin-bottom: 10px;">Enter new password for <strong>${userName}</strong></p>
+          <input type="password" id="swal-input-password" class="swal2-input" 
+                 placeholder="Enter new password (min 6 characters)" 
+                 style="width: 100%; padding: 10px; font-size: 14px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+      `,
       showCancelButton: true,
-      inputValidator: (value) => {
-        if (!value || value.length < 6) {
-          return 'Password must be at least 6 characters';
+      confirmButtonText: 'Reset Password',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#e51d5e',
+      focusConfirm: false,
+      preConfirm: () => {
+        const password = document.getElementById('swal-input-password').value;
+        if (!password || password.length < 6) {
+          Swal.showValidationMessage('Password must be at least 6 characters');
+          return false;
         }
+        return password;
       }
     });
 
     if (newPassword) {
       try {
         await AdminAPI.resetUserPassword(userId, newPassword);
-        Swal.fire('Success', 'Password has been reset', 'success');
+        Swal.fire({
+          title: 'Success',
+          text: 'Password has been reset successfully',
+          icon: 'success',
+          confirmButtonColor: '#e51d5e'
+        });
       } catch (error) {
-        Swal.fire('Error', error.message || 'Failed to reset password', 'error');
+        Swal.fire({
+          title: 'Error',
+          text: error.message || 'Failed to reset password',
+          icon: 'error',
+          confirmButtonColor: '#e51d5e'
+        });
       }
     }
   };
