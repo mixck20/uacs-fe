@@ -102,17 +102,27 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
     setLoading(true);
 
     try {
-      await AuthAPI.changePassword({
+      const response = await AuthAPI.changePassword({
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword
       });
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Password Changed!',
-        text: 'Your password has been changed successfully.',
-        confirmButtonColor: '#e51d5e'
-      });
+      // Check if email verification is required
+      if (response.requiresVerification) {
+        Swal.fire({
+          icon: 'info',
+          title: 'Verification Email Sent',
+          text: response.message || 'Please check your email to verify and complete the password change.',
+          confirmButtonColor: '#e51d5e'
+        });
+      } else {
+        Swal.fire({
+          icon: 'success',
+          title: 'Password Changed!',
+          text: 'Your password has been changed successfully.',
+          confirmButtonColor: '#e51d5e'
+        });
+      }
 
       // Reset form
       setPasswordData({
