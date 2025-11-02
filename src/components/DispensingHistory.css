@@ -23,13 +23,15 @@
   color: #e51d5e;
   font-weight: 700;
   margin: 0 0 8px 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.dispensing-title svg {
-  font-size: 2rem;
+  display: inline-block;
+  background: linear-gradient(135deg, #e51d5e 0%, #ff6b9d 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-bottom: 12px;
+  border-bottom: 4px solid transparent;
+  border-image: linear-gradient(90deg, #e51d5e 0%, #ff6b9d 100%);
+  border-image-slice: 1;
 }
 
 .dispensing-subtitle {

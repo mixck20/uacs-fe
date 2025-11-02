@@ -181,7 +181,7 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
         <div className="dispensing-header">
           <div>
             <h1 className="dispensing-title">
-              <FaPills /> Dispensing History & Reports
+              Dispensing History & Reports
             </h1>
             <p className="dispensing-subtitle">Complete medication distribution records</p>
           </div>
