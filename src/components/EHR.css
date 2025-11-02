@@ -251,23 +251,23 @@
 
 /* Make Add First Record button bigger */
 .empty-state .ehr-btn.add-btn {
-  padding: 1.25rem 3rem;
-  font-size: 1.25rem;
-  font-weight: 700;
-  border-radius: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  box-shadow: 0 8px 20px rgba(229, 29, 94, 0.3);
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(229, 29, 94, 0.25);
 }
 
 .empty-state .ehr-btn.add-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(229, 29, 94, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(229, 29, 94, 0.35);
 }
 
 .empty-state .ehr-btn.add-btn svg {
-  font-size: 1.5rem;
+  font-size: 1rem;
 }
 
 /* Color handled by global .pdf-export-btn in App.css */
