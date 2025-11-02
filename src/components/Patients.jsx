@@ -201,19 +201,14 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
-      let yPos = 20;
+      let yPos = 30;
 
-      // Add logo
-      const logo = new Image();
-      logo.src = '/logo.png';
-      doc.addImage(logo, 'PNG', 15, 15, 20, 20);
-
-      // Header
+      // Header - No logo, just text
       doc.setFontSize(18);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(0, 0, 0);
-      doc.text("UNIVERSITY OF THE ASSUMPTION", pageWidth / 2, yPos + 5, { align: "center" });
-      yPos += 13;
+      doc.text("UNIVERSITY OF THE ASSUMPTION", pageWidth / 2, yPos, { align: "center" });
+      yPos += 8;
       doc.setFontSize(14);
       doc.setTextColor(60);
       doc.text("Patient Records List", pageWidth / 2, yPos, { align: "center" });
@@ -256,7 +251,6 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         doc.setFont("helvetica", "normal");
         
         const details = [
-          `ID: ${patient.studentId || patient.schoolId || 'N/A'}`,
           `Email: ${patient.email || 'N/A'}`,
           `Gender: ${patient.gender || 'N/A'}`,
           `Contact: ${patient.contactNumber || patient.contact || 'N/A'}`,
