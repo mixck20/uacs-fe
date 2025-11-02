@@ -532,10 +532,10 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                   <span className="patient-label">Email:</span>
                   <span className="patient-value">{patient.email}</span>
                 </div>
-                {patient.userId && patient.userId.department && (
+                {(patient.userId?.department || patient.department) && (
                   <div className="patient-info-row">
                     <span className="patient-label">Department:</span>
-                    <span className="patient-value">{patient.userId.department}</span>
+                    <span className="patient-value">{patient.userId?.department || patient.department}</span>
                   </div>
                 )}
                 <div className="patient-info-row">
