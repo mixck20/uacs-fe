@@ -178,10 +178,27 @@ function UserManagement() {
       title: 'Reset Password',
       html: `
         <div style="text-align: left; margin: 20px 0;">
-          <p style="margin-bottom: 10px;">Enter new password for <strong>${userName}</strong></p>
-          <input type="password" id="swal-input-password" class="swal2-input" 
-                 placeholder="Enter new password (min 6 characters)" 
-                 style="width: 100%; padding: 10px; font-size: 14px; border: 1px solid #ddd; border-radius: 4px;">
+          <p style="margin-bottom: 15px; color: #333;">Enter new password for <strong>${userName}</strong></p>
+          <input 
+            type="password" 
+            id="swal-input-password" 
+            placeholder="Enter new password (min 6 characters)" 
+            autocomplete="new-password"
+            style="
+              width: 100% !important;
+              max-width: 100% !important;
+              padding: 12px !important;
+              font-size: 16px !important;
+              border: 2px solid #ddd !important;
+              border-radius: 6px !important;
+              box-sizing: border-box !important;
+              display: block !important;
+              visibility: visible !important;
+              opacity: 1 !important;
+              margin: 0 auto !important;
+              background: white !important;
+              color: #333 !important;
+            ">
         </div>
       `,
       showCancelButton: true,
@@ -189,6 +206,13 @@ function UserManagement() {
       cancelButtonText: 'Cancel',
       confirmButtonColor: '#e51d5e',
       focusConfirm: false,
+      didOpen: () => {
+        // Focus on input when dialog opens
+        const input = document.getElementById('swal-input-password');
+        if (input) {
+          setTimeout(() => input.focus(), 100);
+        }
+      },
       preConfirm: () => {
         const password = document.getElementById('swal-input-password').value;
         if (!password || password.length < 6) {
