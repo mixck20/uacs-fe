@@ -20,7 +20,6 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     age: "",
     physician: "",
     nurse: "",
-    courseYearSection: "",
     // PE Findings
     height: "",
     weight: "",
@@ -228,7 +227,6 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
         age: "",
         physician: "",
         nurse: "",
-        courseYearSection: "",
         height: "",
         weight: "",
         bloodPressure: "",
@@ -731,19 +729,6 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Course, Year & Section</label>
-                    <input
-                      type="text"
-                      name="courseYearSection"
-                      placeholder="e.g., BSCS 3A"
-                      value={newRecord.courseYearSection}
-                      onChange={handleRecordChange}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
                     <label>Physician</label>
                     <input
                       type="text"
@@ -1024,12 +1009,6 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                   <div className="detail-row">
                     <span className="detail-label">Age:</span>
                     <span className="detail-value">{selectedVisit.age} years</span>
-                  </div>
-                )}
-                {selectedVisit.courseYearSection && (
-                  <div className="detail-row">
-                    <span className="detail-label">Course, Year & Section:</span>
-                    <span className="detail-value">{selectedVisit.courseYearSection}</span>
                   </div>
                 )}
                 {selectedVisit.physician && (
