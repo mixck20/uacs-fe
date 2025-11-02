@@ -495,6 +495,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
       confirmButtonText: 'Submit Request',
       cancelButtonText: 'Cancel',
       confirmButtonColor: '#e51d5e',
+      input: null, // Prevent default SweetAlert input fields
       customClass: {
         container: 'certificate-request-modal',
         popup: 'certificate-popup',
