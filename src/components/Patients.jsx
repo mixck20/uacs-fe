@@ -13,6 +13,11 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [filterType, setFilterType] = useState('all'); // 'all', 'registered', 'walkins'
   const [showArchived, setShowArchived] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Prevent double submit
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [patientToArchive, setPatientToArchive] = useState(null);
+  const [archiveReason, setArchiveReason] = useState('');
+  const [archiveNotes, setArchiveNotes] = useState('');
   const [form, setForm] = useState({
     surname: "",
     firstName: "",
@@ -59,6 +64,10 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
 
   async function handleAddPatient(e) {
     e.preventDefault();
+    
+    // Prevent double submission
+    if (isSubmitting) return;
+    
     if (!form.surname || !form.firstName || !form.email || !form.birthday || !form.sex) {
       Swal.fire({ 
         title: "Missing Required Fields", 
@@ -79,6 +88,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
       return;
     }
 
+    setIsSubmitting(true); // Disable button
     try {
       const fullName = `${form.surname}, ${form.firstName}${form.middleName ? ' ' + form.middleName : ''}`;
       const payload = {
@@ -137,6 +147,8 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
       Swal.fire({ title: "Patient added successfully!", icon: "success", timer: 1500, showConfirmButton: false });
     } catch (err) {
       Swal.fire({ title: "Failed to add patient", text: err.message, icon: "error" });
+    } finally {
+      setIsSubmitting(false); // Re-enable button
     }
   }
 
@@ -326,61 +338,41 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     });
   }
 
-  async function handleArchivePatient(patient) {
-    const { value: formValues } = await Swal.fire({
-      title: `Archive Patient: ${patient.fullName}`,
-      html: `
-        <div style="text-align: left;">
-          <label style="display: block; margin-bottom: 10px;">
-            <strong>Reason for Archiving:</strong>
-          </label>
-          <select id="archive-reason" class="swal2-input" style="width: 100%;">
-            <option value="">Select a reason...</option>
-            <option value="graduated">Student Graduated</option>
-            <option value="duplicate">Duplicate Record</option>
-            <option value="inactive">Inactive/Long Period</option>
-            <option value="entry_error">Entry Error</option>
-            <option value="other">Other</option>
-          </select>
-          <label style="display: block; margin-top: 15px; margin-bottom: 10px;">
-            <strong>Additional Notes (Optional):</strong>
-          </label>
-          <textarea id="archive-notes" class="swal2-textarea" placeholder="Add any additional notes..." style="width: 100%;"></textarea>
-        </div>
-      `,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Archive",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#ef4444",
-      preConfirm: () => {
-        const reason = document.getElementById('archive-reason').value;
-        const notes = document.getElementById('archive-notes').value;
-        if (!reason) {
-          Swal.showValidationMessage('Please select a reason');
-          return false;
-        }
-        return { reason, notes };
-      }
-    });
+  function handleArchivePatient(patient) {
+    setPatientToArchive(patient);
+    setShowArchiveModal(true);
+    setArchiveReason('');
+    setArchiveNotes('');
+  }
 
-    if (formValues) {
-      try {
-        await PatientsAPI.archive(patient._id, formValues.reason, formValues.notes);
-        setPatients(prev => prev.filter(p => p._id !== patient._id));
-        Swal.fire({
-          title: "Patient Archived!",
-          text: `${patient.fullName} has been archived successfully.`,
-          icon: "success",
-          timer: 2000
-        });
-      } catch (error) {
-        Swal.fire({
-          title: "Archive Failed",
-          text: error.message || "Failed to archive patient",
-          icon: "error"
-        });
-      }
+  async function confirmArchive() {
+    if (!archiveReason) {
+      Swal.fire({ 
+        title: "Reason Required", 
+        text: "Please select a reason for archiving", 
+        icon: "warning" 
+      });
+      return;
+    }
+
+    try {
+      await PatientsAPI.archive(patientToArchive._id, archiveReason, archiveNotes);
+      setPatients(prev => prev.filter(p => p._id !== patientToArchive._id));
+      setShowArchiveModal(false);
+      setPatientToArchive(null);
+      Swal.fire({
+        title: "Patient Archived!",
+        text: `${patientToArchive.fullName} has been archived successfully.`,
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Archive Failed",
+        text: error.message || "Failed to archive patient",
+        icon: "error"
+      });
     }
   }
 
@@ -863,11 +855,11 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                 </div>
 
                 <div className="patients-modal-actions">
-                  <button type="button" className="patients-btn-cancel" onClick={() => setShowForm(false)}>
+                  <button type="button" className="patients-btn-cancel" onClick={() => setShowForm(false)} disabled={isSubmitting}>
                     Cancel
                   </button>
-                  <button type="submit" className="patients-btn-save">
-                    Save Patient
+                  <button type="submit" className="patients-btn-save" disabled={isSubmitting}>
+                    {isSubmitting ? 'Saving...' : 'Save Patient'}
                   </button>
                 </div>
               </form>
@@ -1014,6 +1006,64 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                 <button className="patients-btn patients-btn-secondary" onClick={() => setSelectedPatient(null)}>
                   Close
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Archive Patient Modal */}
+        {showArchiveModal && patientToArchive && (
+          <div className="patients-modal-overlay" onClick={() => setShowArchiveModal(false)}>
+            <div className="patients-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+              <div className="patients-modal-header">
+                <h2>Archive Patient: {patientToArchive.fullName}</h2>
+                <button className="patients-modal-close" onClick={() => setShowArchiveModal(false)}>
+                  <FaTimes />
+                </button>
+              </div>
+              <div className="patients-modal-form" style={{ padding: '20px' }}>
+                <div className="patients-form-group">
+                  <label>Reason for Archiving: <span className="required">*</span></label>
+                  <select 
+                    value={archiveReason} 
+                    onChange={(e) => setArchiveReason(e.target.value)}
+                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}
+                  >
+                    <option value="">Select a reason</option>
+                    <option value="graduated">Student Graduated</option>
+                    <option value="duplicate">Duplicate Record</option>
+                    <option value="inactive">Inactive/Long Period</option>
+                    <option value="entry_error">Entry Error</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div className="patients-form-group">
+                  <label>Additional Notes (Optional):</label>
+                  <textarea
+                    value={archiveNotes}
+                    onChange={(e) => setArchiveNotes(e.target.value)}
+                    placeholder="Add any additional notes..."
+                    rows="4"
+                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}
+                  />
+                </div>
+                <div className="patients-modal-actions">
+                  <button 
+                    type="button" 
+                    className="patients-btn-cancel" 
+                    onClick={() => setShowArchiveModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="button" 
+                    className="patients-btn-save" 
+                    onClick={confirmArchive}
+                    style={{ backgroundColor: '#ef4444' }}
+                  >
+                    Archive
+                  </button>
+                </div>
               </div>
             </div>
           </div>
