@@ -24,6 +24,9 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     sex: "",
     religion: "",
     address: "",
+    course: "",
+    yearLevel: "",
+    section: "",
     fatherName: "",
     motherName: "",
     spouseName: "",
@@ -83,8 +86,6 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         firstName: form.firstName.trim(),
         middleName: form.middleName.trim(),
         fullName: fullName,
-        // Don't send studentId if empty - let backend handle it as null
-        ...(form.studentId && form.studentId.trim() ? { studentId: form.studentId.trim() } : {}),
         email: form.email.trim().toLowerCase(),
         contactNumber: form.cellNumber || "",
         cellNumber: form.cellNumber || "",
@@ -93,6 +94,10 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         gender: form.sex,
         religion: form.religion || "",
         address: form.address || "",
+        // Academic info (for walk-ins)
+        ...(form.course ? { course: form.course } : {}),
+        ...(form.yearLevel ? { yearLevel: form.yearLevel } : {}),
+        ...(form.section ? { section: form.section.toUpperCase() } : {}),
         fatherName: form.fatherName || "",
         motherName: form.motherName || "",
         spouseName: form.spouseName || "",
@@ -117,6 +122,9 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         sex: "",
         religion: "",
         address: "",
+        course: "",
+        yearLevel: "",
+        section: "",
         fatherName: "",
         motherName: "",
         spouseName: "",
@@ -701,6 +709,78 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                 </div>
 
                 <div className="form-section">
+                  <h3 className="form-section-title">Academic Information</h3>
+                  <div className="patients-form-grid">
+                    <div className="patients-form-group">
+                      <label>Course</label>
+                      <select 
+                        name="course" 
+                        value={form.course} 
+                        onChange={handleFormChange}
+                      >
+                        <option value="">Select course</option>
+                        <option value="BSIT">BSIT - BS Information Technology</option>
+                        <option value="BSCS">BSCS - BS Computer Science</option>
+                        <option value="BSN">BSN - BS Nursing</option>
+                        <option value="BSPharm">BSPharm - BS Pharmacy</option>
+                        <option value="BSBA">BSBA - BS Business Administration</option>
+                        <option value="BSA">BSA - BS Accountancy</option>
+                        <option value="BSMA">BSMA - BS Management Accounting</option>
+                        <option value="BSHM">BSHM - BS Hospitality Management</option>
+                        <option value="BSTM">BSTM - BS Tourism Management</option>
+                        <option value="BSCE">BSCE - BS Civil Engineering</option>
+                        <option value="BSArch">BSArch - BS Architecture</option>
+                        <option value="BSEE">BSEE - BS Electrical Engineering</option>
+                        <option value="BSECE">BSECE - BS Electronics Engineering</option>
+                        <option value="BSME">BSME - BS Mechanical Engineering</option>
+                        <option value="BSED">BSED - BS Secondary Education</option>
+                        <option value="BEED">BEED - BS Elementary Education</option>
+                        <option value="BPEd">BPEd - Bachelor of Physical Education</option>
+                        <option value="AB-Psych">AB-Psych - AB Psychology</option>
+                        <option value="AB-PolSci">AB-PolSci - AB Political Science</option>
+                        <option value="BSCrim">BSCrim - BS Criminology</option>
+                        <option value="BSND">BSND - BS Nutrition and Dietetics</option>
+                        <option value="BSMT">BSMT - BS Medical Technology</option>
+                        <option value="BSPT">BSPT - BS Physical Therapy</option>
+                        <option value="BSRT">BSRT - BS Radiologic Technology</option>
+                        <option value="BSMidwifery">BSMidwifery - BS Midwifery</option>
+                        <option value="BSPharma">BSPharma - BS Pharmaceutical Sciences</option>
+                        <option value="BSDS">BSDS - BS Data Science</option>
+                      </select>
+                    </div>
+                    <div className="patients-form-group">
+                      <label>Year Level</label>
+                      <select 
+                        name="yearLevel" 
+                        value={form.yearLevel} 
+                        onChange={handleFormChange}
+                      >
+                        <option value="">Select year</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                        <option value="5">5th Year</option>
+                      </select>
+                    </div>
+                    <div className="patients-form-group">
+                      <label>Section</label>
+                      <input
+                        type="text"
+                        name="section"
+                        placeholder="e.g., A, B, C"
+                        value={form.section}
+                        onChange={handleFormChange}
+                        maxLength="1"
+                      />
+                    </div>
+                  </div>
+                  <p className="form-note">
+                    <small>For walk-in patients only. If patient has an account, this will be auto-populated from their registration.</small>
+                  </p>
+                </div>
+
+                <div className="form-section">
                   <h3 className="form-section-title">Family Information</h3>
                   <div className="patients-form-grid">
                     <div className="patients-form-group">
@@ -833,14 +913,18 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                     <div className="patient-details-row">
                       <span className="detail-label">Department:</span>
                       <span className="detail-value">
+                        {/* Check userId first (registered), then patient's own (walk-in) */}
                         {selectedPatient.userId?.department || selectedPatient.department || 'N/A'}
                       </span>
                     </div>
                     <div className="patient-details-row">
                       <span className="detail-label">Course/Year/Section:</span>
                       <span className="detail-value">
+                        {/* Check userId first (registered users), then patient's own fields (walk-ins) */}
                         {selectedPatient.userId?.course && selectedPatient.userId?.yearLevel
                           ? `${selectedPatient.userId.course} ${selectedPatient.userId.yearLevel}${selectedPatient.userId.section ? selectedPatient.userId.section : ''}`
+                          : selectedPatient.course && selectedPatient.yearLevel
+                          ? `${selectedPatient.course} ${selectedPatient.yearLevel}${selectedPatient.section ? selectedPatient.section : ''}`
                           : selectedPatient.userId?.courseYear || selectedPatient.courseYearSection || 'N/A'}
                       </span>
                     </div>
