@@ -282,9 +282,9 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     const pageHeight = doc.internal.pageSize.getHeight();
     let yPos = 20;
 
-    // Add logo
+    // Add school logo
     const logo = new Image();
-    logo.src = '/logo.png';
+    logo.src = '/ua-logo.png';
     doc.addImage(logo, 'PNG', 15, 15, 20, 20);
 
     // Header
