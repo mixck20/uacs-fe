@@ -347,8 +347,9 @@
 }
 
 .expired-badge {
-  background: #fecaca;
-  color: #991b1b;
+  background: #dc2626;
+  color: #ffffff;
+  font-weight: 700;
 }
 
 .medicine-card-actions {
