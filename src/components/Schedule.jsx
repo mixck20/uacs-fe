@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import ClinicNavbar from './ClinicNavbar';
 import './Schedule.css';
 
@@ -47,7 +48,12 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
 
   const handleAddStaff = async () => {
     if (!newStaff.name.trim()) {
-      alert('Please enter staff name');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Information',
+        text: 'Please enter staff name',
+        confirmButtonColor: '#e51d5e'
+      });
       return;
     }
 
@@ -68,11 +74,21 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
         schedule: ''
       });
       fetchSchedule();
-      alert('Staff schedule added successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Staff schedule added successfully!',
+        confirmButtonColor: '#e51d5e'
+      });
     } catch (error) {
       console.error('Error adding staff:', error);
       const errorMsg = error.response?.data?.message || error.message || 'Error adding staff schedule';
-      alert(errorMsg);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: errorMsg,
+        confirmButtonColor: '#e51d5e'
+      });
     }
   };
 
@@ -84,14 +100,36 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
       });
       setEditingStaff(null);
       fetchSchedule();
+      Swal.fire({
+        icon: 'success',
+        title: 'Updated!',
+        text: 'Staff schedule updated successfully',
+        confirmButtonColor: '#e51d5e',
+        timer: 2000
+      });
     } catch (error) {
       console.error('Error updating staff:', error);
-      alert('Error updating staff schedule');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error updating staff schedule',
+        confirmButtonColor: '#e51d5e'
+      });
     }
   };
 
   const handleDeleteStaff = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this staff schedule?')) return;
+    const result = await Swal.fire({
+      title: 'Delete Staff Schedule?',
+      text: 'This action cannot be undone',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e51d5e',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (!result.isConfirmed) return;
     
     try {
       const token = localStorage.getItem('token');
@@ -99,15 +137,32 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchSchedule();
+      Swal.fire({
+        icon: 'success',
+        title: 'Deleted!',
+        text: 'Staff schedule has been deleted',
+        confirmButtonColor: '#e51d5e',
+        timer: 2000
+      });
     } catch (error) {
       console.error('Error deleting staff:', error);
-      alert('Error deleting staff schedule');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error deleting staff schedule',
+        confirmButtonColor: '#e51d5e'
+      });
     }
   };
 
   const handleAddDoctor = async () => {
     if (!newDoctor.name.trim()) {
-      alert('Please enter doctor name');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Information',
+        text: 'Please enter doctor name',
+        confirmButtonColor: '#e51d5e'
+      });
       return;
     }
 
@@ -126,11 +181,21 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
         medicalExaminationSchedule: ''
       });
       fetchSchedule();
-      alert('Doctor schedule added successfully!');
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Doctor schedule added successfully!',
+        confirmButtonColor: '#e51d5e'
+      });
     } catch (error) {
       console.error('Error adding doctor:', error);
       const errorMsg = error.response?.data?.message || error.message || 'Error adding doctor schedule';
-      alert(errorMsg);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: errorMsg,
+        confirmButtonColor: '#e51d5e'
+      });
     }
   };
 
@@ -142,14 +207,36 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
       });
       setEditingDoctor(null);
       fetchSchedule();
+      Swal.fire({
+        icon: 'success',
+        title: 'Updated!',
+        text: 'Doctor schedule updated successfully',
+        confirmButtonColor: '#e51d5e',
+        timer: 2000
+      });
     } catch (error) {
       console.error('Error updating doctor:', error);
-      alert('Error updating doctor schedule');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error updating doctor schedule',
+        confirmButtonColor: '#e51d5e'
+      });
     }
   };
 
   const handleDeleteDoctor = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this doctor schedule?')) return;
+    const result = await Swal.fire({
+      title: 'Delete Doctor Schedule?',
+      text: 'This action cannot be undone',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e51d5e',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (!result.isConfirmed) return;
     
     try {
       const token = localStorage.getItem('token');
@@ -157,9 +244,21 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchSchedule();
+      Swal.fire({
+        icon: 'success',
+        title: 'Deleted!',
+        text: 'Doctor schedule has been deleted',
+        confirmButtonColor: '#e51d5e',
+        timer: 2000
+      });
     } catch (error) {
       console.error('Error deleting doctor:', error);
-      alert('Error deleting doctor schedule');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error deleting doctor schedule',
+        confirmButtonColor: '#e51d5e'
+      });
     }
   };
 
