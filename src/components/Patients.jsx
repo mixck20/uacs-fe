@@ -901,8 +901,10 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                     <div className="patient-details-row">
                       <span className="detail-label">Date of Birth:</span>
                       <span className="detail-value">
-                        {selectedPatient.birthDate 
-                          ? new Date(selectedPatient.birthDate).toLocaleDateString() 
+                        {selectedPatient.dateOfBirth 
+                          ? new Date(selectedPatient.dateOfBirth).toLocaleDateString() 
+                          : selectedPatient.birthDate 
+                          ? new Date(selectedPatient.birthDate).toLocaleDateString()
                           : selectedPatient.dob || 'N/A'}
                       </span>
                     </div>
