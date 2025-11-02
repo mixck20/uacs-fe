@@ -908,7 +908,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                               <FaUser /> {cert.patientId?.fullName || cert.patientId?.name || 'Unknown Patient'}
                             </span>
                             <span className="certificate-date">
-                              <FaCalendar /> {new Date(cert.requestDate).toLocaleDateString()}
+                              <FaCalendar /> {cert.createdAt ? new Date(cert.createdAt).toLocaleDateString() : 'Recently'}
                             </span>
                           </div>
                         </div>
