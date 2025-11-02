@@ -849,7 +849,18 @@
 .certificate-request-modal .swal2-textarea,
 .certificate-request-modal .swal2-file,
 .certificate-request-modal .swal2-range,
+.certificate-request-modal .swal2-select,
+.certificate-request-modal .swal2-radio,
+.certificate-request-modal .swal2-checkbox,
 .certificate-request-modal input.swal2-input,
-.certificate-request-modal textarea.swal2-textarea {
+.certificate-request-modal textarea.swal2-textarea,
+.certificate-request-modal .swal2-validation-message,
+.swal2-popup input:not([name="selected-visits"]):not([type="checkbox"]),
+.swal2-popup textarea:not(#certificate-notes),
+.swal2-input-label {
   display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
