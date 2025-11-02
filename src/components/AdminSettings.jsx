@@ -46,24 +46,11 @@ function AdminSettings() {
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    
-    // Check if email changed - require password
-    if (profileData.email !== user.email && !profileData.currentPassword) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Password Required',
-        text: 'Please enter your current password to change your email',
-        confirmButtonColor: '#e51d5e'
-      });
-      return;
-    }
 
     try {
       const result = await Swal.fire({
         title: 'Update Profile?',
-        text: profileData.email !== user.email 
-          ? 'A verification email will be sent to your new email address'
-          : 'Are you sure you want to update your profile?',
+        text: 'Are you sure you want to update your profile?',
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#e51d5e',
@@ -73,35 +60,21 @@ function AdminSettings() {
 
       if (!result.isConfirmed) return;
 
-      const updateData = {
-        name: profileData.name,
-        ...(profileData.email !== user.email && {
-          email: profileData.email,
-          currentPassword: profileData.currentPassword
-        })
-      };
-
-      await AuthAPI.updateProfile(updateData);
+      await AuthAPI.updateProfile({
+        name: profileData.name
+      });
 
       // Update local storage
       const updatedUser = { ...user, name: profileData.name };
-      if (profileData.email === user.email) {
-        updatedUser.email = profileData.email;
-      }
       localStorage.setItem('user', JSON.stringify(updatedUser));
       setUser(updatedUser);
 
       Swal.fire({
         icon: 'success',
         title: 'Profile Updated!',
-        text: profileData.email !== user.email
-          ? 'Please check your new email to verify the change'
-          : 'Your profile has been updated successfully',
+        text: 'Your profile has been updated successfully',
         confirmButtonColor: '#e51d5e'
       });
-
-      // Clear password field
-      setProfileData(prev => ({ ...prev, currentPassword: '' }));
 
     } catch (error) {
       Swal.fire({
@@ -229,34 +202,15 @@ function AdminSettings() {
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label><FaEnvelope /> Email Address</label>
-                    <input
-                      type="email"
-                      value={profileData.email}
-                      onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                      required
-                    />
-                    {profileData.email !== user?.email && (
-                      <small className="form-hint">
-                        A verification email will be sent to the new address
-                      </small>
-                    )}
-                  </div>
-
-                  {profileData.email !== user?.email && (
                     <div className="form-group">
-                      <label><FaLock /> Current Password (required for email change)</label>
+                      <label><FaEnvelope /> Email Address</label>
                       <input
-                        type="password"
-                        value={profileData.currentPassword}
-                        onChange={(e) => setProfileData({ ...profileData, currentPassword: e.target.value })}
-                        placeholder="Enter your current password"
+                        type="email"
+                        value={profileData.email}
+                        disabled
+                        className="disabled-input"
                       />
-                    </div>
-                  )}
-
-                  <div className="form-actions">
+                    </div>                  <div className="form-actions">
                     <button type="submit" className="btn-primary">
                       Update Profile
                     </button>

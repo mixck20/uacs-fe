@@ -46,24 +46,11 @@ function ClinicSettings({ onLogout, activePage, setActivePage, user: userProp })
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    
-    // Check if email changed - require password
-    if (profileData.email !== currentUser.email && !profileData.currentPassword) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Password Required',
-        text: 'Please enter your current password to change your email',
-        confirmButtonColor: '#e51d5e'
-      });
-      return;
-    }
 
     try {
       const result = await Swal.fire({
         title: 'Update Profile?',
-        text: profileData.email !== currentUser.email 
-          ? 'A verification email will be sent to your new email address'
-          : 'Are you sure you want to update your profile?',
+        text: 'Are you sure you want to update your name?',
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#e51d5e',
@@ -74,34 +61,22 @@ function ClinicSettings({ onLogout, activePage, setActivePage, user: userProp })
       if (!result.isConfirmed) return;
 
       const updateData = {
-        name: profileData.name,
-        ...(profileData.email !== currentUser.email && {
-          email: profileData.email,
-          currentPassword: profileData.currentPassword
-        })
+        name: profileData.name
       };
 
       await AuthAPI.updateProfile(updateData);
 
       // Update local storage
       const updatedUser = { ...currentUser, name: profileData.name };
-      if (profileData.email === currentUser.email) {
-        updatedUser.email = profileData.email;
-      }
       localStorage.setItem('user', JSON.stringify(updatedUser));
       setCurrentUser(updatedUser);
 
       Swal.fire({
         icon: 'success',
         title: 'Profile Updated!',
-        text: profileData.email !== currentUser.email
-          ? 'Please check your new email to verify the change'
-          : 'Your profile has been updated successfully',
+        text: 'Your name has been updated successfully',
         confirmButtonColor: '#e51d5e'
       });
-
-      // Clear password field
-      setProfileData(prev => ({ ...prev, currentPassword: '' }));
 
     } catch (error) {
       Swal.fire({
@@ -212,12 +187,6 @@ function ClinicSettings({ onLogout, activePage, setActivePage, user: userProp })
               >
                 <FaShieldAlt /> Security
               </button>
-              <button
-                className={`settings-tab ${activeTab === 'logout' ? 'active' : ''}`}
-                onClick={() => setActiveTab('logout')}
-              >
-                <FaSignOutAlt /> Logout
-              </button>
             </div>
 
             {/* Profile Tab */}
@@ -243,27 +212,10 @@ function ClinicSettings({ onLogout, activePage, setActivePage, user: userProp })
                       <input
                         type="email"
                         value={profileData.email}
-                        onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                        required
+                        disabled
+                        className="disabled-input"
                       />
-                      {profileData.email !== currentUser?.email && (
-                        <small className="form-hint">
-                          A verification email will be sent to the new address
-                        </small>
-                      )}
                     </div>
-
-                    {profileData.email !== currentUser?.email && (
-                      <div className="form-group">
-                        <label><FaLock /> Current Password (required for email change)</label>
-                        <input
-                          type="password"
-                          value={profileData.currentPassword}
-                          onChange={(e) => setProfileData({ ...profileData, currentPassword: e.target.value })}
-                          placeholder="Enter your current password"
-                        />
-                      </div>
-                    )}
 
                     <div className="form-actions">
                       <button type="submit" className="btn-primary">
@@ -343,31 +295,6 @@ function ClinicSettings({ onLogout, activePage, setActivePage, user: userProp })
                       </button>
                     </div>
                   </form>
-                </div>
-              </div>
-            )}
-
-            {/* Logout Tab */}
-            {activeTab === 'logout' && (
-              <div className="settings-content">
-                <div className="settings-section">
-                  <h2>Logout</h2>
-                  <p className="section-description">Sign out of your account</p>
-
-                  <div className="logout-section">
-                    <div className="logout-info">
-                      <FaSignOutAlt size={48} color="#e51d5e" />
-                      <h3>Ready to leave?</h3>
-                      <p>Click the button below to safely log out of your account.</p>
-                    </div>
-
-                    <button 
-                      className="btn-logout" 
-                      onClick={onLogout}
-                    >
-                      <FaSignOutAlt /> Logout
-                    </button>
-                  </div>
                 </div>
               </div>
             )}

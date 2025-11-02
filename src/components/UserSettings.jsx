@@ -331,6 +331,10 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
                   />
                 </div>
 
+                <div className="security-notice">
+                  <p>A verification email will be sent to confirm your password change</p>
+                </div>
+
                 <button type="submit" className="settings-save-btn" disabled={loading}>
                   <FaKey /> {loading ? 'Changing...' : 'Change Password'}
                 </button>
