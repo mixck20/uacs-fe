@@ -843,3 +843,13 @@
   font-family: inherit !important;
   resize: vertical !important;
 }
+
+/* Hide SweetAlert2's default input and textarea elements */
+.certificate-request-modal .swal2-input,
+.certificate-request-modal .swal2-textarea,
+.certificate-request-modal .swal2-file,
+.certificate-request-modal .swal2-range,
+.certificate-request-modal input.swal2-input,
+.certificate-request-modal textarea.swal2-textarea {
+  display: none !important;
+}
