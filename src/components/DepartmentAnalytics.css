@@ -227,27 +227,28 @@
 }
 
 .department-analytics .bar-chart {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-around;
-  gap: 1.5rem;
-  height: 450px;
-  padding: 1rem 1rem 8rem 1rem;
-  border-bottom: 2px solid #e2e8f0;
-  overflow-x: auto;
-  min-width: 100%;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: space-around !important;
+  gap: 1.5rem !important;
+  height: 450px !important;
+  padding: 1rem 1rem 8rem 1rem !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+  overflow-x: auto !important;
+  min-width: 100% !important;
+  flex-direction: row !important;
 }
 
 .department-analytics .bar-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  min-width: 100px;
-  max-width: 120px;
-  position: relative;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.75rem !important;
+  min-width: 100px !important;
+  max-width: 120px !important;
+  position: relative !important;
 }
 
 .department-analytics .bar-value {
@@ -277,22 +278,22 @@
 }
 
 .department-analytics .bar-label {
-  font-size: 0.75rem;
-  color: #64748b;
-  text-align: center;
-  line-height: 1.4;
-  font-weight: 500;
-  word-wrap: break-word;
-  max-width: 120px;
-  height: 5rem;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  position: absolute;
-  bottom: -6.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 0 0.5rem;
+  font-size: 0.75rem !important;
+  color: #64748b !important;
+  text-align: center !important;
+  line-height: 1.4 !important;
+  font-weight: 500 !important;
+  word-wrap: break-word !important;
+  max-width: 120px !important;
+  height: 5rem !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  position: absolute !important;
+  bottom: -6.5rem !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  padding: 0 0.5rem !important;
 }
 
 .loading-state {
