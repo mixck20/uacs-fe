@@ -34,7 +34,6 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
   // Prescription state
   const [prescriptions, setPrescriptions] = useState([]);
   const [inventoryItems, setInventoryItems] = useState([]);
-  const [autoDispense, setAutoDispense] = useState(true);
 
   // --- Fetch patients and inventory from backend on mount ---
   useEffect(() => {
@@ -149,8 +148,8 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
       return;
     }
 
-    // Validate prescriptions if auto-dispense is enabled
-    if (autoDispense && prescriptions.length > 0) {
+    // Validate prescriptions - always dispense if medications are selected
+    if (prescriptions.length > 0) {
       for (let i = 0; i < prescriptions.length; i++) {
         const rx = prescriptions[i];
         if (!rx.medication || !rx.dosage) {
@@ -168,11 +167,11 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
       const recordData = {
         ...newRecord,
         prescriptions: prescriptions,
-        dispenseMedications: autoDispense ? prescriptions.filter(rx => rx.itemId).map(rx => ({
+        dispenseMedications: prescriptions.filter(rx => rx.itemId).map(rx => ({
           itemId: rx.itemId,
           medication: rx.medication,
           quantity: rx.quantity || 1
-        })) : undefined
+        }))
       };
 
       const data = await PatientsAPI.addVisit(selectedPatient._id || selectedPatient.id, recordData);
@@ -938,22 +937,6 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                         </div>
                       </div>
                     ))}
-                  </div>
-                )}
-
-                {prescriptions.some(rx => rx.itemId) && (
-                  <div className="auto-dispense-option">
-                    <label className="checkbox-label">
-                      <input
-                        type="checkbox"
-                        checked={autoDispense}
-                        onChange={(e) => setAutoDispense(e.target.checked)}
-                      />
-                      <span>Automatically dispense medications from inventory</span>
-                    </label>
-                    <small className="form-hint">
-                      Medications will be deducted from inventory and recorded in dispensing history
-                    </small>
                   </div>
                 )}
               </div>
