@@ -1387,12 +1387,25 @@
   font-size: 1.1rem;
 }
 
+.certificate-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.certificate-patient,
 .certificate-date {
   color: #64748b;
   font-size: 0.875rem;
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.certificate-patient {
+  color: #475569;
+  font-weight: 500;
 }
 
 .certificate-status {

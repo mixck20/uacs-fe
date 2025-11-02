@@ -512,18 +512,45 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
 
   // --- Certificate Handlers ---
   async function handleIssueCertificate(cert) {
+    const patientName = cert.patientId?.fullName || cert.patientId?.name || 'Unknown Patient';
+    const requestDate = new Date(cert.requestDate).toLocaleDateString();
+    
     const { value: formValues } = await Swal.fire({
       title: 'Issue Medical Certificate',
       html: `
-        <div style="text-align: left;">
-          <label style="display: block; margin-bottom: 5px; font-weight: 600;">Diagnosis *</label>
-          <textarea id="diagnosis" class="swal2-textarea" placeholder="Enter diagnosis" required></textarea>
+        <div style="text-align: left; padding: 10px;">
+          <div style="background: #f3f4f6; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+            <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Patient:</strong> ${patientName}</p>
+            <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Purpose:</strong> ${cert.purpose || 'Medical Certificate'}</p>
+            <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Requested:</strong> ${requestDate}</p>
+            ${cert.requestNotes ? `<p style="margin: 0; font-size: 14px;"><strong>Notes:</strong> ${cert.requestNotes}</p>` : ''}
+          </div>
           
-          <label style="display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 600;">Recommendations *</label>
-          <textarea id="recommendations" class="swal2-textarea" placeholder="Enter recommendations" required></textarea>
+          <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">Diagnosis *</label>
+          <textarea 
+            id="cert-diagnosis" 
+            placeholder="Enter diagnosis" 
+            required
+            style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical; min-height: 80px; box-sizing: border-box;"
+          ></textarea>
           
-          <label style="display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 600;">Rest Days</label>
-          <input id="restDays" type="number" class="swal2-input" placeholder="Number of days" style="margin-top: 5px;">
+          <label style="display: block; margin-top: 16px; margin-bottom: 8px; font-weight: 600; color: #374151;">Recommendations *</label>
+          <textarea 
+            id="cert-recommendations" 
+            placeholder="Enter recommendations" 
+            required
+            style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical; min-height: 80px; box-sizing: border-box;"
+          ></textarea>
+          
+          <label style="display: block; margin-top: 16px; margin-bottom: 8px; font-weight: 600; color: #374151;">Rest Days (Optional)</label>
+          <input 
+            id="cert-restDays" 
+            type="number" 
+            min="0"
+            placeholder="e.g., 3" 
+            style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; font-family: inherit; box-sizing: border-box;"
+          />
+          <p style="margin: 5px 0 0 0; font-size: 12px; color: #6b7280;">Leave blank if not applicable</p>
         </div>
       `,
       focusConfirm: false,
@@ -531,10 +558,15 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
       confirmButtonText: 'Issue Certificate',
       confirmButtonColor: '#e51d5e',
       cancelButtonColor: '#6c757d',
+      customClass: {
+        popup: 'cert-issue-modal',
+        htmlContainer: 'cert-issue-content'
+      },
+      width: '600px',
       preConfirm: () => {
-        const diagnosis = document.getElementById('diagnosis').value;
-        const recommendations = document.getElementById('recommendations').value;
-        const restDays = document.getElementById('restDays').value;
+        const diagnosis = document.getElementById('cert-diagnosis').value.trim();
+        const recommendations = document.getElementById('cert-recommendations').value.trim();
+        const restDays = document.getElementById('cert-restDays').value;
         
         if (!diagnosis || !recommendations) {
           Swal.showValidationMessage('Please fill in all required fields');
@@ -870,9 +902,14 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                         <div className="certificate-header">
                           <div className="certificate-info">
                             <h4>{cert.purpose || 'Medical Certificate'}</h4>
-                            <span className="certificate-date">
-                              <FaCalendar /> Requested: {new Date(cert.requestDate).toLocaleDateString()}
-                            </span>
+                            <div className="certificate-meta">
+                              <span className="certificate-patient">
+                                <FaUser /> {cert.patientId?.fullName || cert.patientId?.name || 'Unknown Patient'}
+                              </span>
+                              <span className="certificate-date">
+                                <FaCalendar /> {new Date(cert.requestDate).toLocaleDateString()}
+                              </span>
+                            </div>
                           </div>
                           <span className={`certificate-status status-${cert.status?.toLowerCase()}`}>
                             {cert.status?.toLowerCase() === 'pending' && <FaExclamationTriangle />}
