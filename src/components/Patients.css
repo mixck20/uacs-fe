@@ -285,25 +285,23 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
 }
 
 .patient-name {
   font-size: 1.25rem;
   font-weight: 600;
   color: #1e293b;
-  margin: 0 0 1rem 0;
-  min-height: 2.5rem;
-  display: flex;
-  align-items: center;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
 }
 
 .patient-info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #f0f0f0;
-  min-height: 2.5rem;
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 0.4rem 0;
 }
 
 .patient-info-row:last-child {
@@ -312,14 +310,17 @@
 
 .patient-label {
   color: #64748b;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: left;
 }
 
 .patient-value {
   color: #1e293b;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  word-break: break-word;
 }
 
 .patient-badge {
