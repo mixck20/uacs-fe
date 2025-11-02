@@ -230,9 +230,9 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-around;
-  gap: 0.75rem;
-  height: 350px;
-  padding: 1rem 0.5rem 6rem 0.5rem;
+  gap: 1.5rem;
+  height: 450px;
+  padding: 1rem 1rem 8rem 1rem;
   border-bottom: 2px solid #e2e8f0;
   overflow-x: auto;
   min-width: 100%;
@@ -244,9 +244,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.5rem;
-  min-width: 70px;
-  max-width: 90px;
+  gap: 0.75rem;
+  min-width: 100px;
+  max-width: 120px;
   position: relative;
 }
 
@@ -261,7 +261,7 @@
 .bar {
   width: 100%;
   min-height: 8px;
-  max-width: 70px;
+  max-width: 80px;
   background: linear-gradient(180deg, #e51d5e 0%, #ff6b9d 100%);
   border-radius: 8px 8px 0 0;
   transition: all 0.3s ease;
@@ -277,22 +277,22 @@
 }
 
 .bar-label {
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   color: #64748b;
   text-align: center;
-  line-height: 1.3;
+  line-height: 1.4;
   font-weight: 500;
   word-wrap: break-word;
-  max-width: 90px;
-  height: 4rem;
+  max-width: 120px;
+  height: 5rem;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   position: absolute;
-  bottom: -5rem;
+  bottom: -6.5rem;
   left: 50%;
   transform: translateX(-50%);
-  padding: 0 0.25rem;
+  padding: 0 0.5rem;
 }
 
 .loading-state {
@@ -307,11 +307,11 @@
   .bar-chart {
     justify-content: flex-start;
     overflow-x: auto;
-    padding-bottom: 7rem;
+    padding-bottom: 8rem;
   }
 
   .bar-item {
-    min-width: 80px;
+    min-width: 90px;
   }
 }
 
