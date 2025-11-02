@@ -15,6 +15,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
   const [activeTab, setActiveTab] = useState('history'); // 'history' or 'certificates'
   const [certificates, setCertificates] = useState([]);
   const [selectedVisit, setSelectedVisit] = useState(null);
+  const [showCertificates, setShowCertificates] = useState(false);
 
   // EHR record form state
   const [newRecord, setNewRecord] = useState({
@@ -650,18 +651,34 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     <div>
       <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} user={user} />
       <div className="clinic-content">
-        <h1 className="ehr-title">Electronic Health Records</h1>
+        <div className="ehr-header">
+          <h1 className="ehr-title">Electronic Health Records</h1>
+          <button 
+            className="cert-requests-btn"
+            onClick={() => setShowCertificates(!showCertificates)}
+          >
+            <FaCertificate />
+            <span>Certificate Requests</span>
+            {certificates.filter(c => c.status?.toLowerCase() === 'pending').length > 0 && (
+              <span className="cert-badge">
+                {certificates.filter(c => c.status?.toLowerCase() === 'pending').length}
+              </span>
+            )}
+          </button>
+        </div>
 
-        {/* Search Bar */}
-        <input
-          type="text"
-          className="ehr-search"
-          placeholder="Search by patient name..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+        {!showCertificates ? (
+          <>
+            {/* Search Bar */}
+            <input
+              type="text"
+              className="ehr-search"
+              placeholder="Search by patient name..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
 
-        <div className="ehr-layout">
+            <div className="ehr-layout">
           <div className="ehr-patient-list">
             <div className="patient-list-header">
               <FaUser />
@@ -695,25 +712,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
           </div>
 
           <div className="ehr-records">
-            {/* Tab Navigation */}
-            <div className="ehr-tabs">
-              <button 
-                className={`ehr-tab ${activeTab === 'history' ? 'active' : ''}`}
-                onClick={() => setActiveTab('history')}
-              >
-                <FaNotesMedical /> Medical History
-                {selectedPatient && <span className="tab-badge">{selectedPatient.visits?.length || 0}</span>}
-              </button>
-              <button 
-                className={`ehr-tab ${activeTab === 'certificates' ? 'active' : ''}`}
-                onClick={() => setActiveTab('certificates')}
-              >
-                <FaCertificate /> Certificates
-                <span className="tab-badge">{certificates.length}</span>
-              </button>
-            </div>
-            
-            {activeTab === 'history' && selectedPatient ? (
+            {selectedPatient ? (
               <>
                 {/* Patient Header */}
                 <div className="patient-header">
@@ -860,106 +859,108 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                 </div>
                 )}
               </>
-            ) : activeTab === 'history' ? (
+            ) : (
               <div className="empty-state centered">
                 <FaUser className="empty-icon large" />
                 <h3>No Patient Selected</h3>
                 <p>Select a patient from the list to view their medical records</p>
               </div>
-            ) : null}
-            
-            {/* Certificates Tab - Always Available */}
-            {activeTab === 'certificates' && (
-              <div className="certificates-section">
-                <div className="section-header">
-                  <FaCertificate />
-                  <h3>Medical Certificates</h3>
-                  <span className="record-count">
-                    {certificates.length} {certificates.length === 1 ? 'Certificate' : 'Certificates'}
-                  </span>
-                </div>
-                
-                {certificates.length === 0 ? (
-                  <div className="empty-state">
-                    <FaCertificate className="empty-icon" />
-                    <p>No certificates requested yet</p>
-                  </div>
-                ) : (
-                  <div className="certificates-list">
-                    {certificates.map((cert) => (
-                      <div key={cert._id} className={`certificate-card status-${cert.status.toLowerCase()}`}>
-                        <div className="certificate-header">
-                          <div className="certificate-info">
-                            <h4>{cert.purpose || 'Medical Certificate'}</h4>
-                            <div className="certificate-meta">
-                              <span className="certificate-patient">
-                                <FaUser /> {cert.patientId?.fullName || cert.patientId?.name || 'Unknown Patient'}
-                              </span>
-                              <span className="certificate-date">
-                                <FaCalendar /> {new Date(cert.requestDate).toLocaleDateString()}
-                              </span>
-                            </div>
-                          </div>
-                          <span className={`certificate-status status-${cert.status?.toLowerCase()}`}>
-                            {cert.status?.toLowerCase() === 'pending' && <FaExclamationTriangle />}
-                            {cert.status?.toLowerCase() === 'issued' && <FaCheckCircle />}
-                            {cert.status?.toLowerCase() === 'rejected' && <FaBan />}
-                            {cert.status}
-                          </span>
-                        </div>
-                        
-                        <div className="certificate-body">
-                          {cert.requestNotes && (
-                            <p className="certificate-notes"><strong>Request Notes:</strong> {cert.requestNotes}</p>
-                          )}
-                          
-                          {cert.status?.toLowerCase() === 'issued' && cert.diagnosis && (
-                            <p className="certificate-diagnosis"><strong>Diagnosis:</strong> {cert.diagnosis}</p>
-                          )}
-                          
-                          {cert.status?.toLowerCase() === 'issued' && cert.recommendations && (
-                            <p className="certificate-recommendations"><strong>Recommendations:</strong> {cert.recommendations}</p>
-                          )}
-                          
-                          {cert.status?.toLowerCase() === 'rejected' && cert.rejectionReason && (
-                            <p className="certificate-rejection"><strong>Rejection Reason:</strong> {cert.rejectionReason}</p>
-                          )}
-                        </div>
-                        
-                        <div className="certificate-actions">
-                          {cert.status?.toLowerCase() === 'pending' && (
-                            <>
-                              <button 
-                                className="cert-btn issue-btn"
-                                onClick={() => handleIssueCertificate(cert)}
-                              >
-                                <FaCheckCircle /> Issue Certificate
-                              </button>
-                              <button 
-                                className="cert-btn reject-btn"
-                                onClick={() => handleRejectCertificate(cert)}
-                              >
-                                <FaBan /> Reject
-                              </button>
-                            </>
-                          )}
-                          {cert.status?.toLowerCase() === 'issued' && (
-                            <button 
-                              className="cert-btn download-btn"
-                              onClick={() => handleDownloadCertificate(cert._id)}
-                            >
-                              <FaDownload /> Download PDF
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
             )}
           </div>
         </div>
+          </>
+        ) : (
+          /* Certificate Requests View */
+          <div className="certificates-full-view">
+            <div className="certificates-section">
+              <div className="section-header">
+                <FaCertificate />
+                <h3>Medical Certificate Requests</h3>
+                <span className="record-count">
+                  {certificates.length} {certificates.length === 1 ? 'Request' : 'Requests'}
+                </span>
+              </div>
+              
+              {certificates.length === 0 ? (
+                <div className="empty-state">
+                  <FaCertificate className="empty-icon" />
+                  <p>No certificate requests yet</p>
+                </div>
+              ) : (
+                <div className="certificates-list">
+                  {certificates.map((cert) => (
+                    <div key={cert._id} className={`certificate-card status-${cert.status?.toLowerCase()}`}>
+                      <div className="certificate-header">
+                        <div className="certificate-info">
+                          <h4>{cert.purpose || 'Medical Certificate'}</h4>
+                          <div className="certificate-meta">
+                            <span className="certificate-patient">
+                              <FaUser /> {cert.patientId?.fullName || cert.patientId?.name || 'Unknown Patient'}
+                            </span>
+                            <span className="certificate-date">
+                              <FaCalendar /> {new Date(cert.requestDate).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                        <span className={`certificate-status status-${cert.status?.toLowerCase()}`}>
+                          {cert.status?.toLowerCase() === 'pending' && <FaExclamationTriangle />}
+                          {cert.status?.toLowerCase() === 'issued' && <FaCheckCircle />}
+                          {cert.status?.toLowerCase() === 'rejected' && <FaBan />}
+                          {cert.status}
+                        </span>
+                      </div>
+                      
+                      <div className="certificate-body">
+                        {cert.requestNotes && (
+                          <p className="certificate-notes"><strong>Request Notes:</strong> {cert.requestNotes}</p>
+                        )}
+                        
+                        {cert.status?.toLowerCase() === 'issued' && cert.diagnosis && (
+                          <p className="certificate-diagnosis"><strong>Diagnosis:</strong> {cert.diagnosis}</p>
+                        )}
+                        
+                        {cert.status?.toLowerCase() === 'issued' && cert.recommendations && (
+                          <p className="certificate-recommendations"><strong>Recommendations:</strong> {cert.recommendations}</p>
+                        )}
+                        
+                        {cert.status?.toLowerCase() === 'rejected' && cert.rejectionReason && (
+                          <p className="certificate-rejection"><strong>Rejection Reason:</strong> {cert.rejectionReason}</p>
+                        )}
+                      </div>
+                      
+                      <div className="certificate-actions">
+                        {cert.status?.toLowerCase() === 'pending' && (
+                          <>
+                            <button 
+                              className="cert-btn issue-btn"
+                              onClick={() => handleIssueCertificate(cert)}
+                            >
+                              <FaCheckCircle /> Issue Certificate
+                            </button>
+                            <button 
+                              className="cert-btn reject-btn"
+                              onClick={() => handleRejectCertificate(cert)}
+                            >
+                              <FaBan /> Reject
+                            </button>
+                          </>
+                        )}
+                        {cert.status?.toLowerCase() === 'issued' && (
+                          <button 
+                            className="cert-btn download-btn"
+                            onClick={() => handleDownloadCertificate(cert._id)}
+                          >
+                            <FaDownload /> Download PDF
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Add Record Modal */}
         {showForm && (

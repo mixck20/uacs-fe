@@ -11,14 +11,21 @@
   margin-left: 280px;
 }
 
+.ehr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 .ehr-title {
   font-size: 2.2rem;
   color: #e51d5e;
   font-weight: 700;
-  margin-bottom: 20px;
   padding-bottom: 0.5rem;
   position: relative;
   display: inline-block;
+  margin: 0;
 }
 
 .ehr-title::after {
@@ -30,6 +37,45 @@
   height: 4px;
   background: linear-gradient(90deg, #e51d5e 0%, rgba(229, 29, 94, 0.2) 100%);
   border-radius: 2px;
+}
+
+.cert-requests-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #fff;
+  border: 2px solid #e51d5e;
+  color: #e51d5e;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.cert-requests-btn:hover {
+  background: #e51d5e;
+  color: #fff;
+}
+
+.cert-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 50%;
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
 }
 
 .ehr-search {
@@ -1337,8 +1383,15 @@
 }
 
 /* Certificates Section */
-.certificates-section {
+.certificates-full-view {
+  background: #fff;
+  border-radius: 12px;
   padding: 24px;
+  margin-top: 20px;
+}
+
+.certificates-section {
+  padding: 0;
 }
 
 .certificates-list {
