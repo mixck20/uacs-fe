@@ -49,8 +49,10 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     const searchLower = searchTerm.toLowerCase();
     return (
       (p.fullName || p.name || '').toLowerCase().includes(searchLower) ||
-      (p.schoolId || '').toLowerCase().includes(searchLower) ||
-      (p.department || '').toLowerCase().includes(searchLower)
+      (p.email || '').toLowerCase().includes(searchLower) ||
+      (p.userId?.department || p.department || '').toLowerCase().includes(searchLower) ||
+      (p.userId?.course || p.course || '').toLowerCase().includes(searchLower) ||
+      (p.userId?.yearLevel || p.yearLevel || '').toString().toLowerCase().includes(searchLower)
     );
   });
 
@@ -442,7 +444,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
           <FaSearch className="patients-search-icon" />
           <input
             className="patients-search"
-            placeholder="Search by name, school ID, or course..."
+            placeholder="Search by name, email, department, course, or year..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
