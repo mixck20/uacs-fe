@@ -514,7 +514,8 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
   // --- Certificate Handlers ---
   async function handleIssueCertificate(cert) {
     const patientName = cert.patientId?.fullName || cert.patientId?.name || 'Unknown Patient';
-    const requestDate = cert.requestDate ? new Date(cert.requestDate).toLocaleDateString() : 'N/A';
+    const requestDate = cert.createdAt || cert.requestDate || cert.dateRequested;
+    const formattedDate = requestDate ? new Date(requestDate).toLocaleDateString() : new Date().toLocaleDateString();
     
     const { value: formValues } = await Swal.fire({
       title: 'Issue Medical Certificate',
@@ -523,28 +524,28 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
           <div class="cert-info-box">
             <p><strong>Patient:</strong> ${patientName}</p>
             <p><strong>Purpose:</strong> ${cert.purpose || 'Medical Certificate'}</p>
-            <p><strong>Requested:</strong> ${requestDate}</p>
+            <p><strong>Requested:</strong> ${formattedDate}</p>
             ${cert.requestNotes ? `<p><strong>Notes:</strong> ${cert.requestNotes}</p>` : ''}
           </div>
           
           <div class="form-field">
             <label for="cert-diagnosis">Diagnosis *</label>
-            <textarea 
+            <div 
               id="cert-diagnosis" 
-              class="cert-textarea"
-              placeholder="Enter diagnosis" 
-              rows="4"
-            ></textarea>
+              class="cert-input-field"
+              contenteditable="true"
+              data-placeholder="Enter diagnosis"
+            ></div>
           </div>
           
           <div class="form-field">
             <label for="cert-recommendations">Recommendations *</label>
-            <textarea 
+            <div 
               id="cert-recommendations" 
-              class="cert-textarea"
-              placeholder="Enter recommendations"
-              rows="4"
-            ></textarea>
+              class="cert-input-field"
+              contenteditable="true"
+              data-placeholder="Enter recommendations"
+            ></div>
           </div>
         </div>
       `,
@@ -559,14 +560,13 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
       },
       width: '600px',
       didOpen: () => {
-        // Ensure textareas are editable
         const diagnosis = document.getElementById('cert-diagnosis');
         const recommendations = document.getElementById('cert-recommendations');
         if (diagnosis) diagnosis.focus();
       },
       preConfirm: () => {
-        const diagnosis = document.getElementById('cert-diagnosis').value.trim();
-        const recommendations = document.getElementById('cert-recommendations').value.trim();
+        const diagnosis = document.getElementById('cert-diagnosis').innerText.trim();
+        const recommendations = document.getElementById('cert-recommendations').innerText.trim();
         
         if (!diagnosis || !recommendations) {
           Swal.showValidationMessage('Please fill in all required fields');

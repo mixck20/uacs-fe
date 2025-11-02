@@ -1578,30 +1578,33 @@
   font-size: 14px;
 }
 
-.cert-textarea {
-  width: 100% !important;
-  max-width: 100% !important;
-  padding: 12px !important;
-  border: 2px solid #d1d5db !important;
-  border-radius: 8px !important;
-  font-size: 14px !important;
-  font-family: inherit !important;
-  resize: vertical !important;
-  min-height: 100px !important;
-  box-sizing: border-box !important;
-  background: white !important;
-  color: #1f2937 !important;
-  line-height: 1.5 !important;
+.cert-input-field {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+  background: white;
+  color: #1f2937;
+  line-height: 1.5;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
-.cert-textarea:focus {
-  outline: none !important;
-  border-color: #e51d5e !important;
-  box-shadow: 0 0 0 3px rgba(229, 29, 94, 0.1) !important;
+.cert-input-field:focus {
+  outline: none;
+  border-color: #e51d5e;
+  box-shadow: 0 0 0 3px rgba(229, 29, 94, 0.1);
 }
 
-.cert-textarea::placeholder {
-  color: #9ca3af !important;
+.cert-input-field:empty:before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
 }
 
 .cert-issue-modal .swal2-html-container {
