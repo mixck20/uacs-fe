@@ -109,19 +109,33 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
 
       // Check if email verification is required
       if (response.requiresVerification) {
-        Swal.fire({
+        await Swal.fire({
           icon: 'info',
           title: 'Verification Email Sent',
-          text: response.message || 'Please check your email to verify and complete the password change.',
-          confirmButtonColor: '#e51d5e'
+          html: `
+            <p>${response.message || 'Please check your email to verify and complete the password change.'}</p>
+            <p style="margin-top: 10px; color: #666;">You will be logged out for security purposes.</p>
+          `,
+          confirmButtonColor: '#e51d5e',
+          confirmButtonText: 'OK'
         });
+        
+        // Logout user for security
+        setTimeout(() => {
+          onLogout();
+        }, 500);
       } else {
-        Swal.fire({
+        await Swal.fire({
           icon: 'success',
           title: 'Password Changed!',
-          text: 'Your password has been changed successfully.',
+          text: 'Your password has been changed successfully. Please login again.',
           confirmButtonColor: '#e51d5e'
         });
+        
+        // Logout user for security
+        setTimeout(() => {
+          onLogout();
+        }, 500);
       }
 
       // Reset form
