@@ -7,6 +7,33 @@ import './Schedule.css';
 const API_URL = 'https://uacs-be.vercel.app/api';
 
 const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout, user }) => {
+  // Helper function to format time from 24-hour to 12-hour AM/PM format
+  const formatTime = (timeString) => {
+    if (!timeString) return '';
+    
+    // If already in AM/PM format, return as is
+    if (timeString.includes('AM') || timeString.includes('PM')) {
+      return timeString;
+    }
+    
+    // Convert 24-hour format to 12-hour AM/PM
+    const convertTime = (time) => {
+      const [hours, minutes] = time.split(':');
+      let hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      hour = hour % 12 || 12;
+      return `${hour}:${minutes} ${ampm}`;
+    };
+    
+    // Handle time ranges (e.g., "13:00 - 17:00")
+    if (timeString.includes('-')) {
+      const [start, end] = timeString.split('-').map(t => t.trim());
+      return `${convertTime(start)} - ${convertTime(end)}`;
+    }
+    
+    return convertTime(timeString);
+  };
+
   const [schedule, setSchedule] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingStaff, setEditingStaff] = useState(null);
@@ -362,7 +389,7 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
                             onChange={(e) => setEditingStaff({ ...editingStaff, time: e.target.value })}
                           />
                         ) : (
-                          staff.time
+                          formatTime(staff.time)
                         )}
                       </td>
                       <td>
@@ -445,7 +472,7 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
                             onChange={(e) => setEditingStaff({ ...editingStaff, schedule: e.target.value })}
                           />
                         ) : (
-                          <div style={{ whiteSpace: 'pre-line' }}>{staff.schedule}</div>
+                          <div style={{ whiteSpace: 'pre-line' }}>{formatTime(staff.schedule)}</div>
                         )}
                       </td>
                       <td>
@@ -700,19 +727,47 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
                 </div>
                 <div className="form-group">
                   <label>Start Time</label>
-                  <input
-                    type="time"
+                  <select
                     value={newStaff.startTime || ''}
                     onChange={(e) => setNewStaff({ ...newStaff, startTime: e.target.value })}
-                  />
+                  >
+                    <option value="">Select start time</option>
+                    <option value="6:00 AM">6:00 AM</option>
+                    <option value="7:00 AM">7:00 AM</option>
+                    <option value="8:00 AM">8:00 AM</option>
+                    <option value="9:00 AM">9:00 AM</option>
+                    <option value="10:00 AM">10:00 AM</option>
+                    <option value="11:00 AM">11:00 AM</option>
+                    <option value="12:00 PM">12:00 PM</option>
+                    <option value="1:00 PM">1:00 PM</option>
+                    <option value="2:00 PM">2:00 PM</option>
+                    <option value="3:00 PM">3:00 PM</option>
+                    <option value="4:00 PM">4:00 PM</option>
+                    <option value="5:00 PM">5:00 PM</option>
+                    <option value="6:00 PM">6:00 PM</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>End Time</label>
-                  <input
-                    type="time"
+                  <select
                     value={newStaff.endTime || ''}
                     onChange={(e) => setNewStaff({ ...newStaff, endTime: e.target.value })}
-                  />
+                  >
+                    <option value="">Select end time</option>
+                    <option value="6:00 AM">6:00 AM</option>
+                    <option value="7:00 AM">7:00 AM</option>
+                    <option value="8:00 AM">8:00 AM</option>
+                    <option value="9:00 AM">9:00 AM</option>
+                    <option value="10:00 AM">10:00 AM</option>
+                    <option value="11:00 AM">11:00 AM</option>
+                    <option value="12:00 PM">12:00 PM</option>
+                    <option value="1:00 PM">1:00 PM</option>
+                    <option value="2:00 PM">2:00 PM</option>
+                    <option value="3:00 PM">3:00 PM</option>
+                    <option value="4:00 PM">4:00 PM</option>
+                    <option value="5:00 PM">5:00 PM</option>
+                    <option value="6:00 PM">6:00 PM</option>
+                  </select>
                 </div>
               </>
             ) : (
