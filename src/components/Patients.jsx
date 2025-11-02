@@ -922,10 +922,6 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                           : selectedPatient.userId?.courseYear || selectedPatient.courseYearSection || 'N/A'}
                       </span>
                     </div>
-                    <div className="patient-details-row">
-                      <span className="detail-label">Blood Type:</span>
-                      <span className="detail-value">{selectedPatient.bloodType || 'N/A'}</span>
-                    </div>
                   </div>
 
                   <div className="patient-details-section">
