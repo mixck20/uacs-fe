@@ -16,7 +16,6 @@ import Patients from "./components/Patients";
 import Inventory from "./components/Inventory";
 import Appointment from "./components/Appointment";
 import EHR from "./components/EHR";
-import CertificateManagement from "./components/CertificateManagement";
 import Schedule from "./components/Schedule";
 import UserSchedule from "./components/UserSchedule";
 import AdminDashboard from "./components/AdminDashboard";
@@ -269,12 +268,6 @@ function App() {
               patients={patients}
               appointments={appointments}
               setAppointments={setAppointments}
-            />
-          );
-        case 'certificates':
-          return (
-            <CertificateManagement
-              {...commonProps}
             />
           );
         case 'schedule':

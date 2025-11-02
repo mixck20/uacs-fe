@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import ClinicNavbar from "./ClinicNavbar";
 import "./EHR.css";
-import { PatientsAPI, InventoryAPI } from "../api";
-import { FaUser, FaCalendar, FaStethoscope, FaPills, FaNotesMedical, FaHeartbeat, FaPhone, FaFileMedical, FaTimes, FaPlus, FaFileExport, FaTrash, FaEye, FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
+import { PatientsAPI, InventoryAPI, CertificateAPI } from "../api";
+import { FaUser, FaCalendar, FaStethoscope, FaPills, FaNotesMedical, FaHeartbeat, FaPhone, FaFileMedical, FaTimes, FaPlus, FaFileExport, FaTrash, FaEye, FaCheckCircle, FaExclamationTriangle, FaCertificate, FaDownload, FaBan } from "react-icons/fa";
 import jsPDF from "jspdf";
 import Swal from "sweetalert2";
 
@@ -12,6 +12,8 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('history'); // 'history' or 'certificates'
+  const [certificates, setCertificates] = useState([]);
   const [selectedVisit, setSelectedVisit] = useState(null);
 
   // EHR record form state
@@ -77,11 +79,28 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     }
   }
 
+  // --- Load certificates for patient ---
+  async function loadPatientCertificates(patientId) {
+    try {
+      const allCerts = await CertificateAPI.getAllCertificates();
+      // Filter certificates for this patient
+      const patientCerts = allCerts.filter(cert => 
+        cert.patientId?._id === patientId || cert.patientId === patientId
+      );
+      setCertificates(patientCerts);
+    } catch (err) {
+      console.error('Failed to load certificates:', err);
+      setCertificates([]);
+    }
+  }
+
   // --- Handle patient selection ---
   function handleSelectPatient(patient) {
     setSelectedPatient(patient);
     setShowForm(false);
+    setActiveTab('history');
     fetchPatientRecord(patient._id || patient.id);
+    loadPatientCertificates(patient._id || patient.id);
   }
 
   // --- Handle file upload ---
@@ -481,6 +500,116 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     doc.save(fileName);
   }
 
+  // --- Certificate Handlers ---
+  async function handleIssueCertificate(cert) {
+    const { value: formValues } = await Swal.fire({
+      title: 'Issue Medical Certificate',
+      html: `
+        <div style="text-align: left;">
+          <label style="display: block; margin-bottom: 5px; font-weight: 600;">Diagnosis *</label>
+          <textarea id="diagnosis" class="swal2-textarea" placeholder="Enter diagnosis" required></textarea>
+          
+          <label style="display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 600;">Recommendations *</label>
+          <textarea id="recommendations" class="swal2-textarea" placeholder="Enter recommendations" required></textarea>
+          
+          <label style="display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 600;">Rest Days</label>
+          <input id="restDays" type="number" class="swal2-input" placeholder="Number of days" style="margin-top: 5px;">
+        </div>
+      `,
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: 'Issue Certificate',
+      confirmButtonColor: '#e51d5e',
+      cancelButtonColor: '#6c757d',
+      preConfirm: () => {
+        const diagnosis = document.getElementById('diagnosis').value;
+        const recommendations = document.getElementById('recommendations').value;
+        const restDays = document.getElementById('restDays').value;
+        
+        if (!diagnosis || !recommendations) {
+          Swal.showValidationMessage('Please fill in all required fields');
+          return false;
+        }
+        
+        return { diagnosis, recommendations, restDays: restDays ? parseInt(restDays) : undefined };
+      }
+    });
+
+    if (formValues) {
+      try {
+        await CertificateAPI.issueCertificate(cert._id, formValues);
+        await loadPatientCertificates(selectedPatient._id || selectedPatient.id);
+        Swal.fire({
+          title: 'Success!',
+          text: 'Certificate issued successfully',
+          icon: 'success',
+          confirmButtonColor: '#e51d5e'
+        });
+      } catch (error) {
+        Swal.fire({
+          title: 'Error',
+          text: error.message || 'Failed to issue certificate',
+          icon: 'error',
+          confirmButtonColor: '#e51d5e'
+        });
+      }
+    }
+  }
+
+  async function handleRejectCertificate(cert) {
+    const { value: reason } = await Swal.fire({
+      title: 'Reject Certificate Request',
+      input: 'textarea',
+      inputLabel: 'Rejection Reason',
+      inputPlaceholder: 'Enter reason for rejection...',
+      inputAttributes: {
+        'aria-label': 'Enter reason for rejection'
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Reject',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      inputValidator: (value) => {
+        if (!value) {
+          return 'You need to provide a reason!';
+        }
+      }
+    });
+
+    if (reason) {
+      try {
+        await CertificateAPI.rejectCertificate(cert._id, reason);
+        await loadPatientCertificates(selectedPatient._id || selectedPatient.id);
+        Swal.fire({
+          title: 'Rejected',
+          text: 'Certificate request has been rejected',
+          icon: 'info',
+          confirmButtonColor: '#e51d5e'
+        });
+      } catch (error) {
+        Swal.fire({
+          title: 'Error',
+          text: error.message || 'Failed to reject certificate',
+          icon: 'error',
+          confirmButtonColor: '#e51d5e'
+        });
+      }
+    }
+  }
+
+  async function handleDownloadCertificate(certId) {
+    try {
+      await CertificateAPI.downloadCertificate(certId);
+    } catch (error) {
+      Swal.fire({
+        title: 'Error',
+        text: error.message || 'Failed to download certificate',
+        icon: 'error',
+        confirmButtonColor: '#e51d5e'
+      });
+    }
+  }
+
   // --- Filter patients by search ---
   const filteredPatients = patients.filter(p =>
     ((p.fullName || p.name || "").toLowerCase().includes(search.toLowerCase()))
@@ -559,7 +688,26 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                   </div>
                 </div>
                 
-                {/* Medical History */}
+                {/* Tab Navigation */}
+                <div className="ehr-tabs">
+                  <button 
+                    className={`ehr-tab ${activeTab === 'history' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('history')}
+                  >
+                    <FaNotesMedical /> Medical History
+                    <span className="tab-badge">{selectedPatient.visits?.length || 0}</span>
+                  </button>
+                  <button 
+                    className={`ehr-tab ${activeTab === 'certificates' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('certificates')}
+                  >
+                    <FaCertificate /> Certificates
+                    <span className="tab-badge">{certificates.length}</span>
+                  </button>
+                </div>
+                
+                {/* Medical History Tab */}
+                {activeTab === 'history' && (
                 <div className="medical-history-section">
                   <div className="section-header">
                     <FaNotesMedical />
@@ -679,6 +827,93 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                     </div>
                   )}
                 </div>
+                )}
+                
+                {/* Certificates Tab */}
+                {activeTab === 'certificates' && (
+                <div className="certificates-section">
+                  <div className="section-header">
+                    <FaCertificate />
+                    <h3>Medical Certificates</h3>
+                    <span className="record-count">
+                      {certificates.length} {certificates.length === 1 ? 'Certificate' : 'Certificates'}
+                    </span>
+                  </div>
+                  
+                  {certificates.length === 0 ? (
+                    <div className="empty-state">
+                      <FaCertificate className="empty-icon" />
+                      <p>No certificates requested yet</p>
+                    </div>
+                  ) : (
+                    <div className="certificates-list">
+                      {certificates.map((cert) => (
+                        <div key={cert._id} className={`certificate-card status-${cert.status.toLowerCase()}`}>
+                          <div className="certificate-header">
+                            <div className="certificate-info">
+                              <h4>{cert.purpose || 'Medical Certificate'}</h4>
+                              <span className="certificate-date">
+                                <FaCalendar /> Requested: {new Date(cert.requestDate).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <span className={`certificate-status status-${cert.status.toLowerCase()}`}>
+                              {cert.status === 'Pending' && <FaExclamationTriangle />}
+                              {cert.status === 'Issued' && <FaCheckCircle />}
+                              {cert.status === 'Rejected' && <FaBan />}
+                              {cert.status}
+                            </span>
+                          </div>
+                          
+                          <div className="certificate-body">
+                            {cert.requestNotes && (
+                              <p className="certificate-notes"><strong>Request Notes:</strong> {cert.requestNotes}</p>
+                            )}
+                            
+                            {cert.status === 'Issued' && cert.diagnosis && (
+                              <p className="certificate-diagnosis"><strong>Diagnosis:</strong> {cert.diagnosis}</p>
+                            )}
+                            
+                            {cert.status === 'Issued' && cert.recommendations && (
+                              <p className="certificate-recommendations"><strong>Recommendations:</strong> {cert.recommendations}</p>
+                            )}
+                            
+                            {cert.status === 'Rejected' && cert.rejectionReason && (
+                              <p className="certificate-rejection"><strong>Rejection Reason:</strong> {cert.rejectionReason}</p>
+                            )}
+                          </div>
+                          
+                          <div className="certificate-actions">
+                            {cert.status === 'Pending' && (
+                              <>
+                                <button 
+                                  className="cert-btn issue-btn"
+                                  onClick={() => handleIssueCertificate(cert)}
+                                >
+                                  <FaCheckCircle /> Issue Certificate
+                                </button>
+                                <button 
+                                  className="cert-btn reject-btn"
+                                  onClick={() => handleRejectCertificate(cert)}
+                                >
+                                  <FaBan /> Reject
+                                </button>
+                              </>
+                            )}
+                            {cert.status === 'Issued' && (
+                              <button 
+                                className="cert-btn download-btn"
+                                onClick={() => handleDownloadCertificate(cert._id)}
+                              >
+                                <FaDownload /> Download PDF
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                )}
               </>
             ) : (
               <div className="empty-state centered">

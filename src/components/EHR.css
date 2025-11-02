@@ -1279,3 +1279,225 @@
     min-width: auto;
   }
 }
+
+/* EHR Tabs */
+.ehr-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 0 24px;
+  background: white;
+  border-bottom: 2px solid #f0f3f7;
+}
+
+.ehr-tab {
+  flex: 0 0 auto;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  margin-bottom: -2px;
+}
+
+.ehr-tab:hover {
+  color: #e51d5e;
+  background: rgba(229, 29, 94, 0.05);
+}
+
+.ehr-tab.active {
+  color: #e51d5e;
+  border-bottom-color: #e51d5e;
+}
+
+.ehr-tab svg {
+  font-size: 1.1rem;
+}
+
+.tab-badge {
+  background: #e51d5e;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-width: 20px;
+  text-align: center;
+}
+
+.ehr-tab.active .tab-badge {
+  background: #c91952;
+}
+
+/* Certificates Section */
+.certificates-section {
+  padding: 24px;
+}
+
+.certificates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.certificate-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.certificate-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.certificate-card.status-pending {
+  border-left: 4px solid #f59e0b;
+}
+
+.certificate-card.status-issued {
+  border-left: 4px solid #10b981;
+}
+
+.certificate-card.status-rejected {
+  border-left: 4px solid #ef4444;
+}
+
+.certificate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f3f7;
+}
+
+.certificate-info h4 {
+  margin: 0 0 8px 0;
+  color: #1e293b;
+  font-size: 1.1rem;
+}
+
+.certificate-date {
+  color: #64748b;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.certificate-status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.certificate-status.status-pending {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.certificate-status.status-issued {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.certificate-status.status-rejected {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.certificate-body {
+  margin-bottom: 16px;
+}
+
+.certificate-body p {
+  margin: 8px 0;
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.certificate-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cert-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.issue-btn {
+  background: #10b981;
+  color: white;
+}
+
+.issue-btn:hover {
+  background: #059669;
+}
+
+.reject-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.reject-btn:hover {
+  background: #dc2626;
+}
+
+.download-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.download-btn:hover {
+  background: #2563eb;
+}
+
+@media (max-width: 768px) {
+  .ehr-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ehr-tab {
+    flex-shrink: 0;
+  }
+
+  .certificate-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .certificate-actions {
+    flex-direction: column;
+  }
+
+  .cert-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
