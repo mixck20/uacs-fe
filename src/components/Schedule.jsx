@@ -89,11 +89,14 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
     try {
       const token = localStorage.getItem('token');
       
-      // Combine startTime and endTime for physicians/dentists
+      // Combine startTime and endTime for all staff
       const staffData = { ...newStaff };
-      if (newStaff.role === 'physician' || newStaff.role === 'dentist') {
-        if (newStaff.startTime && newStaff.endTime) {
+      if (newStaff.startTime && newStaff.endTime) {
+        if (newStaff.role === 'physician' || newStaff.role === 'dentist') {
           staffData.time = `${newStaff.startTime} - ${newStaff.endTime}`;
+        } else if (newStaff.role === 'nurse') {
+          // For nurses, combine day and time into schedule field
+          staffData.schedule = `${newStaff.dayOfDuty}\n${newStaff.startTime} - ${newStaff.endTime}`;
         }
       }
       
@@ -786,15 +789,65 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Schedule</label>
+                  <label>Day of Duty</label>
                   <select
-                    value={newStaff.schedule}
-                    onChange={(e) => setNewStaff({ ...newStaff, schedule: e.target.value })}
+                    value={newStaff.dayOfDuty}
+                    onChange={(e) => setNewStaff({ ...newStaff, dayOfDuty: e.target.value })}
                   >
-                    <option value="">Select schedule</option>
-                    <option value="Monday - Friday&#10;7:30 AM - 4:30 PM">Monday - Friday, 7:30 AM - 4:30 PM</option>
-                    <option value="Monday - Friday&#10;8:00 AM - 5:00 PM">Monday - Friday, 8:00 AM - 5:00 PM</option>
-                    <option value="Monday - Friday&#10;7:00 AM - 3:00 PM">Monday - Friday, 7:00 AM - 3:00 PM</option>
+                    <option value="">Select day</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Monday - Friday">Monday - Friday</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Start Time</label>
+                  <select
+                    value={newStaff.startTime || ''}
+                    onChange={(e) => setNewStaff({ ...newStaff, startTime: e.target.value })}
+                  >
+                    <option value="">Select start time</option>
+                    <option value="6:00 AM">6:00 AM</option>
+                    <option value="7:00 AM">7:00 AM</option>
+                    <option value="7:30 AM">7:30 AM</option>
+                    <option value="8:00 AM">8:00 AM</option>
+                    <option value="9:00 AM">9:00 AM</option>
+                    <option value="10:00 AM">10:00 AM</option>
+                    <option value="11:00 AM">11:00 AM</option>
+                    <option value="12:00 PM">12:00 PM</option>
+                    <option value="1:00 PM">1:00 PM</option>
+                    <option value="2:00 PM">2:00 PM</option>
+                    <option value="3:00 PM">3:00 PM</option>
+                    <option value="4:00 PM">4:00 PM</option>
+                    <option value="5:00 PM">5:00 PM</option>
+                    <option value="6:00 PM">6:00 PM</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>End Time</label>
+                  <select
+                    value={newStaff.endTime || ''}
+                    onChange={(e) => setNewStaff({ ...newStaff, endTime: e.target.value })}
+                  >
+                    <option value="">Select end time</option>
+                    <option value="6:00 AM">6:00 AM</option>
+                    <option value="7:00 AM">7:00 AM</option>
+                    <option value="7:30 AM">7:30 AM</option>
+                    <option value="8:00 AM">8:00 AM</option>
+                    <option value="9:00 AM">9:00 AM</option>
+                    <option value="10:00 AM">10:00 AM</option>
+                    <option value="11:00 AM">11:00 AM</option>
+                    <option value="12:00 PM">12:00 PM</option>
+                    <option value="1:00 PM">1:00 PM</option>
+                    <option value="2:00 PM">2:00 PM</option>
+                    <option value="3:00 PM">3:00 PM</option>
+                    <option value="4:00 PM">4:00 PM</option>
+                    <option value="4:30 PM">4:30 PM</option>
+                    <option value="5:00 PM">5:00 PM</option>
+                    <option value="6:00 PM">6:00 PM</option>
                   </select>
                 </div>
               </>
