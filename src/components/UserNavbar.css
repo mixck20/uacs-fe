@@ -130,10 +130,15 @@
   font-weight: 600;
 }
 
+.notification-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mark-all-read-btn,
 .clear-all-btn {
   background: none;
   border: none;
-  color: #e51d5e;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -142,8 +147,20 @@
   transition: all 0.2s;
 }
 
-.clear-all-btn:hover {
+.mark-all-read-btn {
+  color: #e51d5e;
+}
+
+.clear-all-btn {
+  color: #6c757d;
+}
+
+.mark-all-read-btn:hover {
   background: #ffeaf4;
+}
+
+.clear-all-btn:hover {
+  background: #f0f0f0;
 }
 
 .user-notification-list {

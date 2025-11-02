@@ -183,6 +183,15 @@ const UserNavbar = ({ user, onLogout }) => {
     }
   };
 
+  const markAllAsRead = async () => {
+    try {
+      await NotificationsAPI.markAllAsRead();
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    } catch (error) {
+      console.error('Error marking all as read:', error);
+    }
+  };
+
   return (
     <nav className="user-navbar">
       <div className="user-brand">UA Clinic System</div>
@@ -252,14 +261,24 @@ const UserNavbar = ({ user, onLogout }) => {
             <div className="user-notification-dropdown">
               <div className="user-notification-header">
                 <h3>Notifications</h3>
-                {notifications.length > 0 && (
-                  <button 
-                    className="clear-all-btn"
-                    onClick={clearAllNotifications}
-                  >
-                    Clear All
-                  </button>
-                )}
+                <div className="notification-actions">
+                  {notifications.some(n => !n.read) && (
+                    <button 
+                      className="mark-all-read-btn"
+                      onClick={markAllAsRead}
+                    >
+                      Mark all as read
+                    </button>
+                  )}
+                  {notifications.length > 0 && (
+                    <button 
+                      className="clear-all-btn"
+                      onClick={clearAllNotifications}
+                    >
+                      Clear All
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="user-notification-list">
                 {notifications.length === 0 ? (

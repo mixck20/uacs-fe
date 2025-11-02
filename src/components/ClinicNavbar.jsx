@@ -73,6 +73,16 @@ const ClinicNavbar = ({ activePage, setActivePage, onLogout, user }) => {
     }
   }
 
+  async function clearAllNotifications() {
+    try {
+      await NotificationsAPI.deleteAllNotifications();
+      await loadNotifications();
+      await loadUnreadCount();
+    } catch (error) {
+      console.error('Failed to clear all notifications:', error);
+    }
+  }
+
   function getTimeAgo(date) {
     const seconds = Math.floor((new Date() - new Date(date)) / 1000);
     
@@ -158,11 +168,18 @@ const ClinicNavbar = ({ activePage, setActivePage, onLogout, user }) => {
           <div className="clinic-notification-dropdown">
             <div className="clinic-notification-header">
               <h3>Notifications</h3>
-              {unreadCount > 0 && (
-                <button onClick={markAllAsRead} className="mark-all-read-btn">
-                  Mark all as read
-                </button>
-              )}
+              <div className="notification-actions">
+                {unreadCount > 0 && (
+                  <button onClick={markAllAsRead} className="mark-all-read-btn">
+                    Mark all as read
+                  </button>
+                )}
+                {notifications.length > 0 && (
+                  <button onClick={clearAllNotifications} className="clear-all-btn">
+                    Clear All
+                  </button>
+                )}
+              </div>
             </div>
             <div className="clinic-notification-list">
               {notifications.length === 0 ? (

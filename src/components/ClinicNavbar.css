@@ -156,18 +156,33 @@
   color: #2d3748;
 }
 
-.mark-all-read-btn {
+.notification-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mark-all-read-btn,
+.clear-all-btn {
   background: none;
   border: none;
-  color: #e51d5e;
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 500;
   padding: 0.25rem 0.5rem;
   transition: opacity 0.2s;
+  border-radius: 0.25rem;
 }
 
-.mark-all-read-btn:hover {
+.mark-all-read-btn {
+  color: #e51d5e;
+}
+
+.clear-all-btn {
+  color: #6c757d;
+}
+
+.mark-all-read-btn:hover,
+.clear-all-btn:hover {
   opacity: 0.8;
 }
 
