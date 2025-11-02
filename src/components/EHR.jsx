@@ -541,16 +541,6 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
             required
             style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical; min-height: 80px; box-sizing: border-box;"
           ></textarea>
-          
-          <label style="display: block; margin-top: 16px; margin-bottom: 8px; font-weight: 600; color: #374151;">Rest Days (Optional)</label>
-          <input 
-            id="cert-restDays" 
-            type="number" 
-            min="0"
-            placeholder="e.g., 3" 
-            style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; font-family: inherit; box-sizing: border-box;"
-          />
-          <p style="margin: 5px 0 0 0; font-size: 12px; color: #6b7280;">Leave blank if not applicable</p>
         </div>
       `,
       focusConfirm: false,
@@ -566,14 +556,13 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
       preConfirm: () => {
         const diagnosis = document.getElementById('cert-diagnosis').value.trim();
         const recommendations = document.getElementById('cert-recommendations').value.trim();
-        const restDays = document.getElementById('cert-restDays').value;
         
         if (!diagnosis || !recommendations) {
           Swal.showValidationMessage('Please fill in all required fields');
           return false;
         }
         
-        return { diagnosis, recommendations, restDays: restDays ? parseInt(restDays) : undefined };
+        return { diagnosis, recommendations };
       }
     });
 
