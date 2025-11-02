@@ -201,14 +201,19 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
-      let yPos = 30;
+      let yPos = 20;
 
-      // Header - No logo, just text
+      // Add UA school logo on the left
+      const logo = new Image();
+      logo.src = '/ua-logo.png'; // University of the Assumption logo
+      doc.addImage(logo, 'PNG', 15, 15, 25, 25);
+
+      // Header with logo
       doc.setFontSize(18);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(0, 0, 0);
-      doc.text("UNIVERSITY OF THE ASSUMPTION", pageWidth / 2, yPos, { align: "center" });
-      yPos += 8;
+      doc.text("UNIVERSITY OF THE ASSUMPTION", pageWidth / 2, yPos + 5, { align: "center" });
+      yPos += 13;
       doc.setFontSize(14);
       doc.setTextColor(60);
       doc.text("Patient Records List", pageWidth / 2, yPos, { align: "center" });
