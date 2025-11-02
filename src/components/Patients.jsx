@@ -196,19 +196,27 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     }
   }
 
-  function handleExportToPDF() {
+  async function handleExportToPDF() {
     try {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
       let yPos = 20;
 
-      // Add UA school logo on the left
-      const logo = new Image();
-      logo.src = '/ua-logo.png'; // University of the Assumption logo
-      doc.addImage(logo, 'PNG', 15, 15, 25, 25);
+      // Try to add UA school logo on the left (if available)
+      try {
+        const logo = new Image();
+        logo.src = '/UA-Logo (1).png'; // University of the Assumption logo
+        await new Promise((resolve, reject) => {
+          logo.onload = () => resolve();
+          logo.onerror = () => reject();
+        });
+        doc.addImage(logo, 'PNG', 15, 15, 25, 25);
+      } catch (logoError) {
+        console.log('Logo could not be loaded, continuing without it');
+      }
 
-      // Header with logo
+      // Header
       doc.setFontSize(18);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(0, 0, 0);
