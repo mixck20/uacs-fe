@@ -18,6 +18,8 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
     role: 'physician',
     designation: '',
     dayOfDuty: '',
+    startTime: '',
+    endTime: '',
     time: '',
     schedule: ''
   });
@@ -59,7 +61,16 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(`${API_URL}/schedule/staff`, newStaff, {
+      
+      // Combine startTime and endTime for physicians/dentists
+      const staffData = { ...newStaff };
+      if (newStaff.role === 'physician' || newStaff.role === 'dentist') {
+        if (newStaff.startTime && newStaff.endTime) {
+          staffData.time = `${newStaff.startTime} - ${newStaff.endTime}`;
+        }
+      }
+      
+      const response = await axios.post(`${API_URL}/schedule/staff`, staffData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -70,6 +81,8 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
         role: 'physician',
         designation: '',
         dayOfDuty: '',
+        startTime: '',
+        endTime: '',
         time: '',
         schedule: ''
       });
@@ -686,20 +699,20 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Time</label>
-                  <select
-                    value={newStaff.time}
-                    onChange={(e) => setNewStaff({ ...newStaff, time: e.target.value })}
-                  >
-                    <option value="">Select time</option>
-                    <option value="8:00 AM - 10:00 AM">8:00 AM - 10:00 AM</option>
-                    <option value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM</option>
-                    <option value="1:00 PM - 3:00 PM">1:00 PM - 3:00 PM</option>
-                    <option value="3:00 PM - 5:00 PM">3:00 PM - 5:00 PM</option>
-                    <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
-                    <option value="1:00 PM - 5:00 PM">1:00 PM - 5:00 PM</option>
-                    <option value="8:00 AM - 5:00 PM">8:00 AM - 5:00 PM</option>
-                  </select>
+                  <label>Start Time</label>
+                  <input
+                    type="time"
+                    value={newStaff.startTime || ''}
+                    onChange={(e) => setNewStaff({ ...newStaff, startTime: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>End Time</label>
+                  <input
+                    type="time"
+                    value={newStaff.endTime || ''}
+                    onChange={(e) => setNewStaff({ ...newStaff, endTime: e.target.value })}
+                  />
                 </div>
               </>
             ) : (

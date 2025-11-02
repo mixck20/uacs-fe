@@ -14,7 +14,7 @@ const VerifyPasswordChange = () => {
     const verifyPassword = async () => {
       try {
         const response = await axios.post(
-          `https://uacs-be.vercel.app/auth/verify-password-change/${token}`
+          `https://uacs-be.vercel.app/api/auth/verify-password-change/${token}`
         );
 
         setMessage(response.data.message);
