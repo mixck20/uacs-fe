@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaBell, FaSave, FaKey } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import { AuthAPI } from '../api';
@@ -6,6 +7,7 @@ import UserPortalLayout from './UserPortalLayout';
 import './UserSettings.css';
 
 const UserSettings = ({ user, onLogout, onUserUpdate }) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
   
@@ -120,10 +122,11 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
           confirmButtonText: 'OK'
         });
         
-        // Logout user for security
-        setTimeout(() => {
-          onLogout();
-        }, 500);
+        // Logout user for security - clear storage and redirect
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        if (onLogout) onLogout();
+        navigate('/login');
       } else {
         await Swal.fire({
           icon: 'success',
@@ -132,10 +135,11 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
           confirmButtonColor: '#e51d5e'
         });
         
-        // Logout user for security
-        setTimeout(() => {
-          onLogout();
-        }, 500);
+        // Logout user for security - clear storage and redirect
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        if (onLogout) onLogout();
+        navigate('/login');
       }
 
       // Reset form
