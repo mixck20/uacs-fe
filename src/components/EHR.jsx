@@ -514,34 +514,38 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
   // --- Certificate Handlers ---
   async function handleIssueCertificate(cert) {
     const patientName = cert.patientId?.fullName || cert.patientId?.name || 'Unknown Patient';
-    const requestDate = new Date(cert.requestDate).toLocaleDateString();
+    const requestDate = cert.requestDate ? new Date(cert.requestDate).toLocaleDateString() : 'N/A';
     
     const { value: formValues } = await Swal.fire({
       title: 'Issue Medical Certificate',
       html: `
-        <div style="text-align: left; padding: 10px;">
-          <div style="background: #f3f4f6; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
-            <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Patient:</strong> ${patientName}</p>
-            <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Purpose:</strong> ${cert.purpose || 'Medical Certificate'}</p>
-            <p style="margin: 0 0 8px 0; font-size: 14px;"><strong>Requested:</strong> ${requestDate}</p>
-            ${cert.requestNotes ? `<p style="margin: 0; font-size: 14px;"><strong>Notes:</strong> ${cert.requestNotes}</p>` : ''}
+        <div class="cert-issue-form">
+          <div class="cert-info-box">
+            <p><strong>Patient:</strong> ${patientName}</p>
+            <p><strong>Purpose:</strong> ${cert.purpose || 'Medical Certificate'}</p>
+            <p><strong>Requested:</strong> ${requestDate}</p>
+            ${cert.requestNotes ? `<p><strong>Notes:</strong> ${cert.requestNotes}</p>` : ''}
           </div>
           
-          <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">Diagnosis *</label>
-          <textarea 
-            id="cert-diagnosis" 
-            placeholder="Enter diagnosis" 
-            required
-            style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical; min-height: 80px; box-sizing: border-box;"
-          ></textarea>
+          <div class="form-field">
+            <label for="cert-diagnosis">Diagnosis *</label>
+            <textarea 
+              id="cert-diagnosis" 
+              class="cert-textarea"
+              placeholder="Enter diagnosis" 
+              rows="4"
+            ></textarea>
+          </div>
           
-          <label style="display: block; margin-top: 16px; margin-bottom: 8px; font-weight: 600; color: #374151;">Recommendations *</label>
-          <textarea 
-            id="cert-recommendations" 
-            placeholder="Enter recommendations" 
-            required
-            style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical; min-height: 80px; box-sizing: border-box;"
-          ></textarea>
+          <div class="form-field">
+            <label for="cert-recommendations">Recommendations *</label>
+            <textarea 
+              id="cert-recommendations" 
+              class="cert-textarea"
+              placeholder="Enter recommendations"
+              rows="4"
+            ></textarea>
+          </div>
         </div>
       `,
       focusConfirm: false,
@@ -554,6 +558,12 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
         htmlContainer: 'cert-issue-content'
       },
       width: '600px',
+      didOpen: () => {
+        // Ensure textareas are editable
+        const diagnosis = document.getElementById('cert-diagnosis');
+        const recommendations = document.getElementById('cert-recommendations');
+        if (diagnosis) diagnosis.focus();
+      },
       preConfirm: () => {
         const diagnosis = document.getElementById('cert-diagnosis').value.trim();
         const recommendations = document.getElementById('cert-recommendations').value.trim();
