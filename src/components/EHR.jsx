@@ -874,10 +874,10 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                               <FaCalendar /> Requested: {new Date(cert.requestDate).toLocaleDateString()}
                             </span>
                           </div>
-                          <span className={`certificate-status status-${cert.status.toLowerCase()}`}>
-                            {cert.status === 'Pending' && <FaExclamationTriangle />}
-                            {cert.status === 'Issued' && <FaCheckCircle />}
-                            {cert.status === 'Rejected' && <FaBan />}
+                          <span className={`certificate-status status-${cert.status?.toLowerCase()}`}>
+                            {cert.status?.toLowerCase() === 'pending' && <FaExclamationTriangle />}
+                            {cert.status?.toLowerCase() === 'issued' && <FaCheckCircle />}
+                            {cert.status?.toLowerCase() === 'rejected' && <FaBan />}
                             {cert.status}
                           </span>
                         </div>
@@ -887,21 +887,21 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                             <p className="certificate-notes"><strong>Request Notes:</strong> {cert.requestNotes}</p>
                           )}
                           
-                          {cert.status === 'Issued' && cert.diagnosis && (
+                          {cert.status?.toLowerCase() === 'issued' && cert.diagnosis && (
                             <p className="certificate-diagnosis"><strong>Diagnosis:</strong> {cert.diagnosis}</p>
                           )}
                           
-                          {cert.status === 'Issued' && cert.recommendations && (
+                          {cert.status?.toLowerCase() === 'issued' && cert.recommendations && (
                             <p className="certificate-recommendations"><strong>Recommendations:</strong> {cert.recommendations}</p>
                           )}
                           
-                          {cert.status === 'Rejected' && cert.rejectionReason && (
+                          {cert.status?.toLowerCase() === 'rejected' && cert.rejectionReason && (
                             <p className="certificate-rejection"><strong>Rejection Reason:</strong> {cert.rejectionReason}</p>
                           )}
                         </div>
                         
                         <div className="certificate-actions">
-                          {cert.status === 'Pending' && (
+                          {cert.status?.toLowerCase() === 'pending' && (
                             <>
                               <button 
                                 className="cert-btn issue-btn"
@@ -917,7 +917,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                               </button>
                             </>
                           )}
-                          {cert.status === 'Issued' && (
+                          {cert.status?.toLowerCase() === 'issued' && (
                             <button 
                               className="cert-btn download-btn"
                               onClick={() => handleDownloadCertificate(cert._id)}
