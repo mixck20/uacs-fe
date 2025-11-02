@@ -585,7 +585,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
           <div>
             <h1>Health Records</h1>
             <p className="user-info">
-              {user?.name || user?.fullName || 'User'} {user?.role && `(${user.role})`}
+              {user?.name || user?.fullName || 'User'}
             </p>
           </div>
           <div className="header-actions">
