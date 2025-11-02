@@ -271,7 +271,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     }
   }
 
-  function handleExportPDF() {
+  async function handleExportPDF() {
     if (!selectedPatient) {
       alert("Please select a patient first.");
       return;
@@ -282,10 +282,31 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     const pageHeight = doc.internal.pageSize.getHeight();
     let yPos = 20;
 
-    // Add school logo
-    const logo = new Image();
-    logo.src = '/ua-logo.png';
-    doc.addImage(logo, 'PNG', 15, 15, 20, 20);
+    // Try to add school logo, but continue if it fails
+    try {
+      const logo = new Image();
+      logo.src = '/ua-logo.png';
+      await new Promise((resolve, reject) => {
+        logo.onload = () => {
+          try {
+            doc.addImage(logo, 'PNG', 15, 15, 20, 20);
+            resolve();
+          } catch (err) {
+            console.warn('Failed to add logo to PDF:', err);
+            resolve(); // Continue without logo
+          }
+        };
+        logo.onerror = () => {
+          console.warn('Logo image failed to load');
+          resolve(); // Continue without logo
+        };
+        // Set timeout to not hang indefinitely
+        setTimeout(() => resolve(), 1000);
+      });
+    } catch (error) {
+      console.warn('Error loading logo:', error);
+      // Continue without logo
+    }
 
     // Header
     doc.setFontSize(18);
