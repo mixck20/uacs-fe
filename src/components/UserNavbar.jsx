@@ -252,8 +252,8 @@ const UserNavbar = ({ user, onLogout }) => {
             aria-label="Notifications"
           >
             <FaBell />
-            {notifications.length > 0 && (
-              <span className="user-notification-badge">{notifications.length}</span>
+            {notifications.filter(n => !n.read).length > 0 && (
+              <span className="user-notification-badge">{notifications.filter(n => !n.read).length}</span>
             )}
           </button>
 
