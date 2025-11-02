@@ -232,7 +232,7 @@
   justify-content: space-around !important;
   gap: 1.5rem !important;
   height: 450px !important;
-  padding: 1rem 1rem 8rem 1rem !important;
+  padding: 1rem 1rem 9rem 1rem !important;
   border-bottom: 2px solid #e2e8f0 !important;
   overflow-x: auto !important;
   min-width: 100% !important;
@@ -284,16 +284,20 @@
   line-height: 1.4 !important;
   font-weight: 500 !important;
   word-wrap: break-word !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
   max-width: 120px !important;
-  height: 5rem !important;
+  min-height: 5rem !important;
   display: flex !important;
   align-items: flex-start !important;
   justify-content: center !important;
   position: absolute !important;
-  bottom: -6.5rem !important;
+  bottom: -7rem !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
-  padding: 0 0.5rem !important;
+  padding: 0 0.25rem !important;
+  hyphens: auto !important;
 }
 
 .loading-state {
