@@ -70,9 +70,10 @@ function DepartmentAnalytics() {
         user.department === department
       ).length;
 
-      // Get patients linked to users in this department
+      // Get patients in this department (both linked to users AND walk-in patients)
       const departmentPatients = patientsData.filter(patient => 
-        patient.userId?.department === department
+        // Check userId.department for linked patients OR direct department field for walk-ins
+        patient.userId?.department === department || patient.department === department
       );
 
       const patientsCount = departmentPatients.length;
