@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ClinicNavbar from "./ClinicNavbar";
 import "./Inventory.css";
-import { InventoryAPI } from "../api";
+import { InventoryAPI, PatientAPI } from "../api";
 import Swal from "sweetalert2";
 import {
   FaPills,
@@ -28,10 +28,11 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
   const itemsPerPage = 10;
   const [showDispenseModal, setShowDispenseModal] = useState(false);
   const [dispensingItem, setDispensingItem] = useState(null);
+  const [patients, setPatients] = useState([]);
   const [dispenseForm, setDispenseForm] = useState({
     quantity: "",
+    patientId: "",
     patientName: "",
-    studentId: "",
     reason: "",
     notes: ""
   });
@@ -44,10 +45,20 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
     batchNumber: ""
   });
 
-  // Load medicines from backend
+  // Load medicines and patients from backend
   useEffect(() => {
     loadInventory();
+    loadPatients();
   }, []);
+
+  const loadPatients = async () => {
+    try {
+      const data = await PatientAPI.list();
+      setPatients(data || []);
+    } catch (err) {
+      console.error("Failed to load patients:", err);
+    }
+  };
 
   const loadInventory = async () => {
     try {
@@ -275,8 +286,8 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
     setDispensingItem(null);
     setDispenseForm({
       quantity: "",
+      patientId: "",
       patientName: "",
-      studentId: "",
       reason: "",
       notes: ""
     });
@@ -303,10 +314,10 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
       return;
     }
 
-    if (!dispenseForm.patientName.trim()) {
+    if (!dispenseForm.patientId || !dispenseForm.patientName.trim()) {
       Swal.fire({
-        title: "Patient Name Required",
-        text: "Please enter the patient's name",
+        title: "Patient Required",
+        text: "Please select a patient",
         icon: "warning"
       });
       return;
@@ -320,7 +331,6 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
             <p><strong>Item:</strong> ${dispensingItem.name}</p>
             <p><strong>Quantity:</strong> ${dispenseForm.quantity}</p>
             <p><strong>Patient:</strong> ${dispenseForm.patientName}</p>
-            ${dispenseForm.studentId ? `<p><strong>Student ID:</strong> ${dispenseForm.studentId}</p>` : ''}
             <p style="color: #666; margin-top: 10px;">Remaining stock: ${dispensingItem.quantity - parseInt(dispenseForm.quantity)}</p>
           </div>
         `,
@@ -336,8 +346,8 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
       const response = await InventoryAPI.dispense({
         itemId: dispensingItem._id || dispensingItem.id,
         quantity: parseInt(dispenseForm.quantity),
+        patientId: dispenseForm.patientId,
         patientName: dispenseForm.patientName,
-        studentId: dispenseForm.studentId,
         reason: dispenseForm.reason,
         notes: dispenseForm.notes
       });
@@ -747,23 +757,26 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Patient Name *</label>
-                    <input
-                      type="text"
-                      value={dispenseForm.patientName}
-                      onChange={(e) => setDispenseForm({...dispenseForm, patientName: e.target.value})}
-                      placeholder="Enter patient name"
+                    <label>Patient *</label>
+                    <select
+                      value={dispenseForm.patientId}
+                      onChange={(e) => {
+                        const selectedPatient = patients.find(p => p._id === e.target.value);
+                        setDispenseForm({
+                          ...dispenseForm, 
+                          patientId: e.target.value,
+                          patientName: selectedPatient ? `${selectedPatient.firstName} ${selectedPatient.lastName}` : ''
+                        });
+                      }}
                       required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Student ID (Optional)</label>
-                    <input
-                      type="text"
-                      value={dispenseForm.studentId}
-                      onChange={(e) => setDispenseForm({...dispenseForm, studentId: e.target.value})}
-                      placeholder="Enter student ID"
-                    />
+                    >
+                      <option value="">Select a patient</option>
+                      {patients.map(patient => (
+                        <option key={patient._id} value={patient._id}>
+                          {patient.firstName} {patient.lastName} {patient.userId?.email ? `(${patient.userId.email})` : ''}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
