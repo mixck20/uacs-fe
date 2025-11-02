@@ -76,6 +76,15 @@
   margin: 0;
 }
 
+.subsection-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 30px 0 20px 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #fce7f3;
+}
+
 .add-btn {
   background: linear-gradient(135deg, #e51d5e 0%, #d91b58 100%);
   color: white;
@@ -106,24 +115,26 @@
 }
 
 .schedule-table th {
-  background-color: #f8fafc;
-  color: #475569;
+  background: linear-gradient(135deg, #fef2f7 0%, #fff 100%);
+  color: #e51d5e;
   padding: 1rem;
   text-align: left;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid #fce7f3;
 }
 
 .schedule-table td {
-  padding: 12px;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 14px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  font-size: 0.9rem;
 }
 
 .schedule-table tr:hover {
-  background-color: #f9f9f9;
+  background-color: #fef5f9;
 }
 
 .action-buttons {
@@ -243,8 +254,10 @@
 
 .modal-content h3 {
   margin-top: 0;
-  color: #00539C;
+  color: #e51d5e;
   margin-bottom: 20px;
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 
 .form-group {

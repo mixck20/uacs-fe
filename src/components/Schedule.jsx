@@ -300,7 +300,7 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
           </div>
 
           {/* Physicians */}
-          <h3 style={{ color: '#00539C', marginTop: '20px' }}>University Physicians</h3>
+          <h3 className="subsection-title">University Physicians</h3>
           <table className="schedule-table">
             <thead>
               <tr>
@@ -384,7 +384,7 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
           </table>
 
           {/* Nurses */}
-          <h3 style={{ color: '#00539C', marginTop: '30px' }}>University Nurses</h3>
+          <h3 className="subsection-title">University Nurses</h3>
           <table className="schedule-table">
             <thead>
               <tr>
@@ -477,7 +477,7 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
           </div>
 
           {/* Physicians */}
-          <h3 style={{ color: '#00539C', marginTop: '20px' }}>Physicians</h3>
+          <h3 className="subsection-title">Physicians</h3>
           <table className="schedule-table">
             <thead>
               <tr>
@@ -559,7 +559,7 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
           </table>
 
           {/* Dentists */}
-          <h3 style={{ color: '#00539C', marginTop: '30px' }}>Dentists</h3>
+          <h3 className="subsection-title">Dentists</h3>
           <table className="schedule-table">
             <thead>
               <tr>
@@ -670,41 +670,64 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
               <>
                 <div className="form-group">
                   <label>Day of Duty</label>
-                  <input
-                    type="text"
+                  <select
                     value={newStaff.dayOfDuty}
                     onChange={(e) => setNewStaff({ ...newStaff, dayOfDuty: e.target.value })}
-                    placeholder="e.g., Monday and Tuesday"
-                  />
+                  >
+                    <option value="">Select day(s)</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Monday and Tuesday">Monday and Tuesday</option>
+                    <option value="Wednesday and Thursday">Wednesday and Thursday</option>
+                    <option value="Monday - Friday">Monday - Friday</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>Time</label>
-                  <input
-                    type="text"
+                  <select
                     value={newStaff.time}
                     onChange={(e) => setNewStaff({ ...newStaff, time: e.target.value })}
-                    placeholder="e.g., 8:00AM - 10:00AM"
-                  />
+                  >
+                    <option value="">Select time</option>
+                    <option value="8:00 AM - 10:00 AM">8:00 AM - 10:00 AM</option>
+                    <option value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM</option>
+                    <option value="1:00 PM - 3:00 PM">1:00 PM - 3:00 PM</option>
+                    <option value="3:00 PM - 5:00 PM">3:00 PM - 5:00 PM</option>
+                    <option value="8:00 AM - 12:00 PM">8:00 AM - 12:00 PM</option>
+                    <option value="1:00 PM - 5:00 PM">1:00 PM - 5:00 PM</option>
+                    <option value="8:00 AM - 5:00 PM">8:00 AM - 5:00 PM</option>
+                  </select>
                 </div>
               </>
             ) : (
               <>
                 <div className="form-group">
                   <label>Designation</label>
-                  <input
-                    type="text"
+                  <select
                     value={newStaff.designation}
                     onChange={(e) => setNewStaff({ ...newStaff, designation: e.target.value })}
-                    placeholder="e.g., Grade School Clinic"
-                  />
+                  >
+                    <option value="">Select designation</option>
+                    <option value="Grade School Clinic">Grade School Clinic</option>
+                    <option value="High School Clinic">High School Clinic</option>
+                    <option value="College Clinic">College Clinic</option>
+                    <option value="Main Clinic">Main Clinic</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>Schedule</label>
-                  <textarea
+                  <select
                     value={newStaff.schedule}
                     onChange={(e) => setNewStaff({ ...newStaff, schedule: e.target.value })}
-                    placeholder="e.g., Monday - Friday&#10;7:30AM - 4:30PM"
-                  />
+                  >
+                    <option value="">Select schedule</option>
+                    <option value="Monday - Friday&#10;7:30 AM - 4:30 PM">Monday - Friday, 7:30 AM - 4:30 PM</option>
+                    <option value="Monday - Friday&#10;8:00 AM - 5:00 PM">Monday - Friday, 8:00 AM - 5:00 PM</option>
+                    <option value="Monday - Friday&#10;7:00 AM - 3:00 PM">Monday - Friday, 7:00 AM - 3:00 PM</option>
+                  </select>
                 </div>
               </>
             )}
@@ -746,19 +769,33 @@ const Schedule = ({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLo
             </div>
             <div className="form-group">
               <label>Regular Schedule</label>
-              <textarea
+              <select
                 value={newDoctor.regularSchedule}
                 onChange={(e) => setNewDoctor({ ...newDoctor, regularSchedule: e.target.value })}
-                placeholder="e.g., Wednesday&#10;8:00AM - 1:00PM"
-              />
+              >
+                <option value="">Select schedule</option>
+                <option value="Monday&#10;8:00 AM - 12:00 PM">Monday, 8:00 AM - 12:00 PM</option>
+                <option value="Tuesday&#10;8:00 AM - 12:00 PM">Tuesday, 8:00 AM - 12:00 PM</option>
+                <option value="Wednesday&#10;8:00 AM - 12:00 PM">Wednesday, 8:00 AM - 12:00 PM</option>
+                <option value="Thursday&#10;8:00 AM - 12:00 PM">Thursday, 8:00 AM - 12:00 PM</option>
+                <option value="Friday&#10;8:00 AM - 12:00 PM">Friday, 8:00 AM - 12:00 PM</option>
+                <option value="Monday&#10;1:00 PM - 5:00 PM">Monday, 1:00 PM - 5:00 PM</option>
+                <option value="Wednesday&#10;8:00 AM - 1:00 PM">Wednesday, 8:00 AM - 1:00 PM</option>
+              </select>
             </div>
             <div className="form-group">
               <label>Medical Examination Schedule</label>
-              <textarea
+              <select
                 value={newDoctor.medicalExaminationSchedule}
                 onChange={(e) => setNewDoctor({ ...newDoctor, medicalExaminationSchedule: e.target.value })}
-                placeholder="e.g., Wednesday (walk in)&#10;9:00AM - 2:00PM"
-              />
+              >
+                <option value="">Select schedule</option>
+                <option value="Monday (walk in)&#10;9:00 AM - 12:00 PM">Monday (walk in), 9:00 AM - 12:00 PM</option>
+                <option value="Tuesday (walk in)&#10;9:00 AM - 12:00 PM">Tuesday (walk in), 9:00 AM - 12:00 PM</option>
+                <option value="Wednesday (walk in)&#10;9:00 AM - 2:00 PM">Wednesday (walk in), 9:00 AM - 2:00 PM</option>
+                <option value="Thursday (walk in)&#10;9:00 AM - 12:00 PM">Thursday (walk in), 9:00 AM - 12:00 PM</option>
+                <option value="Friday (walk in)&#10;9:00 AM - 12:00 PM">Friday (walk in), 9:00 AM - 12:00 PM</option>
+              </select>
             </div>
             <div className="modal-buttons">
               <button className="cancel-btn" onClick={() => setShowDoctorModal(false)}>
