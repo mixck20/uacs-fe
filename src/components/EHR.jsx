@@ -79,20 +79,30 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     }
   }
 
-  // --- Load certificates for patient ---
-  async function loadPatientCertificates(patientId) {
+  // --- Load all certificates or patient-specific ---
+  async function loadCertificates(patientId = null) {
     try {
       const allCerts = await CertificateAPI.getAllCertificates();
-      // Filter certificates for this patient
-      const patientCerts = allCerts.filter(cert => 
-        cert.patientId?._id === patientId || cert.patientId === patientId
-      );
-      setCertificates(patientCerts);
+      if (patientId) {
+        // Filter certificates for this patient
+        const patientCerts = allCerts.filter(cert => 
+          cert.patientId?._id === patientId || cert.patientId === patientId
+        );
+        setCertificates(patientCerts);
+      } else {
+        // Show all certificates
+        setCertificates(allCerts);
+      }
     } catch (err) {
       console.error('Failed to load certificates:', err);
       setCertificates([]);
     }
   }
+
+  // Load all certificates on mount
+  useEffect(() => {
+    loadCertificates();
+  }, []);
 
   // --- Handle patient selection ---
   function handleSelectPatient(patient) {
@@ -100,7 +110,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     setShowForm(false);
     setActiveTab('history');
     fetchPatientRecord(patient._id || patient.id);
-    loadPatientCertificates(patient._id || patient.id);
+    loadCertificates(patient._id || patient.id);
   }
 
   // --- Handle file upload ---
@@ -538,7 +548,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     if (formValues) {
       try {
         await CertificateAPI.issueCertificate(cert._id, formValues);
-        await loadPatientCertificates(selectedPatient._id || selectedPatient.id);
+        await loadCertificates(selectedPatient?._id || selectedPatient?.id);
         Swal.fire({
           title: 'Success!',
           text: 'Certificate issued successfully',
@@ -579,7 +589,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     if (reason) {
       try {
         await CertificateAPI.rejectCertificate(cert._id, reason);
-        await loadPatientCertificates(selectedPatient._id || selectedPatient.id);
+        await loadCertificates(selectedPatient?._id || selectedPatient?.id);
         Swal.fire({
           title: 'Rejected',
           text: 'Certificate request has been rejected',
