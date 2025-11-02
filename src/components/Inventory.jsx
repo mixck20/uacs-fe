@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ClinicNavbar from "./ClinicNavbar";
 import "./Inventory.css";
-import { InventoryAPI, PatientAPI } from "../api";
+import { InventoryAPI, PatientsAPI } from "../api";
 import Swal from "sweetalert2";
 import {
   FaPills,
@@ -53,7 +53,7 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
 
   const loadPatients = async () => {
     try {
-      const data = await PatientAPI.list();
+      const data = await PatientsAPI.list();
       setPatients(data || []);
     } catch (err) {
       console.error("Failed to load patients:", err);

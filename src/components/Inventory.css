@@ -198,6 +198,8 @@
   transition: all 0.2s;
   border-left: 4px solid #e5e7eb;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .medicine-card:hover {
@@ -269,6 +271,7 @@
 
 .medicine-card-body {
   margin-bottom: 1rem;
+  flex: 1;
 }
 
 .info-row {
@@ -352,6 +355,7 @@
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  margin-top: auto;
 }
 
 .action-btn {
