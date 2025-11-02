@@ -765,7 +765,7 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
                         setDispenseForm({
                           ...dispenseForm, 
                           patientId: e.target.value,
-                          patientName: selectedPatient ? `${selectedPatient.firstName} ${selectedPatient.lastName}` : ''
+                          patientName: selectedPatient ? selectedPatient.fullName : ''
                         });
                       }}
                       required
@@ -773,7 +773,7 @@ function Inventory({ setActivePage, activePage, inventory, setInventory, onLogou
                       <option value="">Select a patient</option>
                       {patients.map(patient => (
                         <option key={patient._id} value={patient._id}>
-                          {patient.firstName} {patient.lastName} {patient.userId?.email ? `(${patient.userId.email})` : ''}
+                          {patient.fullName} {patient.userId?.email ? `(${patient.userId.email})` : ''}
                         </option>
                       ))}
                     </select>
