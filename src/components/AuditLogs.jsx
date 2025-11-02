@@ -74,8 +74,9 @@ function AuditLogs() {
   };
 
   const getStatusColor = (status) => {
-    if (status === 'success') return 'success';
-    if (status === 'failed' || status === 'error') return 'error';
+    const statusLower = status?.toLowerCase();
+    if (statusLower === 'success') return 'success';
+    if (statusLower === 'failure' || statusLower === 'failed' || statusLower === 'error') return 'error';
     return 'warning';
   };
 
@@ -134,10 +135,11 @@ function AuditLogs() {
                 <option value="LOGOUT">Logout</option>
                 <option value="LOGIN_FAILED">Login Failed</option>
                 <option value="CREATE">Create</option>
+                <option value="READ">Read</option>
                 <option value="UPDATE">Update</option>
                 <option value="DELETE">Delete</option>
-                <option value="VIEW">View</option>
                 <option value="EXPORT">Export</option>
+                <option value="DOWNLOAD">Download</option>
               </select>
             </div>
 
@@ -145,12 +147,14 @@ function AuditLogs() {
               <label>Resource</label>
               <select name="resource" value={filters.resource} onChange={handleFilterChange}>
                 <option value="">All Resources</option>
-                <option value="USER">User</option>
-                <option value="PATIENT">Patient</option>
-                <option value="APPOINTMENT">Appointment</option>
-                <option value="INVENTORY">Inventory</option>
-                <option value="CERTIFICATE">Certificate</option>
-                <option value="FEEDBACK">Feedback</option>
+                <option value="User">User</option>
+                <option value="Patient">Patient</option>
+                <option value="Appointment">Appointment</option>
+                <option value="Inventory">Inventory</option>
+                <option value="Schedule">Schedule</option>
+                <option value="Certificate">Certificate</option>
+                <option value="Feedback">Feedback</option>
+                <option value="Notification">Notification</option>
               </select>
             </div>
 
