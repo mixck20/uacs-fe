@@ -30,6 +30,8 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
     confirmPassword: ''
   });
 
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
+
   const handleProfileChange = (e) => {
     const { name, value, type, checked } = e.target;
     setProfileData(prev => ({
@@ -110,6 +112,7 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
     }
     
     if (passwordErrors.length > 0) {
+      setShowPasswordRequirements(true);
       Swal.fire({
         icon: 'error',
         title: 'Weak Password',
@@ -364,16 +367,18 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
                   />
                 </div>
 
-                <div className="password-requirements">
-                  <small>Password must contain:</small>
-                  <ul>
-                    <li>At least 8 characters</li>
-                    <li>One uppercase letter (A-Z)</li>
-                    <li>One lowercase letter (a-z)</li>
-                    <li>One number (0-9)</li>
-                    <li>One special character (!@#$%^&*)</li>
-                  </ul>
-                </div>
+                {showPasswordRequirements && (
+                  <div className="password-requirements">
+                    <small>Password must contain:</small>
+                    <ul>
+                      <li>At least 8 characters</li>
+                      <li>One uppercase letter (A-Z)</li>
+                      <li>One lowercase letter (a-z)</li>
+                      <li>One number (0-9)</li>
+                      <li>One special character (!@#$%^&*)</li>
+                    </ul>
+                  </div>
+                )}
 
                 <div className="form-group">
                   <label htmlFor="confirmPassword">Confirm New Password</label>

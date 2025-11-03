@@ -373,16 +373,18 @@ const Signup = () => {
                 </div>
               </div>
               
-              <div className="password-requirements">
-                <small>Password must contain:</small>
-                <ul>
-                  <li>At least 8 characters</li>
-                  <li>One uppercase letter (A-Z)</li>
-                  <li>One lowercase letter (a-z)</li>
-                  <li>One number (0-9)</li>
-                  <li>One special character (!@#$%^&*)</li>
-                </ul>
-              </div>
+              {error && error.includes("Password must contain") && (
+                <div className="password-requirements">
+                  <small>Password must contain:</small>
+                  <ul>
+                    <li>At least 8 characters</li>
+                    <li>One uppercase letter (A-Z)</li>
+                    <li>One lowercase letter (a-z)</li>
+                    <li>One number (0-9)</li>
+                    <li>One special character (!@#$%^&*)</li>
+                  </ul>
+                </div>
+              )}
 
               <div className="signup-row-checkbox">
                 <label className="signup-checkbox-label">

@@ -16,6 +16,7 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -62,6 +63,7 @@ const ResetPassword = () => {
     }
     
     if (passwordErrors.length > 0) {
+      setShowPasswordRequirements(true);
       Swal.fire({
         icon: 'error',
         title: 'Weak Password',
@@ -154,16 +156,18 @@ const ResetPassword = () => {
             </div>
           </div>
 
-          <div className="password-requirements">
-            <small>Password must contain:</small>
-            <ul>
-              <li>At least 8 characters</li>
-              <li>One uppercase letter (A-Z)</li>
-              <li>One lowercase letter (a-z)</li>
-              <li>One number (0-9)</li>
-              <li>One special character (!@#$%^&*)</li>
-            </ul>
-          </div>
+          {showPasswordRequirements && (
+            <div className="password-requirements">
+              <small>Password must contain:</small>
+              <ul>
+                <li>At least 8 characters</li>
+                <li>One uppercase letter (A-Z)</li>
+                <li>One lowercase letter (a-z)</li>
+                <li>One number (0-9)</li>
+                <li>One special character (!@#$%^&*)</li>
+              </ul>
+            </div>
+          )}
 
           <div className="form-group">
             <label htmlFor="confirmPassword">
