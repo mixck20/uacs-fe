@@ -91,11 +91,29 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
       return;
     }
 
+    // Validate password strength
+    const passwordErrors = [];
     if (passwordData.newPassword.length < 8) {
+      passwordErrors.push("at least 8 characters");
+    }
+    if (!/[A-Z]/.test(passwordData.newPassword)) {
+      passwordErrors.push("one uppercase letter");
+    }
+    if (!/[a-z]/.test(passwordData.newPassword)) {
+      passwordErrors.push("one lowercase letter");
+    }
+    if (!/[0-9]/.test(passwordData.newPassword)) {
+      passwordErrors.push("one number");
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(passwordData.newPassword)) {
+      passwordErrors.push("one special character");
+    }
+    
+    if (passwordErrors.length > 0) {
       Swal.fire({
         icon: 'error',
         title: 'Weak Password',
-        text: 'Password must be at least 8 characters long.',
+        html: `Password must contain:<br/>• ${passwordErrors.join("<br/>• ")}`,
         confirmButtonColor: '#e51d5e'
       });
       return;
@@ -344,7 +362,17 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
                     onChange={handlePasswordChange}
                     required
                   />
-                  <small className="field-note">Minimum 8 characters</small>
+                </div>
+
+                <div className="password-requirements">
+                  <small>Password must contain:</small>
+                  <ul>
+                    <li>At least 8 characters</li>
+                    <li>One uppercase letter (A-Z)</li>
+                    <li>One lowercase letter (a-z)</li>
+                    <li>One number (0-9)</li>
+                    <li>One special character (!@#$%^&*)</li>
+                  </ul>
                 </div>
 
                 <div className="form-group">

@@ -58,9 +58,26 @@ const Signup = () => {
       return;
     }
 
-    // Validate password length
-    if (form.password.length < 6) {
-      setError("Password must be at least 6 characters long");
+    // Validate password strength
+    const passwordErrors = [];
+    if (form.password.length < 8) {
+      passwordErrors.push("at least 8 characters");
+    }
+    if (!/[A-Z]/.test(form.password)) {
+      passwordErrors.push("one uppercase letter");
+    }
+    if (!/[a-z]/.test(form.password)) {
+      passwordErrors.push("one lowercase letter");
+    }
+    if (!/[0-9]/.test(form.password)) {
+      passwordErrors.push("one number");
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(form.password)) {
+      passwordErrors.push("one special character");
+    }
+    
+    if (passwordErrors.length > 0) {
+      setError(`Password must contain: ${passwordErrors.join(", ")}`);
       return;
     }
 
@@ -355,6 +372,18 @@ const Signup = () => {
                   </button>
                 </div>
               </div>
+              
+              <div className="password-requirements">
+                <small>Password must contain:</small>
+                <ul>
+                  <li>At least 8 characters</li>
+                  <li>One uppercase letter (A-Z)</li>
+                  <li>One lowercase letter (a-z)</li>
+                  <li>One number (0-9)</li>
+                  <li>One special character (!@#$%^&*)</li>
+                </ul>
+              </div>
+
               <div className="signup-row-checkbox">
                 <label className="signup-checkbox-label">
                   <input
