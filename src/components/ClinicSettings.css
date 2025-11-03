@@ -191,6 +191,43 @@
   color: #991b1b;
 }
 
+.clinic-settings .password-requirements {
+  margin: 0.75rem 0 1.5rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-left: 3px solid #e51d5e;
+  border-radius: 4px;
+}
+
+.clinic-settings .password-requirements small {
+  display: block;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.5rem;
+}
+
+.clinic-settings .password-requirements ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.clinic-settings .password-requirements li {
+  font-size: 0.875rem;
+  color: #64748b;
+  padding: 0.25rem 0;
+  padding-left: 1.25rem;
+  position: relative;
+}
+
+.clinic-settings .password-requirements li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #e51d5e;
+  font-weight: bold;
+}
+
 .clinic-settings .security-notice {
   display: flex;
   align-items: center;
