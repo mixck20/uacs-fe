@@ -180,9 +180,13 @@ const Login = ({ onLogin }) => {
               />
               <span>Remember me</span>
             </label>
-            <a href="#" className="forgot-password">
+            <span 
+              className="forgot-password"
+              onClick={() => navigate('/forgot-password')}
+              style={{ cursor: 'pointer' }}
+            >
               Forgot password?
-            </a>
+            </span>
           </div>
 
           <button 

@@ -6,6 +6,8 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import SignupSuccess from "./components/SignupSuccess";
 import VerifyEmail from "./components/VerifyEmail";
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
 import ClinicDashboard from "./components/ClinicDashboard";
 import UserDashboard from "./components/UserDashboard";
 import UserAppointment from "./components/UserAppointment";
@@ -317,6 +319,16 @@ function App() {
         <Route path="/verify/:token" element={<SignupSuccess />} />
         <Route path="/verify-email-change/:token" element={<VerifyEmailChange />} />
         <Route path="/verify-password-change/:token" element={<VerifyPasswordChange />} />
+        <Route path="/forgot-password" element={
+          isLoggedIn ? 
+            <Navigate to="/" /> : 
+            <ForgotPassword />
+        } />
+        <Route path="/reset-password" element={
+          isLoggedIn ? 
+            <Navigate to="/" /> : 
+            <ResetPassword />
+        } />
         <Route path="/*" element={
           !isLoggedIn ? 
             <Navigate to="/login" /> :
