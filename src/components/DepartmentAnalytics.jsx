@@ -78,13 +78,19 @@ function DepartmentAnalytics() {
 
       const patientsCount = departmentPatients.length;
 
+      // Count manually added patients (walk-ins) - those WITHOUT userId
+      const manuallyAddedPatients = departmentPatients.filter(patient => !patient.userId).length;
+
       // Count total visits from patients in this department
       const totalVisits = departmentPatients.reduce((sum, patient) => 
         sum + (patient.visits?.length || 0), 0
       );
 
+      // Total persons = registered users + manually added patients (walk-ins without userId)
+      const totalPersons = registeredUsers + manuallyAddedPatients;
+
       if (registeredUsers > 0 || patientsCount > 0) {
-        console.log(`${department}: ${registeredUsers} users, ${patientsCount} patients, ${totalVisits} visits`);
+        console.log(`${department}: ${registeredUsers} users, ${manuallyAddedPatients} walk-ins, ${patientsCount} total patients, ${totalVisits} visits`);
       }
 
       return {
@@ -92,7 +98,7 @@ function DepartmentAnalytics() {
         registeredUsers,
         patientsCount,
         totalVisits,
-        totalPersons: registeredUsers
+        totalPersons
       };
     });
 
