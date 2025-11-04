@@ -418,7 +418,7 @@ const Signup = () => {
                   }}
                   className="signup-link"
                 >
-                  Sign in now
+                  Login now
                 </span>
               </div>
             </form>

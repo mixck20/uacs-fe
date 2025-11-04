@@ -194,7 +194,7 @@ const Login = ({ onLogin }) => {
             type="submit" 
             disabled={isLoading}
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
 
           <div style={{
