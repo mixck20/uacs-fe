@@ -1291,7 +1291,7 @@ const UserAppointment = ({ user, onLogout }) => {
                       >
                         <FaInfoCircle /> View Details
                       </button>
-                      {(appointment.status === 'Pending' || appointment.status === 'Confirmed') && (
+                      {appointment.status === 'Pending' && (
                         <>
                           <button 
                             className="reschedule-btn-modern"
