@@ -25,7 +25,6 @@ const Signup = () => {
     firstName: "",
     lastName: "",
     gender: "",
-    role: "",
     course: "",
     yearLevel: "",
     section: "",
@@ -93,7 +92,6 @@ const Signup = () => {
         firstName: form.firstName.trim(),
         lastName: form.lastName.trim(),
         gender: form.gender,
-        role: form.role,
         email: form.email.trim().toLowerCase(),
         password: form.password,
         emailUpdates: form.emailUpdates
@@ -133,7 +131,6 @@ const Signup = () => {
         firstName: "",
         lastName: "",
         gender: "",
-        role: "",
         course: "",
         yearLevel: "",
         section: "",
@@ -235,85 +232,93 @@ const Signup = () => {
                   <FaVenusMars className="signup-input-icon" />
                   <FaChevronDown className="signup-select-arrow" />
                 </div>
-                <div className="signup-input-container">
-                  <select
-                    name="role"
-                    value={form.role}
-                    onChange={handleChange}
-                    className="signup-input signup-select"
-                    required
-                  >
-                    <option value="" disabled>Roles</option>
-                    <option value="Student">Student</option>
-                    <option value="Faculty">Faculty</option>
-                  </select>
-                  <FaGraduationCap className="signup-input-icon" />
-                  <FaChevronDown className="signup-select-arrow" />
-                </div>
               </div>
 
-              {/* Academic Information - Only for Students/Faculty */}
-              {form.role && (
-                <>
-                  {/* Course */}
+              {/* Email field with helper text */}
+              <div className="signup-row">
+                <div className="signup-input-container">
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="School email (ua.edu.ph)"
+                    value={form.email}
+                    onChange={handleChange}
+                    className="signup-input"
+                    required
+                  />
+                  <FaEnvelope className="signup-input-icon" />
+                </div>
+              </div>
+              <div style={{
+                fontSize: "0.75rem",
+                color: "#64748b",
+                marginTop: "-0.75rem",
+                marginBottom: "0.75rem",
+                textAlign: "center"
+              }}>
+                Your role (Student/Faculty) will be automatically determined from your email
+              </div>
+
+              {/* Academic Information - Always show for registration */}
+              <>
+                {/* Course */}
+                <div className="signup-row">
+                  <div className="signup-input-container">
+                    <select
+                      name="course"
+                      value={form.course}
+                      onChange={handleChange}
+                      className="signup-input signup-select"
+                      required
+                    >
+                      <option value="" disabled>Select Course</option>
+                      {COURSES.map((course) => (
+                        <option key={course.code} value={course.code}>
+                          {course.code} - {course.name}
+                        </option>
+                      ))}
+                    </select>
+                    <FaGraduationCap className="signup-input-icon" />
+                    <FaChevronDown className="signup-select-arrow" />
+                  </div>
+                </div>
+
+                {/* Year Level and Section */}
+                {form.course && (
                   <div className="signup-row">
                     <div className="signup-input-container">
                       <select
-                        name="course"
-                        value={form.course}
+                        name="yearLevel"
+                        value={form.yearLevel}
                         onChange={handleChange}
                         className="signup-input signup-select"
                         required
                       >
-                        <option value="" disabled>Select Course</option>
-                        {COURSES.map((course) => (
-                          <option key={course.code} value={course.code}>
-                            {course.code} - {course.name}
+                        <option value="" disabled>Year Level</option>
+                        {YEAR_LEVELS.map((year) => (
+                          <option key={year.value} value={year.value}>
+                            {year.label}
                           </option>
                         ))}
                       </select>
                       <FaGraduationCap className="signup-input-icon" />
                       <FaChevronDown className="signup-select-arrow" />
                     </div>
-                  </div>
-
-                  {/* Year Level and Section */}
-                  {form.course && (
-                    <div className="signup-row">
-                      <div className="signup-input-container">
-                        <select
-                          name="yearLevel"
-                          value={form.yearLevel}
-                          onChange={handleChange}
-                          className="signup-input signup-select"
-                          required
-                        >
-                          <option value="" disabled>Year Level</option>
-                          {YEAR_LEVELS.map((year) => (
-                            <option key={year.value} value={year.value}>
-                              {year.label}
-                            </option>
-                          ))}
-                        </select>
-                        <FaGraduationCap className="signup-input-icon" />
-                        <FaChevronDown className="signup-select-arrow" />
-                      </div>
-                      <div className="signup-input-container">
-                        <input
-                          type="text"
-                          name="section"
-                          placeholder="Section (optional, e.g., A, B, 1)"
-                          value={form.section}
-                          onChange={handleChange}
-                          className="signup-input"
-                          maxLength="2"
-                        />
-                        <FaGraduationCap className="signup-input-icon" />
-                      </div>
+                    <div className="signup-input-container">
+                      <input
+                        type="text"
+                        name="section"
+                        placeholder="Section (optional, e.g., A, B, 1)"
+                        value={form.section}
+                        onChange={handleChange}
+                        className="signup-input"
+                        maxLength="2"
+                      />
+                      <FaGraduationCap className="signup-input-icon" />
                     </div>
-                  )}
-                </>
-              )}
+                  </div>
+                )}
+              </>
 
               <div className="signup-row">
                 <div className="signup-input-container">
