@@ -28,6 +28,7 @@ const Signup = () => {
     course: "",
     yearLevel: "",
     section: "",
+    department: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -38,6 +39,20 @@ const Signup = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [detectedRole, setDetectedRole] = useState(null); // 'student' or 'faculty'
+
+  // UA Departments
+  const DEPARTMENTS = [
+    "College of Accountancy",
+    "College of Hospitality and Tourism Management",
+    "School of Business and Public Administration",
+    "Institute of Theology and Religious Studies",
+    "School of Education",
+    "College of Nursing and Pharmacy",
+    "School of Arts and Sciences",
+    "College of Engineering and Architecture",
+    "College of Information Technology"
+  ];
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -45,6 +60,18 @@ const Signup = () => {
       ...form, 
       [name]: type === "checkbox" ? checked : value 
     });
+
+    // Detect role from email in real-time
+    if (name === 'email') {
+      const emailLower = value.toLowerCase().trim();
+      if (emailLower.includes('.student@ua.edu.ph')) {
+        setDetectedRole('student');
+      } else if (emailLower.endsWith('@ua.edu.ph') && emailLower.length > '@ua.edu.ph'.length) {
+        setDetectedRole('faculty');
+      } else {
+        setDetectedRole(null);
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -86,6 +113,23 @@ const Signup = () => {
       return;
     }
 
+    // Role-specific validation
+    const emailLower = form.email.toLowerCase().trim();
+    const isStudent = emailLower.includes('.student@ua.edu.ph');
+    const isFaculty = emailLower.endsWith('@ua.edu.ph') && !isStudent;
+
+    if (isStudent) {
+      if (!form.course || !form.yearLevel) {
+        setError("Students must select a course and year level");
+        return;
+      }
+    } else if (isFaculty) {
+      if (!form.department) {
+        setError("Faculty must select a department");
+        return;
+      }
+    }
+
     setSubmitting(true);
     try {
       const payload = {
@@ -97,24 +141,19 @@ const Signup = () => {
         emailUpdates: form.emailUpdates
       };
 
-      // Add academic information if provided
-      if (form.course) {
+      // Add fields based on role
+      if (isStudent) {
+        // Student: Add course, yearLevel, section (department auto-calculated on backend)
         payload.course = form.course;
-        // Auto-populate department from course
-        const department = getDepartmentFromCourse(form.course);
-        if (department) {
-          payload.department = department;
-        }
-      }
-      if (form.yearLevel) {
         payload.yearLevel = parseInt(form.yearLevel);
-      }
-      if (form.section) {
-        payload.section = form.section.trim().toUpperCase();
-      }
-      // Generate legacy courseYear field for backwards compatibility
-      if (form.course && form.yearLevel) {
+        if (form.section) {
+          payload.section = form.section.trim().toUpperCase();
+        }
+        // Generate legacy courseYear field for backwards compatibility
         payload.courseYear = formatCourseYearSection(form.course, parseInt(form.yearLevel), form.section);
+      } else if (isFaculty) {
+        // Faculty: Add department only
+        payload.department = form.department;
       }
 
       const data = await publicApiFetch('/api/auth/register', {
@@ -134,11 +173,13 @@ const Signup = () => {
         course: "",
         yearLevel: "",
         section: "",
+        department: "",
         email: "",
         password: "",
         confirmPassword: "",
         emailUpdates: false,
       });
+      setDetectedRole(null);
 
       // Redirect to signup success page
       navigate('/signup-success');
@@ -251,40 +292,43 @@ const Signup = () => {
               </div>
               <div style={{
                 fontSize: "0.75rem",
-                color: "#64748b",
+                color: detectedRole === 'student' ? '#10b981' : detectedRole === 'faculty' ? '#3b82f6' : '#64748b',
                 marginTop: "-0.75rem",
                 marginBottom: "0.75rem",
-                textAlign: "center"
+                textAlign: "center",
+                fontWeight: detectedRole ? '600' : '400'
               }}>
-                Your role (Student/Faculty) will be automatically determined from your email
+                {detectedRole === 'student' && '✓ Student account detected'}
+                {detectedRole === 'faculty' && '✓ Faculty account detected'}
+                {!detectedRole && 'Your role (Student/Faculty) will be automatically determined from your email'}
               </div>
 
-              {/* Academic Information - Always show for registration */}
-              <>
-                {/* Course */}
-                <div className="signup-row">
-                  <div className="signup-input-container">
-                    <select
-                      name="course"
-                      value={form.course}
-                      onChange={handleChange}
-                      className="signup-input signup-select"
-                      required
-                    >
-                      <option value="" disabled>Select Course</option>
-                      {COURSES.map((course) => (
-                        <option key={course.code} value={course.code}>
-                          {course.code} - {course.name}
-                        </option>
-                      ))}
-                    </select>
-                    <FaGraduationCap className="signup-input-icon" />
-                    <FaChevronDown className="signup-select-arrow" />
+              {/* Dynamic fields based on detected role */}
+              {detectedRole === 'student' && (
+                <>
+                  {/* Course - For Students */}
+                  <div className="signup-row">
+                    <div className="signup-input-container">
+                      <select
+                        name="course"
+                        value={form.course}
+                        onChange={handleChange}
+                        className="signup-input signup-select"
+                        required
+                      >
+                        <option value="" disabled>Select Course *</option>
+                        {COURSES.map((course) => (
+                          <option key={course.code} value={course.code}>
+                            {course.code} - {course.name}
+                          </option>
+                        ))}
+                      </select>
+                      <FaGraduationCap className="signup-input-icon" />
+                      <FaChevronDown className="signup-select-arrow" />
+                    </div>
                   </div>
-                </div>
 
-                {/* Year Level and Section */}
-                {form.course && (
+                  {/* Year Level and Section - For Students */}
                   <div className="signup-row">
                     <div className="signup-input-container">
                       <select
@@ -294,7 +338,7 @@ const Signup = () => {
                         className="signup-input signup-select"
                         required
                       >
-                        <option value="" disabled>Year Level</option>
+                        <option value="" disabled>Year Level *</option>
                         {YEAR_LEVELS.map((year) => (
                           <option key={year.value} value={year.value}>
                             {year.label}
@@ -317,24 +361,36 @@ const Signup = () => {
                       <FaGraduationCap className="signup-input-icon" />
                     </div>
                   </div>
-                )}
-              </>
+                </>
+              )}
 
-              <div className="signup-row">
-                <div className="signup-input-container">
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="School email (ua.edu.ph)"
-                    value={form.email}
-                    onChange={handleChange}
-                    className="signup-input"
-                    required
-                  />
-                  <FaEnvelope className="signup-input-icon" />
-                </div>
-              </div>
+              {detectedRole === 'faculty' && (
+                <>
+                  {/* Department - For Faculty */}
+                  <div className="signup-row">
+                    <div className="signup-input-container">
+                      <select
+                        name="department"
+                        value={form.department}
+                        onChange={handleChange}
+                        className="signup-input signup-select"
+                        required
+                      >
+                        <option value="" disabled>Select Department *</option>
+                        {DEPARTMENTS.map((dept) => (
+                          <option key={dept} value={dept}>
+                            {dept}
+                          </option>
+                        ))}
+                      </select>
+                      <FaGraduationCap className="signup-input-icon" />
+                      <FaChevronDown className="signup-select-arrow" />
+                    </div>
+                  </div>
+                </>
+              )}
 
+              {/* Password Fields */}
               <div className="signup-row">
                 <div className="signup-input-container">
                   <input
