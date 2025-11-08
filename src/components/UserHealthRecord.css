@@ -807,6 +807,59 @@
   border-radius: 8px !important;
 }
 
+/* Mobile Responsive for Certificate Modal */
+@media (max-width: 768px) {
+  .certificate-request-modal .swal2-popup,
+  .certificate-popup {
+    max-width: 95vw !important;
+    width: 95vw !important;
+    margin: 0.5rem !important;
+    padding: 1rem !important;
+  }
+
+  .certificate-request-modal .swal2-title {
+    font-size: 1.125rem !important;
+    padding: 0.5rem 0 !important;
+  }
+
+  .certificate-request-modal .swal2-html-container {
+    padding: 0.5rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  .certificate-confirm-btn,
+  .certificate-cancel-btn {
+    padding: 0.625rem 1rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  .certificate-request-modal .swal2-actions {
+    gap: 0.5rem !important;
+    flex-wrap: nowrap !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .certificate-request-modal .swal2-popup,
+  .certificate-popup {
+    max-width: 98vw !important;
+    width: 98vw !important;
+    margin: 0.25rem !important;
+    padding: 0.75rem !important;
+  }
+
+  .certificate-request-modal .swal2-title {
+    font-size: 1rem !important;
+  }
+
+  .certificate-confirm-btn,
+  .certificate-cancel-btn {
+    flex: 1 !important;
+    padding: 0.625rem 0.75rem !important;
+    font-size: 0.8125rem !important;
+  }
+}
+
 /* Fix any SweetAlert2 overflow issues */
 .swal2-container .swal2-popup {
   overflow-x: hidden !important;
@@ -863,4 +916,34 @@
   height: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
+}
+@media (max-width: 768px) {
+  .health-records-page * {
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+  .certificate-request-section {
+    padding: 1rem !important;
+  }
+  .certificate-item {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  .certificate-info {
+    width: 100% !important;
+  }
+  .certificate-actions {
+    width: 100% !important;
+    justify-content: flex-start !important;
+  }
+  .certificate-actions button {
+    flex: 1 !important;
+  }
+  .record-card {
+    padding: 1rem !important;
+  }
+  .record-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
 }

@@ -490,7 +490,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
           ></textarea>
         </div>
       `,
-      width: '550px',
+      width: window.innerWidth <= 768 ? '95%' : '550px',
       showCancelButton: true,
       confirmButtonText: 'Submit Request',
       cancelButtonText: 'Cancel',
