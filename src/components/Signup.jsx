@@ -186,11 +186,37 @@ const Signup = () => {
     } catch (err) {
       console.error('Registration error:', err);
       setError(err.message);
-      Swal.fire({
-        title: "Registration failed",
-        text: err.message,
-        icon: "error",
-      });
+      
+      // Show more helpful error message for duplicate email
+      if (err.message && err.message.toLowerCase().includes('already registered')) {
+        Swal.fire({
+          title: "Email Already Registered",
+          html: `
+            <p>This email is already registered in the system.</p>
+            <p><strong>If this is your account:</strong></p>
+            <ul style="text-align: left; padding-left: 2rem;">
+              <li>Check your email inbox for the verification link</li>
+              <li>Check your spam/junk folder</li>
+              <li>Go to Login page if you've already verified</li>
+            </ul>
+            <p>Need help? Contact the clinic for assistance.</p>
+          `,
+          icon: "info",
+          confirmButtonText: "Go to Login",
+          showCancelButton: true,
+          cancelButtonText: "Close"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate('/login');
+          }
+        });
+      } else {
+        Swal.fire({
+          title: "Registration failed",
+          text: err.message,
+          icon: "error",
+        });
+      }
     } finally {
       setSubmitting(false);
     }
