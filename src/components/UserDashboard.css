@@ -278,19 +278,58 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
+  min-height: 60vh;
+  width: 100%;
   gap: 1rem;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.loading-container p {
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
 }
 
 .spinner {
   animation: spin 1s linear infinite;
-  font-size: 2rem;
+  font-size: 3rem;
   color: #e51d5e;
 }
 
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .loading-container {
+    min-height: 50vh;
+    padding: 1.5rem 1rem;
+  }
+
+  .spinner {
+    font-size: 2.5rem;
+  }
+
+  .loading-container p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .loading-container {
+    min-height: 40vh;
+  }
+
+  .spinner {
+    font-size: 2rem;
+  }
+
+  .loading-container p {
+    font-size: 0.85rem;
+  }
 }
 
 /* Quick Stats */
