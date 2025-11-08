@@ -51,7 +51,7 @@
   cursor: pointer;
   box-shadow: 0 4px 6px rgba(229, 29, 94, 0.25);
   transition: all 0.2s ease;
-  z-index: 1000;
+  z-index: 999;
 }
 
 .chatbot-button span {
@@ -76,10 +76,30 @@
 
 @media (max-width: 768px) {
   .portal-content {
-    padding: 1rem;
+    padding: 0.5rem;
   }
 
   .content-wrapper {
-    padding: 1.5rem;
+    padding: 1rem;
+  }
+
+  .chatbot-button {
+    bottom: 1.25rem;
+    right: 1rem;
+    padding: 0.875rem;
+    font-size: 1.125rem;
+  }
+
+  .chatbot-button span {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .chatbot-button {
+    bottom: 1rem;
+    right: 0.75rem;
+    padding: 0.75rem;
+    font-size: 1rem;
   }
 }

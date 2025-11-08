@@ -317,11 +317,63 @@
   transform: translateX(4px);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .chatbot-dialog {
-    width: calc(100% - 2rem);
-    height: calc(100vh - 8rem);
-    bottom: 5rem;
-    right: 1rem;
+    width: calc(100vw - 1rem);
+    height: 70vh;
+    bottom: 4.5rem;
+    right: 0.5rem;
+    max-height: 500px;
+  }
+
+  .chatbot-header {
+    padding: 0.75rem;
+  }
+
+  .chatbot-title {
+    font-size: 0.9rem;
+  }
+
+  .chatbot-dialog .chatbot-messages {
+    padding: 1rem !important;
+  }
+
+  .message {
+    max-width: 90%;
+  }
+
+  .bot-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .chatbot-dialog .message-content {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .chatbot-dialog .message p {
+    font-size: 0.875rem !important;
+  }
+
+  .chatbot-input {
+    padding: 0.75rem;
+  }
+
+  .chatbot-input input {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  .send-btn {
+    padding: 0.625rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .chatbot-dialog {
+    width: calc(100vw - 0.5rem);
+    height: 60vh;
+    bottom: 4rem;
+    right: 0.25rem;
   }
 }
