@@ -1913,3 +1913,32 @@
     max-height: 90vh;
   }
 }
+ 
+ / *   A d d i t i o n a l   M o b i l e   F i x e s   -   A d d e d   b y   S y s t e m   * /  
+ @media (max-width: 768px) {
+  .appointments-page * {
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+  .page-header {
+    padding: 1rem !important;
+    margin: 0 !important;
+  }
+  .new-appointment-btn {
+    width: 100% !important;
+    margin-top: 1rem;
+  }
+  .appointments-grid-modern {
+    padding: 0 !important;
+  }
+  .card-modern {
+    margin: 0.5rem 0 !important;
+  }
+  .detail-row-modern {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .detail-value {
+    text-align: left !important;
+  }
+}

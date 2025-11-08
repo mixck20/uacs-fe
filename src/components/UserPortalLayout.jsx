@@ -3,6 +3,7 @@ import UserNavbar from './UserNavbar';
 import { FaComments } from 'react-icons/fa';
 import ChatbotDialog from './ChatbotDialog';
 import './UserPortalLayout.css';
+import './mobile-responsive-fixes.css';
 
 const UserPortalLayout = ({ user, onLogout, children, currentPage }) => {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
