@@ -29,9 +29,11 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     sex: "",
     religion: "",
     address: "",
+    patientType: "student", // student, faculty, staff, visitor
     course: "",
     yearLevel: "",
     section: "",
+    department: "",
     fatherName: "",
     motherName: "",
     spouseName: "",
@@ -106,10 +108,13 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         gender: form.sex,
         religion: form.religion || "",
         address: form.address || "",
-        // Academic info (for walk-ins)
-        ...(form.course ? { course: form.course } : {}),
-        ...(form.yearLevel ? { yearLevel: form.yearLevel } : {}),
-        ...(form.section ? { section: form.section.toUpperCase() } : {}),
+        patientType: form.patientType, // student, faculty, staff, visitor
+        // Academic info - only for students
+        ...(form.patientType === 'student' && form.course ? { course: form.course } : {}),
+        ...(form.patientType === 'student' && form.yearLevel ? { yearLevel: form.yearLevel } : {}),
+        ...(form.patientType === 'student' && form.section ? { section: form.section.toUpperCase() } : {}),
+        // Department - only for faculty
+        ...(form.patientType === 'faculty' && form.department ? { department: form.department } : {}),
         fatherName: form.fatherName || "",
         motherName: form.motherName || "",
         spouseName: form.spouseName || "",
@@ -134,9 +139,11 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         sex: "",
         religion: "",
         address: "",
+        patientType: "student",
         course: "",
         yearLevel: "",
         section: "",
+        department: "",
         fatherName: "",
         motherName: "",
         spouseName: "",
@@ -709,9 +716,35 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                   </div>
                 </div>
 
+                {/* Patient Type Selector */}
                 <div className="form-section">
-                  <h3 className="form-section-title">Academic Information</h3>
+                  <h3 className="form-section-title">Patient Type</h3>
                   <div className="patients-form-grid">
+                    <div className="patients-form-group patients-form-group-full">
+                      <label>Type <span className="required">*</span></label>
+                      <select 
+                        name="patientType" 
+                        value={form.patientType} 
+                        onChange={handleFormChange}
+                        required
+                      >
+                        <option value="student">Student</option>
+                        <option value="faculty">Faculty</option>
+                        <option value="staff">Staff (Security, Maintenance, Admin, etc.)</option>
+                        <option value="visitor">Visitor/Other</option>
+                      </select>
+                    </div>
+                  </div>
+                  <p className="form-note">
+                    <small>Select the type of patient being added. This determines what additional information is required.</small>
+                  </p>
+                </div>
+
+                {/* Conditional Academic/Department Information */}
+                {form.patientType === 'student' && (
+                  <div className="form-section">
+                    <h3 className="form-section-title">Academic Information (Student)</h3>
+                    <div className="patients-form-grid">
                     <div className="patients-form-group">
                       <label>Course</label>
                       <select 
@@ -777,9 +810,49 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                     </div>
                   </div>
                   <p className="form-note">
-                    <small>For walk-in patients only. If patient has an account, this will be auto-populated from their registration.</small>
+                    <small>For walk-in student patients only. If patient has an account, this will be auto-populated from their registration.</small>
                   </p>
                 </div>
+                )}
+
+                {form.patientType === 'faculty' && (
+                  <div className="form-section">
+                    <h3 className="form-section-title">Department (Faculty)</h3>
+                    <div className="patients-form-grid">
+                      <div className="patients-form-group patients-form-group-full">
+                        <label>Department <span className="required">*</span></label>
+                        <select 
+                          name="department" 
+                          value={form.department} 
+                          onChange={handleFormChange}
+                          required
+                        >
+                          <option value="">Select department</option>
+                          <option value="College of Accountancy">College of Accountancy</option>
+                          <option value="College of Hospitality and Tourism Management">College of Hospitality and Tourism Management</option>
+                          <option value="School of Business and Public Administration">School of Business and Public Administration</option>
+                          <option value="Institute of Theology and Religious Studies">Institute of Theology and Religious Studies</option>
+                          <option value="School of Education">School of Education</option>
+                          <option value="College of Nursing and Pharmacy">College of Nursing and Pharmacy</option>
+                          <option value="School of Arts and Sciences">School of Arts and Sciences</option>
+                          <option value="College of Engineering and Architecture">College of Engineering and Architecture</option>
+                          <option value="College of Information Technology">College of Information Technology</option>
+                        </select>
+                      </div>
+                    </div>
+                    <p className="form-note">
+                      <small>Select the academic department this faculty member belongs to.</small>
+                    </p>
+                  </div>
+                )}
+
+                {(form.patientType === 'staff' || form.patientType === 'visitor') && (
+                  <div className="form-section">
+                    <p className="form-note" style={{ textAlign: 'center', padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
+                      <small><strong>Staff/Visitor:</strong> No additional academic information required. Please continue with Family and Emergency Contact information below.</small>
+                    </p>
+                  </div>
+                )}
 
                 <div className="form-section">
                   <h3 className="form-section-title">Family Information</h3>
