@@ -183,17 +183,20 @@
 
 .input-group {
   position: relative;
-  display: flex;
-  align-items: center;
+  display: block;
+  width: 100%;
 }
 
 .input-icon {
   position: absolute;
   left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
   color: #94a3b8;
   font-size: 1.1rem;
   pointer-events: none;
   transition: color 0.2s ease;
+  z-index: 1;
 }
 
 .form-input {
@@ -205,10 +208,11 @@
   border-radius: 12px;
   transition: all 0.2s ease;
   color: #1e293b;
+  position: relative;
 }
 
 .form-input.with-icon {
-  padding-left: 3rem;
+  padding-left: 3.2rem;
 }
 
 .form-input:focus {
@@ -436,7 +440,7 @@
   }
 
   .form-input.with-icon {
-    padding-left: 2.75rem;
+    padding-left: 2.875rem;
   }
 
   .input-icon {
@@ -493,6 +497,15 @@
   .form-input {
     padding: 0.75rem 0.875rem;
     font-size: 0.9rem;
+  }
+
+  .form-input.with-icon {
+    padding-left: 2.75rem;
+  }
+
+  .input-icon {
+    font-size: 0.95rem;
+    left: 0.75rem;
   }
 
   .remember-me,
