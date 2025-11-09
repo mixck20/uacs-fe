@@ -295,13 +295,26 @@
 
 .pagination {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
+  flex-direction: column;
+  gap: 15px;
   background: white;
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-info {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
 
 .pagination button {
@@ -325,9 +338,11 @@
   cursor: not-allowed;
 }
 
-.pagination span {
+.pagination .page-number {
   color: #374151;
   font-weight: 600;
+  min-width: 120px;
+  text-align: center;
 }
 
 .modal-overlay {
@@ -579,5 +594,27 @@
 
   .modal-header h2 {
     font-size: 1.5rem;
+  }
+
+  .pagination {
+    padding: 15px;
+  }
+
+  .pagination-info {
+    font-size: 0.85rem;
+  }
+
+  .pagination-controls {
+    gap: 10px;
+  }
+
+  .pagination button {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+
+  .pagination .page-number {
+    font-size: 0.9rem;
+    min-width: 100px;
   }
 }

@@ -39,6 +39,11 @@ function UserManagement() {
     fetchUsers();
   }, [pagination.page, roleFilter, statusFilter, searchTerm]);
 
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, [roleFilter, statusFilter, searchTerm]);
+
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -50,7 +55,10 @@ function UserManagement() {
         searchTerm
       );
       setUsers(data.users || []);
-      setPagination(prev => ({ ...prev, total: data.total || 0 }));
+      setPagination(prev => ({ 
+        ...prev, 
+        total: data.pagination?.total || data.total || 0 
+      }));
     } catch (error) {
       console.error('Error fetching users:', error);
       Swal.fire('Error', error.message || 'Failed to load users', 'error');
@@ -443,21 +451,30 @@ function UserManagement() {
         </div>
 
         {/* Pagination */}
-        <div className="pagination">
-          <button
-            disabled={pagination.page === 1}
-            onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
-          >
-            Previous
-          </button>
-          <span>Page {pagination.page} of {Math.ceil(pagination.total / pagination.limit) || 1}</span>
-          <button
-            disabled={pagination.page >= Math.ceil(pagination.total / pagination.limit)}
-            onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
-          >
-            Next
-          </button>
-        </div>
+        {!loading && users.length > 0 && (
+          <div className="pagination">
+            <div className="pagination-info">
+              Showing {((pagination.page - 1) * pagination.limit) + 1} - {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} users
+            </div>
+            <div className="pagination-controls">
+              <button
+                disabled={pagination.page === 1}
+                onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+              >
+                Previous
+              </button>
+              <span className="page-number">
+                Page {pagination.page} of {Math.ceil(pagination.total / pagination.limit) || 1}
+              </span>
+              <button
+                disabled={pagination.page >= Math.ceil(pagination.total / pagination.limit)}
+                onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Modal */}
         {showModal && (
