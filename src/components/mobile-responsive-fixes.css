@@ -166,12 +166,23 @@
     margin-bottom: 0.375rem !important;
   }
 
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
+  /* Exclude login form from global input overrides */
+  .form-group input:not(.login-form .form-input),
+  .form-group select:not(.login-form select),
+  .form-group textarea:not(.login-form textarea) {
     padding: 0.625rem !important;
     font-size: 0.875rem !important;
     border-radius: 8px !important;
+  }
+
+  /* Login form specific styles - preserve icon spacing */
+  .login-form .form-input {
+    padding: 0.875rem 1rem !important;
+    font-size: 0.95rem !important;
+  }
+
+  .login-form .form-input.with-icon {
+    padding-left: 3rem !important;
   }
 
   /* Form Rows - Keep 2 Columns for Date/Time */
@@ -616,5 +627,15 @@
 
   .form-row {
     grid-template-columns: 1fr !important;
+  }
+
+  /* Login form specific for small mobile */
+  .login-form .form-input {
+    padding: 0.75rem 0.875rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  .login-form .form-input.with-icon {
+    padding-left: 2.875rem !important;
   }
 }
