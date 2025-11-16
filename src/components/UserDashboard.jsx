@@ -6,6 +6,18 @@ import { PatientsAPI } from "../api";
 import UserPortalLayout from "./UserPortalLayout";
 import "./UserDashboard.css";
 
+// Helper function to format time in 12-hour format with AM/PM
+const formatTime12Hour = (time24) => {
+  if (!time24) return 'Not set';
+  
+  const [hours, minutes] = time24.split(':');
+  const hour = parseInt(hours, 10);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12; // Convert 0 to 12 for midnight
+  
+  return `${hour12}:${minutes} ${ampm}`;
+};
+
 const UserDashboard = ({ user, onLogout }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -116,7 +128,7 @@ const UserDashboard = ({ user, onLogout }) => {
                 upcomingAppointments.map(apt => (
                   <div key={apt._id} className="appointment-item">
                     <div className="appointment-info">
-                      <div className="appointment-date">{formatDate(new Date(apt.date))} at {apt.time}</div>
+                      <div className="appointment-date">{formatDate(new Date(apt.date))} at {formatTime12Hour(apt.time)}</div>
                       <div className="appointment-type">{apt.type}</div>
                       {apt.meetLink && (
                         <a href={apt.meetLink} target="_blank" rel="noopener noreferrer" className="meet-link">

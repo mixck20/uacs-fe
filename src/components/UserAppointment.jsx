@@ -8,6 +8,18 @@ import { useDebounce } from '../hooks/useDebounce';
 import { useRateLimit } from '../hooks/useRateLimit';
 import { sanitizeText, sanitizeFormData } from '../utils/sanitize';
 
+// Helper function to format time in 12-hour format with AM/PM
+const formatTime12Hour = (time24) => {
+  if (!time24) return 'Not set';
+  
+  const [hours, minutes] = time24.split(':');
+  const hour = parseInt(hours, 10);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12; // Convert 0 to 12 for midnight
+  
+  return `${hour12}:${minutes} ${ampm}`;
+};
+
 const UserAppointment = ({ user, onLogout }) => {
   const [activeTab, setActiveTab] = useState('schedule');
   const [appointmentType, setAppointmentType] = useState('clinic');
@@ -1102,7 +1114,7 @@ const UserAppointment = ({ user, onLogout }) => {
                           <FaClock className="info-icon" />
                           <div>
                             <span className="info-label">Time</span>
-                            <span className="info-value">{appointment.time || 'Not set'}</span>
+                            <span className="info-value">{formatTime12Hour(appointment.time)}</span>
                           </div>
                         </div>
                         
@@ -1334,7 +1346,7 @@ const UserAppointment = ({ user, onLogout }) => {
               <div className="chat-modal-header">
                 <div>
                   <h3>Chat</h3>
-                  <p>Appointment: {new Date(selectedAppointment.date).toLocaleDateString()} at {selectedAppointment.time}</p>
+                  <p>Appointment: {new Date(selectedAppointment.date).toLocaleDateString()} at {formatTime12Hour(selectedAppointment.time)}</p>
                 </div>
                 <button className="close-btn-icon" onClick={() => setShowChat(false)}>
                   <FaTimes />

@@ -10,6 +10,18 @@ import {
 import { AppointmentsAPI, ChatAPI, PatientsAPI } from "../api";
 import Swal from "sweetalert2";
 
+// Helper function to format time in 12-hour format with AM/PM
+const formatTime12Hour = (time24) => {
+  if (!time24) return 'Not set';
+  
+  const [hours, minutes] = time24.split(':');
+  const hour = parseInt(hours, 10);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12; // Convert 0 to 12 for midnight
+  
+  return `${hour12}:${minutes} ${ampm}`;
+};
+
 function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, patients, appointments, setAppointments, onLogout, user }) {
   const [currentCall, setCurrentCall] = useState(null);
   const [showChat, setShowChat] = useState(false);
@@ -275,7 +287,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               <div style="background: #f3f4f6; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
                 <p style="margin: 0 0 0.25rem 0;"><strong style="color: #374151;">Patient:</strong> <span style="color: #6b7280;">${appointment.patientName}</span></p>
                 <p style="margin: 0 0 0.25rem 0;"><strong style="color: #374151;">Date:</strong> <span style="color: #6b7280;">${new Date(appointment.date).toLocaleDateString()}</span></p>
-                <p style="margin: 0;"><strong style="color: #374151;">Time:</strong> <span style="color: #6b7280;">${appointment.time}</span></p>
+                <p style="margin: 0;"><strong style="color: #374151;">Time:</strong> <span style="color: #6b7280;">${formatTime12Hour(appointment.time)}</span></p>
               </div>
               <p style="margin: 0 0 0.75rem 0; font-weight: 600; color: #374151;">This will:</p>
               <div style="display: flex; flex-direction: column; gap: 0.5rem;">
@@ -1280,7 +1292,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
                     </div>
                     <div className="detail-row">
                       <FaClock className="detail-icon" />
-                      <span>{appointment.time}</span>
+                      <span>{formatTime12Hour(appointment.time)}</span>
                     </div>
                     <div className="detail-row">
                       <FaStethoscope className="detail-icon" />

@@ -7,6 +7,18 @@ import jsPDF from "jspdf";
 import * as XLSX from "xlsx";
 import "./UserHealthRecord.css";
 
+// Helper function to format time in 12-hour format with AM/PM
+const formatTime12Hour = (time24) => {
+  if (!time24) return 'Not set';
+  
+  const [hours, minutes] = time24.split(':');
+  const hour = parseInt(hours, 10);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12; // Convert 0 to 12 for midnight
+  
+  return `${hour12}:${minutes} ${ampm}`;
+};
+
 const UserHealthRecord = ({ user, onLogout }) => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [patientRecord, setPatientRecord] = useState(null);
@@ -755,7 +767,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
                           <div className="badge-content">
                             <span className="badge-label">Related Appointment</span>
                             <span className="badge-details">
-                              {new Date(visit.appointmentId.date).toLocaleDateString()} at {visit.appointmentId.time}
+                              {new Date(visit.appointmentId.date).toLocaleDateString()} at {formatTime12Hour(visit.appointmentId.time)}
                               {visit.appointmentId.type && ` • ${visit.appointmentId.type}`}
                             </span>
                           </div>
@@ -853,7 +865,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
                                   <div style="margin-bottom: 1.5rem;">
                                     <h4 style="color: #e51d5e; margin-bottom: 0.5rem;">Related Appointment</h4>
                                     <p style="margin: 0; font-size: 0.95rem;">
-                                      ${new Date(visit.appointmentId.date).toLocaleDateString()} at ${visit.appointmentId.time}
+                                      ${new Date(visit.appointmentId.date).toLocaleDateString()} at ${formatTime12Hour(visit.appointmentId.time)}
                                       ${visit.appointmentId.type ? ` • ${visit.appointmentId.type}` : ''}
                                     </p>
                                   </div>
