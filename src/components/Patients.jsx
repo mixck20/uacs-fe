@@ -612,62 +612,103 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                 </button>
               </div>
               <form className="patients-modal-form" onSubmit={handleAddPatient}>
+                {/* Patient Type Selector - First Step */}
                 <div className="form-section">
-                  <h3 className="form-section-title">Personal Information</h3>
-                  <div className="patients-form-grid">
-                    <div className="patients-form-group">
-                      <label>Surname <span className="required">*</span></label>
-                      <input
-                        type="text"
-                        name="surname"
-                        placeholder="Enter surname"
-                        value={form.surname}
-                        onChange={handleFormChange}
-                        required
-                      />
+                  <h3 className="form-section-title">Patient Type <span className="required">*</span></h3>
+                  <div className="patient-type-cards">
+                    <div 
+                      className={`patient-type-card ${form.patientType === 'student' ? 'selected' : ''}`}
+                      onClick={() => setForm({ ...form, patientType: 'student' })}
+                    >
+                      <div className="patient-type-label">Student</div>
+                      <div className="patient-type-desc">University students</div>
                     </div>
-                    <div className="patients-form-group">
-                      <label>First Name <span className="required">*</span></label>
-                      <input
-                        type="text"
-                        name="firstName"
-                        placeholder="Enter first name"
-                        value={form.firstName}
-                        onChange={handleFormChange}
-                        required
-                      />
+                    <div 
+                      className={`patient-type-card ${form.patientType === 'faculty' ? 'selected' : ''}`}
+                      onClick={() => setForm({ ...form, patientType: 'faculty' })}
+                    >
+                      <div className="patient-type-label">Faculty</div>
+                      <div className="patient-type-desc">Teaching staff</div>
                     </div>
-                    <div className="patients-form-group">
-                      <label>Middle Name</label>
-                      <input
-                        type="text"
-                        name="middleName"
-                        placeholder="Enter middle name"
-                        value={form.middleName}
-                        onChange={handleFormChange}
-                      />
+                    <div 
+                      className={`patient-type-card ${form.patientType === 'staff' ? 'selected' : ''}`}
+                      onClick={() => setForm({ ...form, patientType: 'staff' })}
+                    >
+                      <div className="patient-type-label">Staff</div>
+                      <div className="patient-type-desc">Security, maintenance, admin</div>
+                    </div>
+                    <div 
+                      className={`patient-type-card ${form.patientType === 'visitor' ? 'selected' : ''}`}
+                      onClick={() => setForm({ ...form, patientType: 'visitor' })}
+                    >
+                      <div className="patient-type-label">Visitor/Other</div>
+                      <div className="patient-type-desc">Walk-in patients</div>
                     </div>
                   </div>
+                  <p className="form-note">
+                    <small>Select the type of patient to continue</small>
+                  </p>
+                </div>
 
-                  <div className="patients-form-grid">
-                    <div className="patients-form-group">
-                      <label>
-                        {form.patientType === 'visitor' ? 'Email' : 'School Email'} 
-                        {form.patientType !== 'visitor' && <span className="required">*</span>}
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        placeholder={
-                          form.patientType === 'visitor' 
-                            ? "Enter email (optional)" 
-                            : "Enter school email (@ua.edu.ph)"
-                        }
-                        value={form.email}
-                        onChange={handleFormChange}
-                        required={form.patientType !== 'visitor'}
-                      />
-                    </div>
+                {/* Show personal information only after patient type is selected */}
+                {form.patientType && (
+                  <>
+                    <div className="form-section">
+                      <h3 className="form-section-title">Personal Information</h3>
+                      <div className="patients-form-grid">
+                        <div className="patients-form-group">
+                          <label>Surname <span className="required">*</span></label>
+                          <input
+                            type="text"
+                            name="surname"
+                            placeholder="Enter surname"
+                            value={form.surname}
+                            onChange={handleFormChange}
+                            required
+                          />
+                        </div>
+                        <div className="patients-form-group">
+                          <label>First Name <span className="required">*</span></label>
+                          <input
+                            type="text"
+                            name="firstName"
+                            placeholder="Enter first name"
+                            value={form.firstName}
+                            onChange={handleFormChange}
+                            required
+                          />
+                        </div>
+                        <div className="patients-form-group">
+                          <label>Middle Name</label>
+                          <input
+                            type="text"
+                            name="middleName"
+                            placeholder="Enter middle name"
+                            value={form.middleName}
+                            onChange={handleFormChange}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="patients-form-grid">
+                        <div className="patients-form-group">
+                          <label>
+                            {form.patientType === 'visitor' ? 'Email' : 'School Email'} 
+                            {form.patientType !== 'visitor' && <span className="required">*</span>}
+                          </label>
+                          <input
+                            type="email"
+                            name="email"
+                            placeholder={
+                              form.patientType === 'visitor' 
+                                ? "Enter email (optional)" 
+                                : "Enter school email (@ua.edu.ph)"
+                            }
+                            value={form.email}
+                            onChange={handleFormChange}
+                            required={form.patientType !== 'visitor'}
+                          />
+                        </div>
                     <div className="patients-form-group">
                       <label>Contact Number</label>
                       <input
@@ -733,48 +774,6 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                       />
                     </div>
                   </div>
-                </div>
-
-                {/* Patient Type Selector - Card Style */}
-                <div className="form-section">
-                  <h3 className="form-section-title">Patient Type <span className="required">*</span></h3>
-                  <div className="patient-type-cards">
-                    <div 
-                      className={`patient-type-card ${form.patientType === 'student' ? 'selected' : ''}`}
-                      onClick={() => setForm({ ...form, patientType: 'student' })}
-                    >
-                      <div className="patient-type-icon">🎓</div>
-                      <div className="patient-type-label">Student</div>
-                      <div className="patient-type-desc">University students</div>
-                    </div>
-                    <div 
-                      className={`patient-type-card ${form.patientType === 'faculty' ? 'selected' : ''}`}
-                      onClick={() => setForm({ ...form, patientType: 'faculty' })}
-                    >
-                      <div className="patient-type-icon">👨‍🏫</div>
-                      <div className="patient-type-label">Faculty</div>
-                      <div className="patient-type-desc">Teaching staff</div>
-                    </div>
-                    <div 
-                      className={`patient-type-card ${form.patientType === 'staff' ? 'selected' : ''}`}
-                      onClick={() => setForm({ ...form, patientType: 'staff' })}
-                    >
-                      <div className="patient-type-icon">👷</div>
-                      <div className="patient-type-label">Staff</div>
-                      <div className="patient-type-desc">Security, maintenance, admin</div>
-                    </div>
-                    <div 
-                      className={`patient-type-card ${form.patientType === 'visitor' ? 'selected' : ''}`}
-                      onClick={() => setForm({ ...form, patientType: 'visitor' })}
-                    >
-                      <div className="patient-type-icon">🚶</div>
-                      <div className="patient-type-label">Visitor/Other</div>
-                      <div className="patient-type-desc">Walk-in patients</div>
-                    </div>
-                  </div>
-                  <p className="form-note">
-                    <small>Select the type of patient being added. This determines what additional information is required.</small>
-                  </p>
                 </div>
 
                 {/* Conditional Academic/Department Information */}
@@ -972,6 +971,8 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                     </div>
                   </div>
                 </div>
+                  </>
+                )}
 
                 <div className="patients-modal-actions">
                   <button type="button" className="patients-btn-cancel" onClick={() => setShowForm(false)} disabled={isSubmitting}>
