@@ -72,24 +72,36 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     // Prevent double submission
     if (isSubmitting) return;
     
-    if (!form.surname || !form.firstName || !form.email || !form.birthday || !form.sex) {
+    if (!form.surname || !form.firstName || !form.birthday || !form.sex) {
       Swal.fire({ 
         title: "Missing Required Fields", 
-        text: "Please fill in Surname, First Name, Email, Birthday, and Sex", 
+        text: "Please fill in Surname, First Name, Birthday, and Sex", 
         icon: "warning" 
       });
       return;
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@ua\.edu\.ph$/i;
-    if (!emailRegex.test(form.email)) {
+    // Email is required for student, faculty, and staff only
+    if (['student', 'faculty', 'staff'].includes(form.patientType) && !form.email) {
       Swal.fire({ 
-        title: "Invalid Email", 
-        text: "Please use a valid school email (@ua.edu.ph)", 
+        title: "Missing Required Field", 
+        text: "Email is required for students, faculty, and staff", 
         icon: "warning" 
       });
       return;
+    }
+
+    // Validate email format only if email is provided and not a visitor
+    if (form.email && form.patientType !== 'visitor') {
+      const emailRegex = /^[^\s@]+@ua\.edu\.ph$/i;
+      if (!emailRegex.test(form.email)) {
+        Swal.fire({ 
+          title: "Invalid Email", 
+          text: "Please use a valid school email (@ua.edu.ph) for students, faculty, and staff", 
+          icon: "warning" 
+        });
+        return;
+      }
     }
 
     setIsSubmitting(true); // Disable button
@@ -100,7 +112,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         firstName: form.firstName.trim(),
         middleName: form.middleName.trim(),
         fullName: fullName,
-        email: form.email.trim().toLowerCase(),
+        email: form.email ? form.email.trim().toLowerCase() : "", // Email optional for visitors
         contactNumber: form.cellNumber || "",
         cellNumber: form.cellNumber || "",
         dateOfBirth: form.birthday,
@@ -639,14 +651,21 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
 
                   <div className="patients-form-grid">
                     <div className="patients-form-group">
-                      <label>School Email <span className="required">*</span></label>
+                      <label>
+                        {form.patientType === 'visitor' ? 'Email' : 'School Email'} 
+                        {form.patientType !== 'visitor' && <span className="required">*</span>}
+                      </label>
                       <input
                         type="email"
                         name="email"
-                        placeholder="Enter school email (@ua.edu.ph)"
+                        placeholder={
+                          form.patientType === 'visitor' 
+                            ? "Enter email (optional)" 
+                            : "Enter school email (@ua.edu.ph)"
+                        }
                         value={form.email}
                         onChange={handleFormChange}
-                        required
+                        required={form.patientType !== 'visitor'}
                       />
                     </div>
                     <div className="patients-form-group">
