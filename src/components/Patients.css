@@ -554,6 +554,53 @@
   margin-bottom: 0;
 }
 
+/* Patient Type Card Selector */
+.patient-type-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.patient-type-card {
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.patient-type-card:hover {
+  border-color: #e51d5e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(229, 29, 94, 0.15);
+}
+
+.patient-type-card.selected {
+  border-color: #e51d5e;
+  background: linear-gradient(135deg, #fff5f8 0%, #ffffff 100%);
+  box-shadow: 0 4px 12px rgba(229, 29, 94, 0.2);
+}
+
+.patient-type-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.patient-type-label {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.patient-type-desc {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
 .patients-form-group {
   display: flex;
   flex-direction: column;
@@ -863,6 +910,10 @@
     gap: 1rem;
   }
 
+  .patient-type-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .patient-details-header {
     flex-direction: column;
     text-align: center;
@@ -908,6 +959,10 @@
     width: 70px;
     height: 70px;
     font-size: 1.75rem;
+  }
+
+  .patient-type-cards {
+    grid-template-columns: 1fr;
   }
 
   .patient-details-info h2 {

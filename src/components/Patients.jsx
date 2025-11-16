@@ -735,23 +735,41 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                   </div>
                 </div>
 
-                {/* Patient Type Selector */}
+                {/* Patient Type Selector - Card Style */}
                 <div className="form-section">
-                  <h3 className="form-section-title">Patient Type</h3>
-                  <div className="patients-form-grid">
-                    <div className="patients-form-group patients-form-group-full">
-                      <label>Type <span className="required">*</span></label>
-                      <select 
-                        name="patientType" 
-                        value={form.patientType} 
-                        onChange={handleFormChange}
-                        required
-                      >
-                        <option value="student">Student</option>
-                        <option value="faculty">Faculty</option>
-                        <option value="staff">Staff (Security, Maintenance, Admin, etc.)</option>
-                        <option value="visitor">Visitor/Other</option>
-                      </select>
+                  <h3 className="form-section-title">Patient Type <span className="required">*</span></h3>
+                  <div className="patient-type-cards">
+                    <div 
+                      className={`patient-type-card ${form.patientType === 'student' ? 'selected' : ''}`}
+                      onClick={() => setForm({ ...form, patientType: 'student' })}
+                    >
+                      <div className="patient-type-icon">🎓</div>
+                      <div className="patient-type-label">Student</div>
+                      <div className="patient-type-desc">University students</div>
+                    </div>
+                    <div 
+                      className={`patient-type-card ${form.patientType === 'faculty' ? 'selected' : ''}`}
+                      onClick={() => setForm({ ...form, patientType: 'faculty' })}
+                    >
+                      <div className="patient-type-icon">👨‍🏫</div>
+                      <div className="patient-type-label">Faculty</div>
+                      <div className="patient-type-desc">Teaching staff</div>
+                    </div>
+                    <div 
+                      className={`patient-type-card ${form.patientType === 'staff' ? 'selected' : ''}`}
+                      onClick={() => setForm({ ...form, patientType: 'staff' })}
+                    >
+                      <div className="patient-type-icon">👷</div>
+                      <div className="patient-type-label">Staff</div>
+                      <div className="patient-type-desc">Security, maintenance, admin</div>
+                    </div>
+                    <div 
+                      className={`patient-type-card ${form.patientType === 'visitor' ? 'selected' : ''}`}
+                      onClick={() => setForm({ ...form, patientType: 'visitor' })}
+                    >
+                      <div className="patient-type-icon">🚶</div>
+                      <div className="patient-type-label">Visitor/Other</div>
+                      <div className="patient-type-desc">Walk-in patients</div>
                     </div>
                   </div>
                   <p className="form-note">
