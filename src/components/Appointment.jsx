@@ -1436,12 +1436,14 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
                       >
                         <FaFileAlt /> Add Consultation Notes
                       </button>
-                      <button 
-                        className="action-btn action-health-record"
-                        onClick={() => openHealthRecordModal(appointment)}
-                      >
-                        <FaNotesMedical /> Add Health Record
-                      </button>
+                      {appointment.type !== 'Online Consultation' && (
+                        <button 
+                          className="action-btn action-health-record"
+                          onClick={() => openHealthRecordModal(appointment)}
+                        >
+                          <FaNotesMedical /> Add Health Record
+                        </button>
+                      )}
                     </>
                   )}
                   {appointment.status === 'Completed' && appointment.consultationNotes && (
@@ -1449,12 +1451,14 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
                       <span className="notes-added-badge">
                         <FaCheck /> Consultation notes recorded
                       </span>
-                      <button 
-                        className="action-btn action-health-record"
-                        onClick={() => openHealthRecordModal(appointment)}
-                      >
-                        <FaNotesMedical /> Add Health Record
-                      </button>
+                      {appointment.type !== 'Online Consultation' && (
+                        <button 
+                          className="action-btn action-health-record"
+                          onClick={() => openHealthRecordModal(appointment)}
+                        >
+                          <FaNotesMedical /> Add Health Record
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
