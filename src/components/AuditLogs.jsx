@@ -16,7 +16,7 @@ function AuditLogs() {
     endDate: '',
     search: ''
   });
-  const [pagination, setPagination] = useState({ page: 1, limit: 15, total: 0 });
+  const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0 });
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
@@ -24,12 +24,20 @@ function AuditLogs() {
     fetchStats();
   }, [pagination.page, filters]);
 
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, [filters.action, filters.resource, filters.startDate, filters.endDate, filters.search]);
+
   const fetchLogs = async () => {
     try {
       setLoading(true);
       const data = await AdminAPI.getAuditLogs(pagination.page, pagination.limit, filters);
       setLogs(data.logs || []);
-      setPagination(prev => ({ ...prev, total: data.total || 0 }));
+      setPagination(prev => ({ 
+        ...prev, 
+        total: data.pagination?.total || data.total || 0 
+      }));
     } catch (error) {
       console.error('Error fetching audit logs:', error);
       Swal.fire('Error', error.message || 'Failed to load audit logs', 'error');
@@ -229,21 +237,30 @@ function AuditLogs() {
         </div>
 
         {/* Pagination */}
-        <div className="pagination">
-          <button
-            disabled={pagination.page === 1}
-            onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
-          >
-            Previous
-          </button>
-          <span>Page {pagination.page} of {Math.ceil(pagination.total / pagination.limit) || 1}</span>
-          <button
-            disabled={pagination.page >= Math.ceil(pagination.total / pagination.limit)}
-            onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
-          >
-            Next
-          </button>
-        </div>
+        {!loading && logs.length > 0 && (
+          <div className="pagination">
+            <div className="pagination-info">
+              Showing {((pagination.page - 1) * pagination.limit) + 1} - {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} logs
+            </div>
+            <div className="pagination-controls">
+              <button
+                disabled={pagination.page === 1}
+                onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+              >
+                Previous
+              </button>
+              <span className="page-number">
+                Page {pagination.page} of {Math.ceil(pagination.total / pagination.limit) || 1}
+              </span>
+              <button
+                disabled={pagination.page >= Math.ceil(pagination.total / pagination.limit)}
+                onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </AdminPortalLayout>
   );
