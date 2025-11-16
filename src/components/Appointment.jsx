@@ -640,7 +640,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
           
           <div style="margin-bottom: 1.5rem;">
             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; font-size: 14px;">
-              Prescriptions (JSON format or leave blank)
+              Prescriptions
             </label>
             <textarea 
               id="swal-prescriptions" 
