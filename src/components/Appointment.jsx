@@ -589,118 +589,115 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
     const result = await Swal.fire({
       title: 'Add Consultation Notes',
       html: `
-        <div style="text-align: left; margin-top: 1rem; max-height: 500px; overflow-y: auto;">
-          <div style="margin-bottom: 1rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+        <div style="text-align: left; margin-top: 1rem; max-height: 500px; overflow-y: auto; padding: 0 10px;">
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; font-size: 14px;">
               Diagnosis *
             </label>
             <input 
               id="swal-diagnosis" 
-              class="swal2-input"
               type="text" 
-              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; font-size: 0.95rem; margin: 0;"
+              style="width: 100%; padding: 10px; border: 2px solid #e0e0e5; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: inherit; outline: none;"
               placeholder="Enter diagnosis..."
             />
           </div>
           
-          <div style="margin-bottom: 1rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; font-size: 14px;">
               Symptoms
             </label>
             <textarea 
               id="swal-symptoms" 
-              class="swal2-textarea"
-              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 60px; font-family: inherit; font-size: 0.95rem; margin: 0; resize: vertical;"
+              rows="3"
+              style="width: 100%; padding: 10px; border: 2px solid #e0e0e5; border-radius: 8px; min-height: 60px; font-family: inherit; font-size: 14px; box-sizing: border-box; resize: vertical; outline: none;"
               placeholder="List symptoms..."
             ></textarea>
           </div>
           
-          <div style="margin-bottom: 1rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; font-size: 14px;">
               Vital Signs
             </label>
             <input 
               id="swal-vitalSigns" 
-              class="swal2-input"
               type="text" 
-              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; font-size: 0.95rem; margin: 0;"
+              style="width: 100%; padding: 10px; border: 2px solid #e0e0e5; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: inherit; outline: none;"
               placeholder="BP, Temp, Pulse, etc..."
             />
           </div>
           
-          <div style="margin-bottom: 1rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; font-size: 14px;">
               Assessment
             </label>
             <textarea 
               id="swal-assessment" 
-              class="swal2-textarea"
-              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 80px; font-family: inherit; font-size: 0.95rem; margin: 0; resize: vertical;"
+              rows="4"
+              style="width: 100%; padding: 10px; border: 2px solid #e0e0e5; border-radius: 8px; min-height: 80px; font-family: inherit; font-size: 14px; box-sizing: border-box; resize: vertical; outline: none;"
               placeholder="Clinical assessment..."
             ></textarea>
           </div>
           
-          <div style="margin-bottom: 1rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; font-size: 14px;">
               Treatment Plan
             </label>
             <textarea 
               id="swal-treatment" 
-              class="swal2-textarea"
-              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 80px; font-family: inherit; font-size: 0.95rem; margin: 0; resize: vertical;"
+              rows="4"
+              style="width: 100%; padding: 10px; border: 2px solid #e0e0e5; border-radius: 8px; min-height: 80px; font-family: inherit; font-size: 14px; box-sizing: border-box; resize: vertical; outline: none;"
               placeholder="Recommended treatment..."
             ></textarea>
           </div>
           
-          <div style="margin-bottom: 1rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; font-size: 14px;">
               Prescriptions (JSON format or leave blank)
             </label>
             <textarea 
               id="swal-prescriptions" 
-              class="swal2-textarea"
-              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 60px; font-family: 'Courier New', monospace; font-size: 0.85rem; margin: 0; resize: vertical;"
+              rows="3"
+              style="width: 100%; padding: 10px; border: 2px solid #e0e0e5; border-radius: 8px; min-height: 60px; font-family: 'Courier New', monospace; font-size: 13px; box-sizing: border-box; resize: vertical; outline: none;"
               placeholder='[{"medication":"Paracetamol","dosage":"500mg","frequency":"3x daily","duration":"5 days"}]'
             ></textarea>
           </div>
           
-          <div style="margin-bottom: 1rem;">
-            <label style="display: flex; align-items: center; cursor: pointer;">
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: flex; align-items: center; cursor: pointer; user-select: none;">
               <input 
                 id="swal-followUpRequired" 
                 type="checkbox" 
-                style="margin-right: 0.5rem; cursor: pointer;"
+                style="margin-right: 8px; cursor: pointer; width: 18px; height: 18px;"
               />
-              <span style="font-weight: 600; color: #333;">Follow-up Required?</span>
+              <span style="font-weight: 600; color: #333; font-size: 14px;">Follow-up Required?</span>
             </label>
           </div>
           
-          <div id="swal-followUpDate" style="display: none; margin-bottom: 1rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+          <div id="swal-followUpDate" style="display: none; margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; font-size: 14px;">
               Follow-up Date
             </label>
             <input 
               id="swal-followUpDateInput" 
-              class="swal2-input"
               type="date" 
-              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; font-size: 0.95rem; margin: 0;"
+              style="width: 100%; padding: 10px; border: 2px solid #e0e0e5; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: inherit; outline: none;"
             />
           </div>
           
-          <div style="margin-bottom: 1rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; font-size: 14px;">
               Follow-up Notes
             </label>
             <textarea 
               id="swal-followUpNotes" 
-              class="swal2-textarea"
-              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 60px; font-family: inherit; font-size: 0.95rem; margin: 0; resize: vertical;"
+              rows="3"
+              style="width: 100%; padding: 10px; border: 2px solid #e0e0e5; border-radius: 8px; min-height: 60px; font-family: inherit; font-size: 14px; box-sizing: border-box; resize: vertical; outline: none;"
               placeholder="Additional recommendations..."
             ></textarea>
           </div>
         </div>
       `,
-      width: '600px',
+      width: '650px',
       showCancelButton: true,
       confirmButtonText: 'Save Notes',
       cancelButtonText: 'Cancel',
