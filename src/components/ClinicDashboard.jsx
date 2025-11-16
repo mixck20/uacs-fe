@@ -232,7 +232,21 @@ const ClinicDashboard = ({ setActivePage, activePage, sidebarOpen, setSidebarOpe
           <div className="dashboard-card activity-card">
             <div className="card-header">Recent Activity</div>
             <div className="recent-activity">
-              {patients.length > 0 ? (
+              {/* Latest Appointment */}
+              {appointments && appointments.length > 0 && (
+                <div className="activity-item">
+                  <div className="activity-icon"><FaClipboardList /></div>
+                  <div className="activity-details">
+                    <div className="activity-text">
+                      New appointment: <strong>{appointments[0]?.userId?.name || 'Patient'}</strong> - {appointments[0]?.type || 'Appointment'}
+                    </div>
+                    <div className="activity-time">{getRelativeTime(appointments[0]?.createdAt ? new Date(appointments[0].createdAt) : undefined)}</div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Latest Patient */}
+              {patients.length > 0 && (
                 <div className="activity-item">
                   <div className="activity-icon"><FaUsers /></div>
                   <div className="activity-details">
@@ -240,24 +254,9 @@ const ClinicDashboard = ({ setActivePage, activePage, sidebarOpen, setSidebarOpe
                     <div className="activity-time">{getRelativeTime(patients[0]?.createdAt ? new Date(patients[0].createdAt) : undefined)}</div>
                   </div>
                 </div>
-              ) : (
-                <div className="activity-item">
-                  <div className="activity-icon"><FaFileAlt /></div>
-                  <div className="activity-details">
-                    <div className="activity-text">No patients added yet</div>
-                    <div className="activity-time">Add your first patient</div>
-                  </div>
-                </div>
               )}
-              {patients.length > 1 && (
-                <div className="activity-item">
-                  <div className="activity-icon"><FaChartLine /></div>
-                  <div className="activity-details">
-                    <div className="activity-text">Total patients: <strong>{totalPatients}</strong></div>
-                    <div className="activity-time">Updated {formatDate(new Date())}</div>
-                  </div>
-                </div>
-              )}
+              
+              {/* Latest Inventory Item */}
               {latestInventoryItem && (
                 <div className="activity-item">
                   <div className="activity-icon"><FaBox /></div>
@@ -270,6 +269,28 @@ const ClinicDashboard = ({ setActivePage, activePage, sidebarOpen, setSidebarOpe
                           : (latestInventoryItem._ts ? new Date(latestInventoryItem._ts) : undefined)
                       )}
                     </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Total Patients Summary */}
+              {patients.length > 1 && (
+                <div className="activity-item">
+                  <div className="activity-icon"><FaChartLine /></div>
+                  <div className="activity-details">
+                    <div className="activity-text">Total patients: <strong>{totalPatients}</strong></div>
+                    <div className="activity-time">Updated {formatDate(new Date())}</div>
+                  </div>
+                </div>
+              )}
+              
+              {/* No Activity Message */}
+              {patients.length === 0 && (!appointments || appointments.length === 0) && (
+                <div className="activity-item">
+                  <div className="activity-icon"><FaFileAlt /></div>
+                  <div className="activity-details">
+                    <div className="activity-text">No recent activity</div>
+                    <div className="activity-time">Add patients or appointments to get started</div>
                   </div>
                 </div>
               )}
