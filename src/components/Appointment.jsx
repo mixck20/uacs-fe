@@ -616,18 +616,6 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
           
           <div style="margin-bottom: 1.5rem;">
             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; font-size: 14px;">
-              Vital Signs
-            </label>
-            <input 
-              id="swal-vitalSigns" 
-              type="text" 
-              style="width: 100%; padding: 10px; border: 2px solid #e0e0e5; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: inherit; outline: none;"
-              placeholder="BP, Temp, Pulse, etc..."
-            />
-          </div>
-          
-          <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; font-size: 14px;">
               Assessment
             </label>
             <textarea 
@@ -661,40 +649,6 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               placeholder='[{"medication":"Paracetamol","dosage":"500mg","frequency":"3x daily","duration":"5 days"}]'
             ></textarea>
           </div>
-          
-          <div style="margin-bottom: 1.5rem;">
-            <label style="display: flex; align-items: center; cursor: pointer; user-select: none;">
-              <input 
-                id="swal-followUpRequired" 
-                type="checkbox" 
-                style="margin-right: 8px; cursor: pointer; width: 18px; height: 18px;"
-              />
-              <span style="font-weight: 600; color: #333; font-size: 14px;">Follow-up Required?</span>
-            </label>
-          </div>
-          
-          <div id="swal-followUpDate" style="display: none; margin-bottom: 1.5rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; font-size: 14px;">
-              Follow-up Date
-            </label>
-            <input 
-              id="swal-followUpDateInput" 
-              type="date" 
-              style="width: 100%; padding: 10px; border: 2px solid #e0e0e5; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: inherit; outline: none;"
-            />
-          </div>
-          
-          <div style="margin-bottom: 1.5rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; font-size: 14px;">
-              Follow-up Notes
-            </label>
-            <textarea 
-              id="swal-followUpNotes" 
-              rows="3"
-              style="width: 100%; padding: 10px; border: 2px solid #e0e0e5; border-radius: 8px; min-height: 60px; font-family: inherit; font-size: 14px; box-sizing: border-box; resize: vertical; outline: none;"
-              placeholder="Additional recommendations..."
-            ></textarea>
-          </div>
         </div>
       `,
       width: '650px',
@@ -702,14 +656,6 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
       confirmButtonText: 'Save Notes',
       cancelButtonText: 'Cancel',
       confirmButtonColor: '#e51d5e',
-      didOpen: () => {
-        // Add event listener for follow-up checkbox
-        const followUpCheckbox = document.getElementById('swal-followUpRequired');
-        const followUpDateDiv = document.getElementById('swal-followUpDate');
-        followUpCheckbox.addEventListener('change', function() {
-          followUpDateDiv.style.display = this.checked ? 'block' : 'none';
-        });
-      },
       preConfirm: () => {
         const diagnosis = document.getElementById('swal-diagnosis').value.trim();
         if (!diagnosis) {
@@ -731,14 +677,14 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
         return {
           diagnosis,
           symptoms: document.getElementById('swal-symptoms').value.trim(),
-          vitalSigns: document.getElementById('swal-vitalSigns').value.trim(),
+          vitalSigns: '',
           assessment: document.getElementById('swal-assessment').value.trim(),
           treatment: document.getElementById('swal-treatment').value.trim(),
           prescriptions,
           followUpRecommendations: {
-            required: document.getElementById('swal-followUpRequired').checked,
-            date: document.getElementById('swal-followUpDateInput').value,
-            notes: document.getElementById('swal-followUpNotes').value.trim()
+            required: false,
+            date: '',
+            notes: ''
           }
         };
       }
