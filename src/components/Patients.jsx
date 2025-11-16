@@ -621,28 +621,24 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                       onClick={() => setForm({ ...form, patientType: 'student' })}
                     >
                       <div className="patient-type-label">Student</div>
-                      <div className="patient-type-desc">University students</div>
                     </div>
                     <div 
                       className={`patient-type-card ${form.patientType === 'faculty' ? 'selected' : ''}`}
                       onClick={() => setForm({ ...form, patientType: 'faculty' })}
                     >
                       <div className="patient-type-label">Faculty</div>
-                      <div className="patient-type-desc">Teaching staff</div>
                     </div>
                     <div 
                       className={`patient-type-card ${form.patientType === 'staff' ? 'selected' : ''}`}
                       onClick={() => setForm({ ...form, patientType: 'staff' })}
                     >
                       <div className="patient-type-label">Staff</div>
-                      <div className="patient-type-desc">Security, maintenance, admin</div>
                     </div>
                     <div 
                       className={`patient-type-card ${form.patientType === 'visitor' ? 'selected' : ''}`}
                       onClick={() => setForm({ ...form, patientType: 'visitor' })}
                     >
                       <div className="patient-type-label">Visitor/Other</div>
-                      <div className="patient-type-desc">Walk-in patients</div>
                     </div>
                   </div>
                   <p className="form-note">

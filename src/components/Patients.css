@@ -565,7 +565,7 @@
 .patient-type-card {
   border: 2px solid #e5e7eb;
   border-radius: 12px;
-  padding: 1.5rem 1rem;
+  padding: 1rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -588,12 +588,6 @@
   font-weight: 600;
   color: #1e293b;
   font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-}
-
-.patient-type-desc {
-  font-size: 0.85rem;
-  color: #64748b;
 }
 
 .patients-form-group {
