@@ -41,6 +41,11 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     emergencyRelationship: "",
     emergencyAddress: "",
     emergencyCel: "",
+    guardianName: "",
+    guardianRelationship: "",
+    guardianEmail: "",
+    guardianPhone: "",
+    guardianNotifyOnVisit: false,
   });
 
   function handleFormChange(e) {
@@ -137,6 +142,16 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
           phone: form.emergencyCel || "",
           cellNumber: form.emergencyCel || "",
         },
+        // Guardian contact - only for students
+        ...(form.patientType === 'student' && form.guardianEmail ? {
+          guardianContact: {
+            name: form.guardianName || "",
+            relationship: form.guardianRelationship || "",
+            email: form.guardianEmail || "",
+            phone: form.guardianPhone || "",
+            notifyOnVisit: form.guardianNotifyOnVisit || false,
+          }
+        } : {}),
       };
       const created = await PatientsAPI.create(payload);
       setPatients(prev => [created, ...prev]);
@@ -163,6 +178,11 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         emergencyRelationship: "",
         emergencyAddress: "",
         emergencyCel: "",
+        guardianName: "",
+        guardianRelationship: "",
+        guardianEmail: "",
+        guardianPhone: "",
+        guardianNotifyOnVisit: false,
       });
       setShowForm(false);
       Swal.fire({ title: "Patient added successfully!", icon: "success", timer: 1500, showConfirmButton: false });
@@ -967,6 +987,69 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                     </div>
                   </div>
                 </div>
+
+                {/* Guardian Contact Section - Only for Students */}
+                {form.patientType === 'student' && (
+                  <div className="form-section">
+                    <h3 className="form-section-title">Parent/Guardian Contact (for notifications)</h3>
+                    <div className="patients-form-grid">
+                      <div className="patients-form-group">
+                        <label>Parent/Guardian Name</label>
+                        <input
+                          type="text"
+                          name="guardianName"
+                          placeholder="Enter parent/guardian name"
+                          value={form.guardianName}
+                          onChange={handleFormChange}
+                        />
+                      </div>
+                      <div className="patients-form-group">
+                        <label>Relationship</label>
+                        <input
+                          type="text"
+                          name="guardianRelationship"
+                          placeholder="e.g., Mother, Father, Guardian"
+                          value={form.guardianRelationship}
+                          onChange={handleFormChange}
+                        />
+                      </div>
+                      <div className="patients-form-group">
+                        <label>Email Address</label>
+                        <input
+                          type="email"
+                          name="guardianEmail"
+                          placeholder="Enter guardian email"
+                          value={form.guardianEmail}
+                          onChange={handleFormChange}
+                        />
+                      </div>
+                      <div className="patients-form-group">
+                        <label>Phone Number</label>
+                        <input
+                          type="text"
+                          name="guardianPhone"
+                          placeholder="Enter guardian phone"
+                          value={form.guardianPhone}
+                          onChange={handleFormChange}
+                        />
+                      </div>
+                      <div className="patients-form-group patients-form-group-full">
+                        <label className="patients-form-checkbox">
+                          <input
+                            type="checkbox"
+                            name="guardianNotifyOnVisit"
+                            checked={form.guardianNotifyOnVisit || false}
+                            onChange={(e) => setForm({ ...form, guardianNotifyOnVisit: e.target.checked })}
+                          />
+                          <span>Send email notification to guardian when student visits the clinic</span>
+                        </label>
+                        <small style={{ display: 'block', marginTop: '0.5rem', color: '#6b7280' }}>
+                          Notifications will include visit date, general reason, and recommendations (no detailed medical information).
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                )}
                   </>
                 )}
 
