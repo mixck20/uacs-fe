@@ -646,7 +646,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               id="swal-prescriptions" 
               rows="3"
               style="width: 100%; padding: 10px; border: 2px solid #e0e0e5; border-radius: 8px; min-height: 60px; font-family: 'Courier New', monospace; font-size: 13px; box-sizing: border-box; resize: vertical; outline: none;"
-              placeholder='[{"medication":"Paracetamol","dosage":"500mg","frequency":"3x daily","duration":"5 days"}]'
+              placeholder='{"medication":"Paracetamol","dosage":"500mg","frequency":"3x daily","duration":"5 days"}'
             ></textarea>
           </div>
         </div>
