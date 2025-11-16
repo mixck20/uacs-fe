@@ -533,12 +533,16 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
             <div className="patients-stat-label">Walk-ins</div>
           </div>
           <div className="patients-stat-card">
-            <div className="patients-stat-number">{patients.filter(p => p.visits && p.visits.length > 0).length}</div>
+            <div className="patients-stat-number">{patients.filter(p => p.patientType === 'Student').length}</div>
             <div className="patients-stat-label">Students</div>
           </div>
           <div className="patients-stat-card">
-            <div className="patients-stat-number">{patients.filter(p => p.role === 'Faculty').length}</div>
+            <div className="patients-stat-number">{patients.filter(p => p.patientType === 'Faculty').length}</div>
             <div className="patients-stat-label">Faculty</div>
+          </div>
+          <div className="patients-stat-card">
+            <div className="patients-stat-number">{patients.filter(p => p.patientType === 'Staff').length}</div>
+            <div className="patients-stat-label">Staff</div>
           </div>
         </div>
 
@@ -551,6 +555,11 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                   <FaUser />
                 </div>
                 <div className="patient-header-actions">
+                  {patient.patientType && (
+                    <span className={`patient-type-badge patient-type-${patient.patientType.toLowerCase().replace(/\s+/g, '-')}`}>
+                      {patient.patientType}
+                    </span>
+                  )}
                   {patient.isRegisteredUser && (
                     <span className="patient-registered-badge" title="Has User Account">
                       <FaUserCheck /> Registered
