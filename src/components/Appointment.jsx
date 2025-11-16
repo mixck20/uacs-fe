@@ -595,9 +595,10 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               Diagnosis *
             </label>
             <input 
-              id="diagnosis" 
+              id="swal-diagnosis" 
+              class="swal2-input"
               type="text" 
-              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; font-size: 0.95rem;"
+              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; font-size: 0.95rem; margin: 0;"
               placeholder="Enter diagnosis..."
             />
           </div>
@@ -607,8 +608,9 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               Symptoms
             </label>
             <textarea 
-              id="symptoms" 
-              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 60px; font-family: inherit; font-size: 0.95rem;"
+              id="swal-symptoms" 
+              class="swal2-textarea"
+              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 60px; font-family: inherit; font-size: 0.95rem; margin: 0; resize: vertical;"
               placeholder="List symptoms..."
             ></textarea>
           </div>
@@ -618,9 +620,10 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               Vital Signs
             </label>
             <input 
-              id="vitalSigns" 
+              id="swal-vitalSigns" 
+              class="swal2-input"
               type="text" 
-              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; font-size: 0.95rem;"
+              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; font-size: 0.95rem; margin: 0;"
               placeholder="BP, Temp, Pulse, etc..."
             />
           </div>
@@ -630,8 +633,9 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               Assessment
             </label>
             <textarea 
-              id="assessment" 
-              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 80px; font-family: inherit; font-size: 0.95rem;"
+              id="swal-assessment" 
+              class="swal2-textarea"
+              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 80px; font-family: inherit; font-size: 0.95rem; margin: 0; resize: vertical;"
               placeholder="Clinical assessment..."
             ></textarea>
           </div>
@@ -641,8 +645,9 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               Treatment Plan
             </label>
             <textarea 
-              id="treatment" 
-              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 80px; font-family: inherit; font-size: 0.95rem;"
+              id="swal-treatment" 
+              class="swal2-textarea"
+              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 80px; font-family: inherit; font-size: 0.95rem; margin: 0; resize: vertical;"
               placeholder="Recommended treatment..."
             ></textarea>
           </div>
@@ -652,32 +657,33 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               Prescriptions (JSON format or leave blank)
             </label>
             <textarea 
-              id="prescriptions" 
-              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 60px; font-family: 'Courier New', monospace; font-size: 0.85rem;"
+              id="swal-prescriptions" 
+              class="swal2-textarea"
+              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 60px; font-family: 'Courier New', monospace; font-size: 0.85rem; margin: 0; resize: vertical;"
               placeholder='[{"medication":"Paracetamol","dosage":"500mg","frequency":"3x daily","duration":"5 days"}]'
             ></textarea>
           </div>
           
           <div style="margin-bottom: 1rem;">
-            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
-              Follow-up Required?
+            <label style="display: flex; align-items: center; cursor: pointer;">
+              <input 
+                id="swal-followUpRequired" 
+                type="checkbox" 
+                style="margin-right: 0.5rem; cursor: pointer;"
+              />
+              <span style="font-weight: 600; color: #333;">Follow-up Required?</span>
             </label>
-            <input 
-              id="followUpRequired" 
-              type="checkbox" 
-              style="margin-right: 0.5rem;"
-            />
-            <label for="followUpRequired">Yes, schedule follow-up</label>
           </div>
           
-          <div id="followUpDate" style="display: none; margin-bottom: 1rem;">
+          <div id="swal-followUpDate" style="display: none; margin-bottom: 1rem;">
             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">
               Follow-up Date
             </label>
             <input 
-              id="followUpDateInput" 
+              id="swal-followUpDateInput" 
+              class="swal2-input"
               type="date" 
-              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; font-size: 0.95rem;"
+              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; font-size: 0.95rem; margin: 0;"
             />
           </div>
           
@@ -686,31 +692,35 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               Follow-up Notes
             </label>
             <textarea 
-              id="followUpNotes" 
-              style="width: 100%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 60px; font-family: inherit; font-size: 0.95rem;"
+              id="swal-followUpNotes" 
+              class="swal2-textarea"
+              style="width: 95%; padding: 0.75rem; border: 2px solid #e0e0e5; border-radius: 12px; min-height: 60px; font-family: inherit; font-size: 0.95rem; margin: 0; resize: vertical;"
               placeholder="Additional recommendations..."
             ></textarea>
           </div>
         </div>
-        <script>
-          document.getElementById('followUpRequired').addEventListener('change', function() {
-            document.getElementById('followUpDate').style.display = this.checked ? 'block' : 'none';
-          });
-        </script>
       `,
       width: '600px',
       showCancelButton: true,
       confirmButtonText: 'Save Notes',
       cancelButtonText: 'Cancel',
       confirmButtonColor: '#e51d5e',
+      didOpen: () => {
+        // Add event listener for follow-up checkbox
+        const followUpCheckbox = document.getElementById('swal-followUpRequired');
+        const followUpDateDiv = document.getElementById('swal-followUpDate');
+        followUpCheckbox.addEventListener('change', function() {
+          followUpDateDiv.style.display = this.checked ? 'block' : 'none';
+        });
+      },
       preConfirm: () => {
-        const diagnosis = document.getElementById('diagnosis').value.trim();
+        const diagnosis = document.getElementById('swal-diagnosis').value.trim();
         if (!diagnosis) {
           Swal.showValidationMessage('Diagnosis is required');
           return false;
         }
 
-        const prescriptionsText = document.getElementById('prescriptions').value.trim();
+        const prescriptionsText = document.getElementById('swal-prescriptions').value.trim();
         let prescriptions = [];
         if (prescriptionsText) {
           try {
@@ -723,15 +733,15 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
 
         return {
           diagnosis,
-          symptoms: document.getElementById('symptoms').value.trim(),
-          vitalSigns: document.getElementById('vitalSigns').value.trim(),
-          assessment: document.getElementById('assessment').value.trim(),
-          treatment: document.getElementById('treatment').value.trim(),
+          symptoms: document.getElementById('swal-symptoms').value.trim(),
+          vitalSigns: document.getElementById('swal-vitalSigns').value.trim(),
+          assessment: document.getElementById('swal-assessment').value.trim(),
+          treatment: document.getElementById('swal-treatment').value.trim(),
           prescriptions,
           followUpRecommendations: {
-            required: document.getElementById('followUpRequired').checked,
-            date: document.getElementById('followUpDateInput').value,
-            notes: document.getElementById('followUpNotes').value.trim()
+            required: document.getElementById('swal-followUpRequired').checked,
+            date: document.getElementById('swal-followUpDateInput').value,
+            notes: document.getElementById('swal-followUpNotes').value.trim()
           }
         };
       }
