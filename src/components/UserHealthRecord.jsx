@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaFileAlt, FaDownload, FaShare, FaLock, FaCalendar, FaCapsules, FaNotesMedical, FaHeartbeat, FaUser, FaStethoscope, FaAllergies, FaTint, FaFilePdf, FaFileExcel, FaCertificate, FaPhone, FaClipboardList } from "react-icons/fa";
+import { FaFileAlt, FaDownload, FaShare, FaLock, FaCalendar, FaCapsules, FaNotesMedical, FaHeartbeat, FaUser, FaStethoscope, FaAllergies, FaTint, FaFilePdf, FaFileExcel, FaCertificate, FaPhone, FaClipboardList, FaEye, FaTimes, FaCheckCircle, FaBan, FaExclamationTriangle } from "react-icons/fa";
 import UserPortalLayout from "./UserPortalLayout";
 import { PatientsAPI, CertificateAPI } from "../api";
 import Swal from "sweetalert2";
@@ -24,6 +24,8 @@ const UserHealthRecord = ({ user, onLogout }) => {
   const [patientRecord, setPatientRecord] = useState(null);
   const [loading, setLoading] = useState(true);
   const [myCertificates, setMyCertificates] = useState([]);
+  const [showCertPreview, setShowCertPreview] = useState(false);
+  const [selectedCertForView, setSelectedCertForView] = useState(null);
 
   useEffect(() => {
     loadHealthRecords();
@@ -59,6 +61,31 @@ const UserHealthRecord = ({ user, onLogout }) => {
       setMyCertificates(certificates);
     } catch (error) {
       console.error('Error loading certificates:', error);
+    }
+  };
+
+  // View certificate handler
+  const handleViewCertificate = (cert) => {
+    setSelectedCertForView(cert);
+    setShowCertPreview(true);
+  };
+
+  const closeCertPreview = () => {
+    setShowCertPreview(false);
+    setSelectedCertForView(null);
+  };
+
+  // Download certificate handler
+  const handleDownloadCertificate = async (certId) => {
+    try {
+      await CertificateAPI.downloadCertificate(certId);
+    } catch (error) {
+      Swal.fire({
+        title: 'Error',
+        text: error.message || 'Failed to download certificate',
+        icon: 'error',
+        confirmButtonColor: '#e51d5e'
+      });
     }
   };
 
@@ -715,6 +742,79 @@ const UserHealthRecord = ({ user, onLogout }) => {
               </button>
             </div>
 
+            {/* My Certificates Section */}
+            {myCertificates.length > 0 && (
+              <div className="my-certificates-section">
+                <h3 className="certificates-title">
+                  <FaCertificate /> My Medical Certificates
+                </h3>
+                <div className="certificates-list">
+                  {myCertificates.map((cert) => (
+                    <div key={cert._id} className={`certificate-card status-${cert.status?.toLowerCase()}`}>
+                      <div className="certificate-header">
+                        <div className="certificate-info-header">
+                          <h4>{cert.purpose || 'Medical Certificate'}</h4>
+                          <span className="certificate-date">
+                            <FaCalendar /> Requested: {new Date(cert.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <span className={`certificate-status-badge status-${cert.status?.toLowerCase()}`}>
+                          {cert.status?.toLowerCase() === 'pending' && <FaExclamationTriangle />}
+                          {cert.status?.toLowerCase() === 'issued' && <FaCheckCircle />}
+                          {cert.status?.toLowerCase() === 'rejected' && <FaBan />}
+                          {cert.status}
+                        </span>
+                      </div>
+                      
+                      <div className="certificate-body">
+                        {cert.requestNotes && (
+                          <p className="certificate-notes">
+                            <strong>Notes:</strong> {cert.requestNotes}
+                          </p>
+                        )}
+                        
+                        {cert.status?.toLowerCase() === 'issued' && cert.issuedAt && (
+                          <p className="certificate-issued-date">
+                            <strong>Issued on:</strong> {new Date(cert.issuedAt).toLocaleDateString()}
+                          </p>
+                        )}
+                        
+                        {cert.status?.toLowerCase() === 'rejected' && cert.rejectionReason && (
+                          <p className="certificate-rejection">
+                            <strong>Rejection Reason:</strong> {cert.rejectionReason}
+                          </p>
+                        )}
+                      </div>
+                      
+                      <div className="certificate-actions">
+                        {cert.status?.toLowerCase() === 'pending' && (
+                          <span className="pending-message">
+                            <FaExclamationTriangle /> Waiting for clinic approval
+                          </span>
+                        )}
+                        {cert.status?.toLowerCase() === 'issued' && (
+                          <>
+                            <button 
+                              className="cert-action-btn view-btn"
+                              onClick={() => handleViewCertificate(cert)}
+                            >
+                              <FaEye /> View Certificate
+                            </button>
+                            <button 
+                              className="cert-action-btn download-btn"
+                              onClick={() => handleDownloadCertificate(cert._id)}
+                            >
+                              <FaDownload /> Download PDF
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Categories */}
             <div className="records-categories">
               <button 
@@ -992,6 +1092,89 @@ const UserHealthRecord = ({ user, onLogout }) => {
           <FaLock className="lock-icon" />
           <p>Your health records are private and secure. Only you and your healthcare providers can access this information.</p>
         </div>
+
+        {/* Certificate Preview Modal */}
+        {showCertPreview && selectedCertForView && (
+          <div className="cert-preview-modal-overlay" onClick={closeCertPreview}>
+            <div className="cert-preview-modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2><FaCertificate /> Medical Certificate</h2>
+                <button className="close-modal-btn" onClick={closeCertPreview}>
+                  <FaTimes />
+                </button>
+              </div>
+
+              <div className="cert-preview-content">
+                <div className="cert-preview-header">
+                  <h3>UNIVERSITY OF THE ASSUMPTION CLINIC</h3>
+                  <h4>MEDICAL CERTIFICATE</h4>
+                </div>
+
+                <div className="cert-preview-body">
+                  <div className="cert-info-section">
+                    <div className="cert-info-row">
+                      <span className="cert-label">Patient Name:</span>
+                      <span className="cert-value">{user?.name || user?.fullName}</span>
+                    </div>
+                    <div className="cert-info-row">
+                      <span className="cert-label">Purpose:</span>
+                      <span className="cert-value">{selectedCertForView.purpose}</span>
+                    </div>
+                    <div className="cert-info-row">
+                      <span className="cert-label">Date Issued:</span>
+                      <span className="cert-value">
+                        {new Date(selectedCertForView.issuedAt || selectedCertForView.createdAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                  </div>
+
+                  {selectedCertForView.diagnosis && (
+                    <div className="cert-info-section">
+                      <h4 className="cert-section-title">Diagnosis</h4>
+                      <div 
+                        className="cert-content-box"
+                        dangerouslySetInnerHTML={{ __html: selectedCertForView.diagnosis }}
+                      />
+                    </div>
+                  )}
+
+                  {selectedCertForView.recommendations && (
+                    <div className="cert-info-section">
+                      <h4 className="cert-section-title">Recommendations</h4>
+                      <div 
+                        className="cert-content-box"
+                        dangerouslySetInnerHTML={{ __html: selectedCertForView.recommendations }}
+                      />
+                    </div>
+                  )}
+
+                  <div className="cert-footer-note">
+                    <p><em>This is a preview only. Use the Download button to get an official PDF copy.</em></p>
+                  </div>
+                </div>
+
+                <div className="cert-modal-actions">
+                  <button className="cert-modal-btn close-btn" onClick={closeCertPreview}>
+                    Close
+                  </button>
+                  <button 
+                    className="cert-modal-btn download-btn" 
+                    onClick={() => {
+                      handleDownloadCertificate(selectedCertForView._id);
+                      closeCertPreview();
+                    }}
+                  >
+                    <FaDownload /> Download PDF
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </UserPortalLayout>
   );
