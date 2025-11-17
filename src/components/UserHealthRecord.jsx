@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaFileAlt, FaDownload, FaShare, FaLock, FaCalendar, FaCapsules, FaNotesMedical, FaHeartbeat, FaUser, FaStethoscope, FaAllergies, FaTint, FaFilePdf, FaFileExcel, FaCertificate, FaPhone, FaClipboardList, FaEye, FaTimes, FaCheckCircle, FaBan, FaExclamationTriangle } from "react-icons/fa";
+import { FaFileAlt, FaShare, FaLock, FaCalendar, FaCapsules, FaNotesMedical, FaHeartbeat, FaUser, FaStethoscope, FaAllergies, FaTint, FaFilePdf, FaFileExcel, FaCertificate, FaPhone, FaClipboardList, FaEye, FaTimes, FaCheckCircle, FaBan, FaExclamationTriangle } from "react-icons/fa";
 import UserPortalLayout from "./UserPortalLayout";
 import { PatientsAPI, CertificateAPI } from "../api";
 import Swal from "sweetalert2";
@@ -73,20 +73,6 @@ const UserHealthRecord = ({ user, onLogout }) => {
   const closeCertPreview = () => {
     setShowCertPreview(false);
     setSelectedCertForView(null);
-  };
-
-  // Download certificate handler
-  const handleDownloadCertificate = async (certId) => {
-    try {
-      await CertificateAPI.downloadCertificate(certId);
-    } catch (error) {
-      Swal.fire({
-        title: 'Error',
-        text: error.message || 'Failed to download certificate',
-        icon: 'error',
-        confirmButtonColor: '#e51d5e'
-      });
-    }
   };
 
   // Export to PDF
@@ -793,20 +779,12 @@ const UserHealthRecord = ({ user, onLogout }) => {
                           </span>
                         )}
                         {cert.status?.toLowerCase() === 'issued' && (
-                          <>
-                            <button 
-                              className="cert-action-btn view-btn"
-                              onClick={() => handleViewCertificate(cert)}
-                            >
-                              <FaEye /> View Certificate
-                            </button>
-                            <button 
-                              className="cert-action-btn download-btn"
-                              onClick={() => handleDownloadCertificate(cert._id)}
-                            >
-                              <FaDownload /> Download PDF
-                            </button>
-                          </>
+                          <button 
+                            className="cert-action-btn view-btn"
+                            onClick={() => handleViewCertificate(cert)}
+                          >
+                            <FaEye /> View Certificate
+                          </button>
                         )}
                       </div>
                     </div>
@@ -1153,22 +1131,13 @@ const UserHealthRecord = ({ user, onLogout }) => {
                   )}
 
                   <div className="cert-footer-note">
-                    <p><em>This is a preview only. Use the Download button to get an official PDF copy.</em></p>
+                    <p><em>This is a view-only certificate. Contact the clinic if you need an official copy.</em></p>
                   </div>
                 </div>
 
                 <div className="cert-modal-actions">
                   <button className="cert-modal-btn close-btn" onClick={closeCertPreview}>
                     Close
-                  </button>
-                  <button 
-                    className="cert-modal-btn download-btn" 
-                    onClick={() => {
-                      handleDownloadCertificate(selectedCertForView._id);
-                      closeCertPreview();
-                    }}
-                  >
-                    <FaDownload /> Download PDF
                   </button>
                 </div>
               </div>
