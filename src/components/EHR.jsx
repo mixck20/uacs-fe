@@ -1058,23 +1058,35 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                 <div className="form-row form-row-4">
                   <div className="form-group">
                     <label>HT (Height)</label>
-                    <input
-                      type="text"
-                      name="height"
-                      placeholder="e.g., 170 cm"
-                      value={newRecord.height}
-                      onChange={handleRecordChange}
-                    />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input
+                        type="number"
+                        name="height"
+                        placeholder="e.g., 170"
+                        value={newRecord.height}
+                        onChange={handleRecordChange}
+                        min="0"
+                        step="0.1"
+                        style={{ flex: 1 }}
+                      />
+                      <span style={{ fontWeight: '500', color: '#666' }}>cm</span>
+                    </div>
                   </div>
                   <div className="form-group">
                     <label>WT (Weight)</label>
-                    <input
-                      type="text"
-                      name="weight"
-                      placeholder="e.g., 65 kg"
-                      value={newRecord.weight}
-                      onChange={handleRecordChange}
-                    />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input
+                        type="number"
+                        name="weight"
+                        placeholder="e.g., 65"
+                        value={newRecord.weight}
+                        onChange={handleRecordChange}
+                        min="0"
+                        step="0.1"
+                        style={{ flex: 1 }}
+                      />
+                      <span style={{ fontWeight: '500', color: '#666' }}>kg</span>
+                    </div>
                   </div>
                   <div className="form-group">
                     <label>BP (Blood Pressure)</label>
@@ -1089,7 +1101,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                   <div className="form-group">
                     <label>LMP (for female)</label>
                     <input
-                      type="text"
+                      type="date"
                       name="lmp"
                       placeholder="Last Menstrual Period"
                       value={newRecord.lmp}
