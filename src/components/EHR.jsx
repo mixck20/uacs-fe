@@ -1499,7 +1499,12 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                   <div className="cert-info-section">
                     <div className="cert-info-row">
                       <span className="cert-label">Patient Name:</span>
-                      <span className="cert-value">{selectedCertForView.patientName}</span>
+                      <span className="cert-value">
+                        {selectedCertForView.patientId?.fullName || 
+                         selectedCertForView.patientId?.name || 
+                         selectedCertForView.patientName || 
+                         'Unknown Patient'}
+                      </span>
                     </div>
                     <div className="cert-info-row">
                       <span className="cert-label">Purpose:</span>
