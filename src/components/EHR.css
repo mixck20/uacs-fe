@@ -1612,6 +1612,114 @@
   max-height: none !important;
 }
 
+/* Certificate Preview Modal */
+.cert-preview-modal {
+  max-width: 800px;
+}
+
+.cert-preview-content {
+  text-align: left;
+  padding: 20px;
+}
+
+.cert-preview-header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid #e51d5e;
+}
+
+.cert-preview-header h3 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #e51d5e;
+  font-weight: 700;
+}
+
+.cert-preview-header h4 {
+  margin: 8px 0 0 0;
+  font-size: 1.4rem;
+  color: #374151;
+  font-weight: 600;
+}
+
+.cert-preview-body {
+  padding: 20px 0;
+}
+
+.cert-info-section {
+  margin-bottom: 24px;
+}
+
+.cert-info-row {
+  display: flex;
+  margin-bottom: 12px;
+  padding: 8px 0;
+}
+
+.cert-label {
+  font-weight: 600;
+  color: #374151;
+  min-width: 140px;
+  font-size: 15px;
+}
+
+.cert-value {
+  color: #1f2937;
+  flex: 1;
+  font-size: 15px;
+}
+
+.cert-section-title {
+  font-size: 1.1rem;
+  color: #e51d5e;
+  margin-bottom: 12px;
+  font-weight: 600;
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 8px;
+}
+
+.cert-content-box {
+  background: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid #e51d5e;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #374151;
+  min-height: 60px;
+}
+
+.cert-content-box p {
+  margin: 0 0 8px 0;
+}
+
+.cert-content-box p:last-child {
+  margin-bottom: 0;
+}
+
+.cert-footer-note {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 2px solid #f3f4f6;
+  text-align: center;
+}
+
+.cert-footer-note p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.view-btn {
+  background: #10b981;
+  color: white;
+}
+
+.view-btn:hover {
+  background: #059669;
+}
+
 @media (max-width: 768px) {
   .ehr-tabs {
     overflow-x: auto;
@@ -1635,4 +1743,22 @@
     width: 100%;
     justify-content: center;
   }
+
+  .cert-info-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cert-label {
+    min-width: auto;
+  }
+
+  .cert-preview-header h3 {
+    font-size: 1.4rem;
+  }
+
+  .cert-preview-header h4 {
+    font-size: 1.1rem;
+  }
 }
+

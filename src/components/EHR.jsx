@@ -16,6 +16,8 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
   const [certificates, setCertificates] = useState([]);
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [showCertificates, setShowCertificates] = useState(false);
+  const [showCertPreview, setShowCertPreview] = useState(false);
+  const [selectedCertForView, setSelectedCertForView] = useState(null);
 
   // EHR record form state
   const [newRecord, setNewRecord] = useState({
@@ -673,6 +675,16 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     }
   }
 
+  function handleViewCertificate(cert) {
+    setSelectedCertForView(cert);
+    setShowCertPreview(true);
+  }
+
+  function closeCertPreview() {
+    setShowCertPreview(false);
+    setSelectedCertForView(null);
+  }
+
   // --- Filter patients by search ---
   const filteredPatients = patients.filter(p =>
     ((p.fullName || p.name || "").toLowerCase().includes(search.toLowerCase()))
@@ -977,12 +989,20 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                           </>
                         )}
                         {cert.status?.toLowerCase() === 'issued' && (
-                          <button 
-                            className="cert-btn download-btn"
-                            onClick={() => handleDownloadCertificate(cert._id)}
-                          >
-                            <FaDownload /> Download PDF
-                          </button>
+                          <>
+                            <button 
+                              className="cert-btn view-btn"
+                              onClick={() => handleViewCertificate(cert)}
+                            >
+                              <FaEye /> View Certificate
+                            </button>
+                            <button 
+                              className="cert-btn download-btn"
+                              onClick={() => handleDownloadCertificate(cert._id)}
+                            >
+                              <FaDownload /> Download PDF
+                            </button>
+                          </>
                         )}
                       </div>
                     </div>
@@ -1451,6 +1471,80 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
 
               <div className="ehr-modal-actions">
                 <button className="ehr-btn cancel-btn" onClick={() => setShowDetailsModal(false)}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Certificate Preview Modal */}
+        {showCertPreview && selectedCertForView && (
+          <div className="ehr-modal">
+            <div className="ehr-modal-content cert-preview-modal">
+              <div className="modal-header">
+                <h2><FaCertificate /> Medical Certificate Preview</h2>
+                <button className="close-modal-btn" onClick={closeCertPreview}>
+                  <FaTimes />
+                </button>
+              </div>
+
+              <div className="cert-preview-content">
+                <div className="cert-preview-header">
+                  <h3>UNIVERSITY OF THE ASSUMPTION CLINIC</h3>
+                  <h4>MEDICAL CERTIFICATE</h4>
+                </div>
+
+                <div className="cert-preview-body">
+                  <div className="cert-info-section">
+                    <div className="cert-info-row">
+                      <span className="cert-label">Patient Name:</span>
+                      <span className="cert-value">{selectedCertForView.patientName}</span>
+                    </div>
+                    <div className="cert-info-row">
+                      <span className="cert-label">Purpose:</span>
+                      <span className="cert-value">{selectedCertForView.purpose}</span>
+                    </div>
+                    <div className="cert-info-row">
+                      <span className="cert-label">Date Issued:</span>
+                      <span className="cert-value">
+                        {new Date(selectedCertForView.issuedAt || selectedCertForView.createdAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                  </div>
+
+                  {selectedCertForView.diagnosis && (
+                    <div className="cert-info-section">
+                      <h4 className="cert-section-title">Diagnosis</h4>
+                      <div 
+                        className="cert-content-box"
+                        dangerouslySetInnerHTML={{ __html: selectedCertForView.diagnosis }}
+                      />
+                    </div>
+                  )}
+
+                  {selectedCertForView.recommendations && (
+                    <div className="cert-info-section">
+                      <h4 className="cert-section-title">Recommendations</h4>
+                      <div 
+                        className="cert-content-box"
+                        dangerouslySetInnerHTML={{ __html: selectedCertForView.recommendations }}
+                      />
+                    </div>
+                  )}
+
+                  <div className="cert-footer-note">
+                    <p><em>This is a preview only. Download the PDF for an official copy.</em></p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="ehr-modal-actions">
+                <button className="ehr-btn cancel-btn" onClick={closeCertPreview}>
                   Close
                 </button>
               </div>
