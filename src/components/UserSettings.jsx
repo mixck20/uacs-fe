@@ -412,7 +412,7 @@ const UserSettings = ({ user, onLogout, onUserUpdate }) => {
                 <div className="notification-setting">
                   <div className="setting-info">
                     <h3>Email Notifications</h3>
-                    <p>Receive updates about your appointments and health records via email</p>
+                    <p>Receive updates about your appointments and medical records via email</p>
                   </div>
                   <label className="switch">
                     <input

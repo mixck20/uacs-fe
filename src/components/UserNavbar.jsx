@@ -226,7 +226,7 @@ const UserNavbar = ({ user, onLogout }) => {
           className={`user-nav-link ${location.pathname === '/records' ? 'active' : ''}`}
           onClick={handleNavClick}
         >
-          Health Records
+          Medical Records
         </Link>
         <Link 
           to="/feedback" 

@@ -43,10 +43,10 @@ const UserHealthRecord = ({ user, onLogout }) => {
         console.log('ℹ️ No patient record found yet - user has not visited clinic');
         setPatientRecord(null);
       } else {
-        console.error('Error loading health records:', error);
+        console.error('Error loading medical records:', error);
         Swal.fire({
           title: 'Error',
-          text: 'Failed to load health records',
+          text: 'Failed to load medical records',
           icon: 'error'
         });
       }
@@ -95,7 +95,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
     yPos += 13;
     doc.setFontSize(12);
     doc.setTextColor(60);
-    doc.text('CLINIC - PERSONAL HEALTH RECORDS', pageWidth / 2, yPos, { align: 'center' });
+    doc.text('CLINIC - PERSONAL MEDICAL RECORDS', pageWidth / 2, yPos, { align: 'center' });
     yPos += 15;
 
     // Patient Info
@@ -344,7 +344,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
       doc.setFont("helvetica", "italic");
       doc.setTextColor(128, 128, 128);
       doc.text(
-        `Personal Health Records | Generated ${new Date().toLocaleDateString()} | Page ${i} of ${totalPages}`,
+        `Personal Medical Records | Generated ${new Date().toLocaleDateString()} | Page ${i} of ${totalPages}`,
         pageWidth / 2,
         pageHeight - 10,
         { align: "center" }
@@ -352,7 +352,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
     }
 
     doc.save(`Health-Records_${user?.name || 'Patient'}_${new Date().toISOString().split('T')[0]}.pdf`);
-    Swal.fire('Success!', 'Complete health records exported to PDF', 'success');
+    Swal.fire('Success!', 'Complete medical records exported to PDF', 'success');
   };
 
   // Export to Excel
@@ -388,7 +388,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
     XLSX.utils.book_append_sheet(workbook, visitsSheet, 'Visit History');
 
     XLSX.writeFile(workbook, `health-records-${new Date().toISOString().split('T')[0]}.xlsx`);
-    Swal.fire('Success!', 'Health records exported to Excel', 'success');
+    Swal.fire('Success!', 'Medical records exported to Excel', 'success');
   };
 
   // Request Medical Certificate
@@ -405,10 +405,10 @@ const UserHealthRecord = ({ user, onLogout }) => {
       return;
     }
 
-    // Check if there are any health records
+    // Check if there are any medical records
     if (!patientRecord || !patientRecord.visits || patientRecord.visits.length === 0) {
       Swal.fire({
-        title: 'No Health Records',
+        title: 'No Medical Records',
         text: 'You need to have at least one clinic visit before requesting a medical certificate.',
         icon: 'info'
       });
@@ -597,7 +597,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
     return (
       <UserPortalLayout user={user} onLogout={onLogout} currentPage="health-record">
         <div className="health-records-page">
-          <div className="loading-state">Loading your health records...</div>
+          <div className="loading-state">Loading your medical records...</div>
         </div>
       </UserPortalLayout>
     );
@@ -608,7 +608,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
       <div className="health-records-page">
         <div className="page-header">
           <div>
-            <h1>Health Records</h1>
+            <h1>Medical Records</h1>
             <p className="user-info">
               {user?.name || user?.fullName || 'User'}
             </p>
@@ -1053,22 +1053,22 @@ const UserHealthRecord = ({ user, onLogout }) => {
               <div className="no-records-message">
                 <FaFileAlt size={48} />
                 <h3>No Records in This Category</h3>
-                <p>Try selecting a different category to view your health records.</p>
+                <p>Try selecting a different category to view your medical records.</p>
               </div>
             )}
           </>
         ) : (
           <div className="no-records-message">
             <FaFileAlt size={48} />
-            <h3>No Health Records Yet</h3>
-            <p>Your health records will appear here after your first consultation with the clinic.</p>
+            <h3>No Medical Records Yet</h3>
+            <p>Your medical records will appear here after your first consultation with the clinic.</p>
             <p className="hint">Book an appointment to get started!</p>
           </div>
         )}
 
         <div className="privacy-notice">
           <FaLock className="lock-icon" />
-          <p>Your health records are private and secure. Only you and your healthcare providers can access this information.</p>
+          <p>Your medical records are private and secure. Only you and your healthcare providers can access this information.</p>
         </div>
 
         {/* Certificate Preview Modal */}
