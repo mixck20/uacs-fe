@@ -568,7 +568,7 @@ function UserManagement() {
                     <label>Role *</label>
                     <select name="role" value={form.role} onChange={handleFormChange} required>
                       <option value="student">Student</option>
-                      <option value="faculty">Faculty</option>
+                      <option value="employee">Employee</option>
                       <option value="clinic_staff">Clinic Staff</option>
                       <option value="admin">Admin</option>
                     </select>

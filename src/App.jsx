@@ -222,7 +222,7 @@ function App() {
   };
 
   const getActiveComponent = () => {
-    if (['student', 'faculty'].includes(userRole)) {
+    if (['student', 'employee'].includes(userRole)) {
       return (
         <UserDashboard
           {...commonProps}
@@ -347,7 +347,7 @@ function App() {
                 </Routes>
               </div>
             ) :
-            ['student', 'faculty'].includes(userRole) ? (
+            ['student', 'employee'].includes(userRole) ? (
               <div className="app-container">
                 <Routes>
                   <Route path="/dashboard" element={

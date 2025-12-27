@@ -13,7 +13,7 @@ function Email({ patients, setActivePage, onLogout, user }) {
   const [stats, setStats] = useState({
     totalEmails: 0,
     studentsWithEmail: 0,
-    facultyWithEmail: 0,
+    employeesWithEmail: 0,
     openRate: 0
   });
   const [smtpConfig, setSMTPConfig] = useState({ configured: false, verified: false });
@@ -260,8 +260,8 @@ function Email({ patients, setActivePage, onLogout, user }) {
     if (composeForm.recipientType === "all") {
       if (composeForm.recipientGroup === "students") {
         return patients.filter(p => p.role === "Student" && p.emailUpdates).length;
-      } else if (composeForm.recipientGroup === "faculty") {
-        return patients.filter(p => p.role === "Faculty" && p.emailUpdates).length;
+      } else if (composeForm.recipientGroup === "employees") {
+        return patients.filter(p => p.role === "Employee" && p.emailUpdates).length;
       } else {
         return patients.filter(p => p.emailUpdates).length;
       }
@@ -456,7 +456,7 @@ function Email({ patients, setActivePage, onLogout, user }) {
                       onChange={handleComposeFormChange}
                     >
                       <option value="students">Students</option>
-                      <option value="faculty">Faculty</option>
+                      <option value="employees">Employees</option>
                       <option value="both">Both</option>
                     </select>
                   )}

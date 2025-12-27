@@ -67,7 +67,7 @@ const Signup = () => {
       if (emailLower.includes('.student@ua.edu.ph')) {
         setDetectedRole('student');
       } else if (emailLower.endsWith('@ua.edu.ph') && emailLower.length > '@ua.edu.ph'.length) {
-        setDetectedRole('faculty');
+        setDetectedRole('employee');
       } else {
         setDetectedRole(null);
       }
@@ -116,16 +116,16 @@ const Signup = () => {
     // Role-specific validation
     const emailLower = form.email.toLowerCase().trim();
     const isStudent = emailLower.includes('.student@ua.edu.ph');
-    const isFaculty = emailLower.endsWith('@ua.edu.ph') && !isStudent;
+    const isEmployee = emailLower.endsWith('@ua.edu.ph') && !isStudent;
 
     if (isStudent) {
       if (!form.course || !form.yearLevel) {
         setError("Students must select a course and year level");
         return;
       }
-    } else if (isFaculty) {
+    } else if (isEmployee) {
       if (!form.department) {
-        setError("Faculty must select a department");
+        setError("Employees must select a department");
         return;
       }
     }
@@ -151,8 +151,8 @@ const Signup = () => {
         }
         // Generate legacy courseYear field for backwards compatibility
         payload.courseYear = formatCourseYearSection(form.course, parseInt(form.yearLevel), form.section);
-      } else if (isFaculty) {
-        // Faculty: Add department only
+      } else if (isEmployee) {
+        // Employee: Add department only
         payload.department = form.department;
       }
 
@@ -318,15 +318,15 @@ const Signup = () => {
               </div>
               <div style={{
                 fontSize: "0.75rem",
-                color: detectedRole === 'student' ? '#10b981' : detectedRole === 'faculty' ? '#3b82f6' : '#64748b',
+                color: detectedRole === 'student' ? '#10b981' : detectedRole === 'employee' ? '#3b82f6' : '#64748b',
                 marginTop: "-0.75rem",
                 marginBottom: "0.75rem",
                 textAlign: "center",
                 fontWeight: detectedRole ? '600' : '400'
               }}>
                 {detectedRole === 'student' && '✓ Student account detected'}
-                {detectedRole === 'faculty' && '✓ Faculty account detected'}
-                {!detectedRole && 'Your role (Student/Faculty) will be automatically determined from your email'}
+                {detectedRole === 'employee' && '✓ Employee account detected'}
+                {!detectedRole && 'Your role (Student/Employee) will be automatically determined from your email'}
               </div>
 
               {/* Dynamic fields based on detected role */}
@@ -390,9 +390,9 @@ const Signup = () => {
                 </>
               )}
 
-              {detectedRole === 'faculty' && (
+              {detectedRole === 'employee' && (
                 <>
-                  {/* Department - For Faculty */}
+                  {/* Department - For Employee */}
                   <div className="signup-row">
                     <div className="signup-input-container">
                       <select

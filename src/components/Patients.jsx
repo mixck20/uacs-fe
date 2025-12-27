@@ -86,11 +86,11 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
       return;
     }
 
-    // Email is required for student, faculty, and staff only
-    if (['student', 'faculty', 'staff'].includes(form.patientType) && !form.email) {
+    // Email is required for student, employee only
+    if (['student', 'employee'].includes(form.patientType) && !form.email) {
       Swal.fire({ 
         title: "Missing Required Field", 
-        text: "Email is required for students, faculty, and staff", 
+        text: "Email is required for students and employees", 
         icon: "warning" 
       });
       return;
@@ -102,7 +102,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
       if (!emailRegex.test(form.email)) {
         Swal.fire({ 
           title: "Invalid Email", 
-          text: "Please use a valid school email (@ua.edu.ph) for students, faculty, and staff", 
+          text: "Please use a valid school email (@ua.edu.ph) for students and employees", 
           icon: "warning" 
         });
         return;
@@ -125,13 +125,13 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         gender: form.sex,
         religion: form.religion || "",
         address: form.address || "",
-        patientType: form.patientType, // student, faculty, staff, visitor
+        patientType: form.patientType, // student, employee, visitor
         // Academic info - only for students
         ...(form.patientType === 'student' && form.course ? { course: form.course } : {}),
         ...(form.patientType === 'student' && form.yearLevel ? { yearLevel: form.yearLevel } : {}),
         ...(form.patientType === 'student' && form.section ? { section: form.section.toUpperCase() } : {}),
-        // Department - only for faculty
-        ...(form.patientType === 'faculty' && form.department ? { department: form.department } : {}),
+        // Department - only for employee
+        ...(form.patientType === 'employee' && form.department ? { department: form.department } : {}),
         fatherName: form.fatherName || "",
         motherName: form.motherName || "",
         spouseName: form.spouseName || "",
@@ -537,12 +537,8 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
             <div className="patients-stat-label">Students</div>
           </div>
           <div className="patients-stat-card">
-            <div className="patients-stat-number">{patients.filter(p => p.patientType === 'Faculty').length}</div>
-            <div className="patients-stat-label">Faculty</div>
-          </div>
-          <div className="patients-stat-card">
-            <div className="patients-stat-number">{patients.filter(p => p.patientType === 'Staff').length}</div>
-            <div className="patients-stat-label">Staff</div>
+            <div className="patients-stat-number">{patients.filter(p => p.patientType === 'Employee').length}</div>
+            <div className="patients-stat-label">Employees</div>
           </div>
         </div>
 
@@ -652,16 +648,10 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                       <div className="patient-type-label">Student</div>
                     </div>
                     <div 
-                      className={`patient-type-card ${form.patientType === 'faculty' ? 'selected' : ''}`}
-                      onClick={() => setForm({ ...form, patientType: 'faculty' })}
+                      className={`patient-type-card ${form.patientType === 'employee' ? 'selected' : ''}`}
+                      onClick={() => setForm({ ...form, patientType: 'employee' })}
                     >
-                      <div className="patient-type-label">Faculty</div>
-                    </div>
-                    <div 
-                      className={`patient-type-card ${form.patientType === 'staff' ? 'selected' : ''}`}
-                      onClick={() => setForm({ ...form, patientType: 'staff' })}
-                    >
-                      <div className="patient-type-label">Staff</div>
+                      <div className="patient-type-label">Employee</div>
                     </div>
                     <div 
                       className={`patient-type-card ${form.patientType === 'visitor' ? 'selected' : ''}`}
@@ -876,9 +866,9 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                 </div>
                 )}
 
-                {form.patientType === 'faculty' && (
+                {form.patientType === 'employee' && (
                   <div className="form-section">
-                    <h3 className="form-section-title">Department (Faculty)</h3>
+                    <h3 className="form-section-title">Department (Employee)</h3>
                     <div className="patients-form-grid">
                       <div className="patients-form-group patients-form-group-full">
                         <label>Department <span className="required">*</span></label>
@@ -902,15 +892,15 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                       </div>
                     </div>
                     <p className="form-note">
-                      <small>Select the academic department this faculty member belongs to.</small>
+                      <small>Select the academic department this employee belongs to.</small>
                     </p>
                   </div>
                 )}
 
-                {(form.patientType === 'staff' || form.patientType === 'visitor') && (
+                {form.patientType === 'visitor' && (
                   <div className="form-section">
                     <p className="form-note" style={{ textAlign: 'center', padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
-                      <small><strong>Staff/Visitor:</strong> No additional academic information required. Please continue with Family and Emergency Contact information below.</small>
+                      <small><strong>Visitor:</strong> No additional academic information required. Please continue with Family and Emergency Contact information below.</small>
                     </p>
                   </div>
                 )}

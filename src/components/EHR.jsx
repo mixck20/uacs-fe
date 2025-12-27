@@ -19,7 +19,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
   const [showCertPreview, setShowCertPreview] = useState(false);
   const [selectedCertForView, setSelectedCertForView] = useState(null);
 
-  // EHR record form state
+  // EMR record form state
   const [newRecord, setNewRecord] = useState({
     date: "",
     age: "",
@@ -44,9 +44,9 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        console.log('Fetching patients for EHR...');
+        console.log('Fetching patients for EMR...');
         const data = await PatientsAPI.list();
-        console.log(`Successfully fetched ${data.length} patients for EHR`);
+        console.log(`Successfully fetched ${data.length} patients for EMR`);
         setPatients(data || []);
       } catch (err) {
         console.error("Failed to fetch patients:", err);
@@ -530,7 +530,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     }
 
     // Save PDF
-    const fileName = `EHR_${selectedPatient.fullName || selectedPatient.name || 'Patient'}_${new Date().toISOString().split('T')[0]}.pdf`;
+    const fileName = `EMR_${selectedPatient.fullName || selectedPatient.name || 'Patient'}_${new Date().toISOString().split('T')[0]}.pdf`;
     doc.save(fileName);
   }
 
@@ -695,7 +695,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
       <ClinicNavbar activePage={activePage} setActivePage={setActivePage} onLogout={onLogout} user={user} />
       <div className="clinic-content">
         <div className="ehr-header">
-          <h1 className="ehr-title">Electronic Health Records</h1>
+          <h1 className="ehr-title">Electronic Medical Record (EMR)</h1>
           <button 
             className="cert-requests-btn"
             onClick={() => setShowCertificates(!showCertificates)}
