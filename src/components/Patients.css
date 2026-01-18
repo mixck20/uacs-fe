@@ -277,6 +277,11 @@
   color: white;
 }
 
+.patient-type-employee {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
 .patient-type-faculty {
   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
   color: white;

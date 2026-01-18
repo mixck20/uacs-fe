@@ -141,7 +141,7 @@ const ClinicNavbar = ({ activePage, setActivePage, onLogout, user }) => {
           className={`clinic-nav-link ${activePage === "ehr" ? "active" : ""}`}
           onClick={() => handleNavClick("ehr")}
         >
-          EHR
+          EMR
         </span>
         <span 
           className={`clinic-nav-link ${activePage === "schedule" ? "active" : ""}`}
