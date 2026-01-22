@@ -456,8 +456,18 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
             return;
           }
 
-          // Parse CSV header
-          const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+          // Parse CSV header - convert to camelCase for consistency
+          const rawHeaders = lines[0].split(',').map(h => h.trim());
+          
+          // Helper function to convert header to camelCase
+          const toCamelCase = (str) => {
+            return str
+              .toLowerCase()
+              .replace(/[\s_-]+(.)/g, (_, char) => char.toUpperCase())
+              .replace(/^(.)/, (_, char) => char.toLowerCase());
+          };
+          
+          const headers = rawHeaders.map(h => toCamelCase(h));
           const patients = [];
 
           // Parse data rows
