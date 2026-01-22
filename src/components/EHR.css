@@ -303,8 +303,15 @@
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   box-shadow: 0 2px 8px rgba(229, 29, 94, 0.25);
+}
+
+.empty-state .ehr-btn.add-btn svg {
+  display: flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .empty-state .ehr-btn.add-btn:hover {

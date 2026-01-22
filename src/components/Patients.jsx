@@ -45,7 +45,6 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     guardianRelationship: "",
     guardianEmail: "",
     guardianPhone: "",
-    guardianNotifyOnVisit: false,
   });
 
   function handleFormChange(e) {
@@ -149,7 +148,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
             relationship: form.guardianRelationship || "",
             email: form.guardianEmail || "",
             phone: form.guardianPhone || "",
-            notifyOnVisit: form.guardianNotifyOnVisit || false,
+            notifyOnVisit: true,
           }
         } : {}),
       };
@@ -182,7 +181,6 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         guardianRelationship: "",
         guardianEmail: "",
         guardianPhone: "",
-        guardianNotifyOnVisit: false,
       });
       setShowForm(false);
       Swal.fire({ title: "Patient added successfully!", icon: "success", timer: 1500, showConfirmButton: false });
@@ -1287,17 +1285,8 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                         />
                       </div>
                       <div className="patients-form-group patients-form-group-full">
-                        <label className="patients-form-checkbox">
-                          <input
-                            type="checkbox"
-                            name="guardianNotifyOnVisit"
-                            checked={form.guardianNotifyOnVisit || false}
-                            onChange={(e) => setForm({ ...form, guardianNotifyOnVisit: e.target.checked })}
-                          />
-                          <span>Send email notification to guardian when student visits the clinic</span>
-                        </label>
-                        <small style={{ display: 'block', marginTop: '0.5rem', color: '#6b7280' }}>
-                          Notifications will include visit date, general reason, and recommendations (no detailed medical information).
+                        <small style={{ display: 'block', color: '#6b7280' }}>
+                          <strong>Note:</strong> Email notifications will automatically be sent to the guardian when the student visits the clinic. Notifications include visit date, general reason, and recommendations (no detailed medical information).
                         </small>
                       </div>
                     </div>
