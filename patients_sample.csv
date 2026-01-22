@@ -1,4 +1,6 @@
-surname,firstName,middleName,email,gender,dateOfBirth,cellNumber,birthplace,religion,address,patientType,bloodType,course,yearLevel,section,department,emergencyName,emergencyRelationship,emergencyCel
-DelaC,Juan,Santos,jdelacruz.student@ua.edu.ph,Male,1998-05-15,09171234567,Manila,Catholic,Manila,student,O+,BS IT,2,A,Engineering,Maria DelaC,Mother,09171234568
-Santos,Maria,Garcia,msantos.student@ua.edu.ph,Female,1999-08-22,09181234567,QC,Catholic,QC,student,A+,BS Psychology,2,B,Liberal Arts,Roberto Santos,Father,09181234568
-Lopez,Pedro,Torres,plopez.employee@ua.edu.ph,Male,1985-03-10,09191234567,Makati,Roman Catholic,Makati,employee,B+,Staff,N/A,N/A,Student Services,Anna Lopez,Spouse,09191234568
+surname,firstName,middleName,email,gender,dateOfBirth,cellNumber,birthplace,religion,address,patientType,bloodType,course,yearLevel,section,department,emergencyName,emergencyRelationship,emergencyCel,allergies,medicalHistory
+DelaC,Juan,Santos,jdelacruz.student@ua.edu.ph,Male,1998-05-15,09171234567,Manila,Catholic,123 Main St,student,O+,BS Information Technology,2,A,College of Engineering,Maria DelaC,Mother,09171234568,None,None
+Santos,Maria,Garcia,msantos.student@ua.edu.ph,Female,1999-08-22,09181234567,Quezon City,Catholic,456 Oak Ave,student,A+,BS Psychology,2,B,College of Liberal Arts,Roberto Santos,Father,09181234568,Penicillin,None
+Lopez,Pedro,Torres,plopez.employee@ua.edu.ph,Male,1985-03-10,09191234567,Makati,Roman Catholic,789 Pine St,employee,B+,N/A,N/A,N/A,Student Services,Anna Lopez,Spouse,09191234568,None,Hypertension
+Reyes,Ana,Maria,areyes.student@ua.edu.ph,Female,2000-11-12,09201234567,Cebu,Protestant,321 Garden Rd,student,AB-,BS Engineering,1,C,College of Engineering,Juan Reyes,Father,09201234568,Shellfish,None
+Cruz,Carlos,Antonio,ccruz.employee@ua.edu.ph,Male,1988-07-20,09211234567,Davao,Roman Catholic,654 Riverside,employee,O-,N/A,N/A,N/A,Clinic,Rosa Cruz,Spouse,09211234568,None,Diabetes
