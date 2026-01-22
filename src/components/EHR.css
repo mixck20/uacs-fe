@@ -285,11 +285,23 @@
   transition: all 0.2s ease;
   background: #e51d5e;
   color: white;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 .ehr-btn:hover {
   background: #c2185b;
   transition: all 0.2s ease;
+}
+
+/* Ensure SVG icons in all buttons are properly aligned */
+.ehr-btn svg {
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 /* Make Add First Record button bigger */
@@ -305,14 +317,19 @@
   background: linear-gradient(135deg, #e51d5e 0%, #ff6b9d 100%);
   color: white;
   box-shadow: 0 2px 8px rgba(229, 29, 94, 0.25);
+  line-height: 1;
+  vertical-align: middle;
 }
 
 .empty-state .ehr-btn.add-btn svg {
-  display: flex;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  line-height: 1;
-  font-size: 1.1rem;
 }
 
 .empty-state .ehr-btn.add-btn:hover {
