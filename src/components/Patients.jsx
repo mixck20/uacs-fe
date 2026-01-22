@@ -461,6 +461,11 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
           
           // Helper function to convert header to camelCase
           const toCamelCase = (str) => {
+            // Check if already in camelCase (contains uppercase letters not at start)
+            if (/[a-z][A-Z]/.test(str)) {
+              return str; // Already camelCase
+            }
+            
             return str
               .toLowerCase()
               .replace(/[\s_-]+(.)/g, (_, char) => char.toUpperCase())
