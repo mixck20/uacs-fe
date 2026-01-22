@@ -475,16 +475,47 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
           const headers = rawHeaders.map(h => toCamelCase(h));
           const patients = [];
 
+          // Improved CSV parser that handles Excel-exported CSVs with quoted fields
+          const parseCSVLine = (line) => {
+            const cells = [];
+            let current = '';
+            let insideQuotes = false;
+            
+            for (let j = 0; j < line.length; j++) {
+              const char = line[j];
+              const nextChar = line[j + 1];
+              
+              if (char === '"') {
+                // Check for escaped quotes
+                if (insideQuotes && nextChar === '"') {
+                  current += '"';
+                  j++; // Skip next quote
+                } else {
+                  insideQuotes = !insideQuotes;
+                }
+              } else if (char === ',' && !insideQuotes) {
+                // Found a delimiter outside of quotes
+                cells.push(current.trim().replace(/^"|"$/g, ''));
+                current = '';
+              } else {
+                current += char;
+              }
+            }
+            // Push the last cell
+            cells.push(current.trim().replace(/^"|"$/g, ''));
+            return cells;
+          };
+
           // Parse data rows
           for (let i = 1; i < lines.length; i++) {
             if (lines[i].trim() === '') continue;
 
-            const cells = lines[i].split(',').map(cell => cell.trim());
+            const cells = parseCSVLine(lines[i]);
             
             if (cells.length !== headers.length) {
               Swal.fire({
                 title: "CSV Format Error",
-                text: `Row ${i + 1} has ${cells.length} columns but expected ${headers.length}. Make sure there are no extra commas.`,
+                text: `Row ${i + 1} has ${cells.length} columns but expected ${headers.length}. Make sure there are no extra commas or quotes.`,
                 icon: "error"
               });
               return;
