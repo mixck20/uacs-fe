@@ -460,17 +460,44 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
           const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
           const patients = [];
 
+          // Helper function to parse CSV row with quoted fields support
+          const parseCSVRow = (line) => {
+            const cells = [];
+            let current = '';
+            let insideQuotes = false;
+            
+            for (let j = 0; j < line.length; j++) {
+              const char = line[j];
+              const nextChar = line[j + 1];
+              
+              if (char === '"') {
+                if (insideQuotes && nextChar === '"') {
+                  current += '"';
+                  j++;
+                } else {
+                  insideQuotes = !insideQuotes;
+                }
+              } else if (char === ',' && !insideQuotes) {
+                cells.push(current.trim().replace(/^"|"$/g, ''));
+                current = '';
+              } else {
+                current += char;
+              }
+            }
+            cells.push(current.trim().replace(/^"|"$/g, ''));
+            return cells;
+          };
+
           // Parse data rows
           for (let i = 1; i < lines.length; i++) {
             if (lines[i].trim() === '') continue;
 
-            // Simple CSV parsing (handles basic cases)
-            const cells = lines[i].split(',').map(cell => cell.trim().replace(/^"|"$/g, ''));
+            const cells = parseCSVRow(lines[i]);
             
             if (cells.length !== headers.length) {
               Swal.fire({
                 title: "CSV Format Error",
-                text: `Row ${i + 1} has incorrect number of columns`,
+                text: `Row ${i + 1} has ${cells.length} columns but expected ${headers.length}`,
                 icon: "error"
               });
               return;
