@@ -366,20 +366,217 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     }
   }
 
+  async function handleExportToCSV() {
+    try {
+      const dataToExport = filteredPatients.map((patient, index) => ({
+        'No.': index + 1,
+        'Student ID': patient.studentId || patient.schoolId || 'N/A',
+        'Full Name': patient.fullName || patient.name || 'N/A',
+        'Email': patient.email || 'N/A',
+        'Gender': patient.gender || 'N/A',
+        'Date of Birth': patient.dateOfBirth ? new Date(patient.dateOfBirth).toLocaleDateString() : 'N/A',
+        'Contact Number': patient.contactNumber || patient.contact || 'N/A',
+        'Department': patient.department || patient.userId?.department || 'N/A',
+        'Address': patient.address || 'N/A',
+        'Emergency Contact': patient.emergencyContact?.name || 'N/A',
+        'Emergency Phone': patient.emergencyContact?.phone || 'N/A',
+        'Registered': patient.isRegisteredUser ? 'Yes' : 'No',
+        'Total Visits': patient.visits ? patient.visits.length : 0,
+      }));
+
+      // Convert to CSV format
+      const headers = Object.keys(dataToExport[0] || {});
+      const csvContent = [
+        headers.join(','),
+        ...dataToExport.map(row => 
+          headers.map(header => {
+            const value = row[header];
+            // Escape quotes and wrap in quotes if contains comma
+            const escaped = String(value).replace(/"/g, '""');
+            return escaped.includes(',') ? `"${escaped}"` : escaped;
+          }).join(',')
+        )
+      ].join('\n');
+
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Patients_List_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      Swal.fire({
+        title: "Export Successful!",
+        text: `${filteredPatients.length} patients exported to CSV`,
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (err) {
+      Swal.fire({ title: "Export Failed", text: err.message, icon: "error" });
+    }
+  }
+
+  function handleBulkUpload() {
+    // Create file input element
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        Swal.fire({
+          title: "File Too Large",
+          text: "CSV file must be less than 5MB",
+          icon: "error"
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const csvText = event.target.result;
+          const lines = csvText.trim().split('\n');
+
+          if (lines.length < 2) {
+            Swal.fire({
+              title: "Invalid CSV",
+              text: "CSV must have a header row and at least one data row",
+              icon: "error"
+            });
+            return;
+          }
+
+          // Parse CSV header
+          const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+          const patients = [];
+
+          // Parse data rows
+          for (let i = 1; i < lines.length; i++) {
+            if (lines[i].trim() === '') continue;
+
+            // Simple CSV parsing (handles basic cases)
+            const cells = lines[i].split(',').map(cell => cell.trim().replace(/^"|"$/g, ''));
+            
+            if (cells.length !== headers.length) {
+              Swal.fire({
+                title: "CSV Format Error",
+                text: `Row ${i + 1} has incorrect number of columns`,
+                icon: "error"
+              });
+              return;
+            }
+
+            const record = {};
+            headers.forEach((header, idx) => {
+              record[header] = cells[idx] || '';
+            });
+
+            patients.push(record);
+          }
+
+          // Show confirmation dialog with summary
+          const result = await Swal.fire({
+            title: 'Confirm Bulk Upload',
+            html: `<p>You are about to import <strong>${patients.length}</strong> patient records.</p>
+                   <p style="color: #666; font-size: 0.9em; margin-top: 10px;">
+                     Existing patients (matched by email) will be updated.
+                   </p>`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Proceed with Import',
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#6b7280'
+          });
+
+          if (!result.isConfirmed) return;
+
+          // Show loading indicator
+          Swal.fire({
+            title: 'Importing Patients',
+            html: 'Processing your file... This may take a moment.',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+
+          // Submit to API
+          const response = await PatientsAPI.bulkImport(patients);
+
+          // Process response
+          const { results } = response;
+          let message = `<strong>Import Completed!</strong><br>`;
+          message += `✅ Created: ${results.created}<br>`;
+          message += `🔄 Updated: ${results.updated}<br>`;
+          message += `⏭️ Skipped: ${results.skipped}`;
+
+          if (results.errors && results.errors.length > 0) {
+            message += `<br><br><strong style="color: #e51d5e;">Errors:</strong><br>`;
+            const errorMessages = results.errors.slice(0, 5).map(err => 
+              `Row ${err.row}: ${err.reason} (${err.email})`
+            ).join('<br>');
+            message += errorMessages;
+            if (results.errors.length > 5) {
+              message += `<br>... and ${results.errors.length - 5} more errors`;
+            }
+          }
+
+          // Reload patients list
+          const updatedPatients = await PatientsAPI.list(filterType, searchTerm, showArchived);
+          setPatients(updatedPatients);
+
+          Swal.fire({
+            title: 'Import Summary',
+            html: message,
+            icon: results.errors.length > 0 ? 'warning' : 'success',
+            confirmButtonColor: '#10b981'
+          });
+
+        } catch (error) {
+          Swal.fire({
+            title: "Import Failed",
+            text: error.message || "Failed to process bulk import",
+            icon: "error"
+          });
+        }
+      };
+
+      reader.readAsText(file);
+    };
+
+    input.click();
+  }
+
   function handleExport() {
     Swal.fire({
       title: "Export Patients",
       text: "Choose export format:",
       icon: "question",
       showCancelButton: true,
+      showDenyButton: true,
       confirmButtonText: '<i class="fa fa-file-excel"></i> Export to Excel',
+      denyButtonText: '<i class="fa fa-file-csv"></i> Export to CSV',
       cancelButtonText: '<i class="fa fa-file-pdf"></i> Export to PDF',
       confirmButtonColor: "#10b981",
+      denyButtonColor: "#3b82f6",
       cancelButtonColor: "#e51d5e",
-      reverseButtons: true
+      reverseButtons: false
     }).then((result) => {
       if (result.isConfirmed) {
         handleExportToExcel();
+      } else if (result.isDenied) {
+        handleExportToCSV();
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         handleExportToPDF();
       }
@@ -469,7 +666,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
             <button className="patients-btn patients-btn-primary" onClick={() => setShowForm(true)}>
               <FaPlus /> Add Patient
             </button>
-            <button className="patients-btn patients-btn-secondary">
+            <button className="patients-btn patients-btn-secondary" onClick={handleBulkUpload}>
               <FaUpload /> Bulk Upload
             </button>
             <button className="patients-btn patients-btn-secondary" onClick={handleExport}>

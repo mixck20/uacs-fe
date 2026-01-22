@@ -236,6 +236,13 @@ export const PatientsAPI = {
     return await apiFetch(`/api/patients/${id}/restore`, {
       method: 'POST'
     });
+  },
+
+  bulkImport: async (patients) => {
+    return await apiFetch('/api/patients/bulk-import', {
+      method: 'POST',
+      body: JSON.stringify({ patients })
+    });
   }
 };
 
