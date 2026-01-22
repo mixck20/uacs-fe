@@ -1,0 +1,6 @@
+surname,firstName,middleName,email,gender,dateOfBirth,cellNumber,birthplace,religion,address,patientType,bloodType,course,yearLevel,section,department,emergencyName,emergencyRelationship,emergencyCel,allergies,medicalHistory
+Hernandez,Roberto,Santos,rhernandez.employee@ua.edu.ph,Male,1990-03-15,09251234567,Manila,Catholic,100 Admin Building,employee,A+,N/A,N/A,N/A,Clinic Staff,Maria Hernandez,Spouse,09251234568,None,None
+Garcia,Esperanza,Reyes,egarcia.employee@ua.edu.ph,Female,1992-08-22,09261234567,Quezon City,Catholic,200 Faculty Housing,employee,O+,N/A,N/A,N/A,Library Services,Juan Garcia,Father,09261234568,Aspirin,None
+Santos,Miguel,Torres,msantos.employee@ua.edu.ph,Male,1988-05-10,09271234567,Makati,Roman Catholic,300 Staff Quarters,employee,B+,N/A,N/A,N/A,Registrar Office,Rosa Santos,Spouse,09271234568,None,Hypertension
+De los Santos,Patricia,Cruz,psantos.employee@ua.edu.ph,Female,1995-12-03,09281234567,Cebu,Catholic,400 Campus Road,employee,AB+,N/A,N/A,N/A,Student Affairs,Vicente De los Santos,Father,09281234568,Penicillin,Asthma
+Gonzales,Francisco,Manuel,fgonzales.employee@ua.edu.ph,Male,1987-07-18,09291234567,Davao,Protestant,500 University Ave,employee,O-,N/A,N/A,N/A,Maintenance,Luisa Gonzales,Sister,09291234568,None,Diabetes
