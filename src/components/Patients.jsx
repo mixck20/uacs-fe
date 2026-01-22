@@ -516,9 +516,9 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
           // Process response
           const { results } = response;
           let message = `<strong>Import Completed!</strong><br>`;
-          message += `✅ Created: ${results.created}<br>`;
-          message += `🔄 Updated: ${results.updated}<br>`;
-          message += `⏭️ Skipped: ${results.skipped}`;
+          message += `Created: ${results.created}<br>`;
+          message += `Updated: ${results.updated}<br>`;
+          message += `Skipped: ${results.skipped}`;
 
           if (results.errors && results.errors.length > 0) {
             message += `<br><br><strong style="color: #e51d5e;">Errors:</strong><br>`;

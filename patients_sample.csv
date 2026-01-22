@@ -1,4 +1,4 @@
 surname,firstName,middleName,email,gender,dateOfBirth,cellNumber,birthplace,religion,address,patientType,bloodType,course,yearLevel,section,department,emergencyName,emergencyRelationship,emergencyCel
-DelaC,Juan,Santos,jdelacruz.student@ua.edu.ph,Male,1998-05-15,09171234567,Manila,Catholic,Manila,student,O+,BS Information Technology,2,A,College of Engineering,Maria DelaC,Mother,09171234568
-Santos,Maria,Garcia,msantos.student@ua.edu.ph,Female,1999-08-22,09181234567,Quezon City,Catholic,QC,student,A+,BS Psychology,2,B,College of Liberal Arts,Roberto Santos,Father,09181234568
-Lopez,Pedro,Torres,plopez.employee@ua.edu.ph,Male,1985-03-10,09191234567,Makati,Roman Catholic,Makati,employee,B+,N/A,N/A,N/A,N/A,Anna Lopez,Spouse,09191234568
+DelaC,Juan,Santos,jdelacruz.student@ua.edu.ph,Male,1998-05-15,09171234567,Manila,Catholic,Manila,student,O+,BS IT,2,A,Engineering,Maria DelaC,Mother,09171234568
+Santos,Maria,Garcia,msantos.student@ua.edu.ph,Female,1999-08-22,09181234567,QC,Catholic,QC,student,A+,BS Psychology,2,B,Liberal Arts,Roberto Santos,Father,09181234568
+Lopez,Pedro,Torres,plopez.employee@ua.edu.ph,Male,1985-03-10,09191234567,Makati,Roman Catholic,Makati,employee,B+,Staff,N/A,N/A,Student Services,Anna Lopez,Spouse,09191234568
