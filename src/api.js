@@ -243,6 +243,24 @@ export const PatientsAPI = {
       method: 'POST',
       body: JSON.stringify({ patients })
     });
+  },
+
+  backup: async () => {
+    const response = await fetch(`${API_URL}/api/patients/backup/export`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    if (!response.ok) throw new Error('Backup failed');
+    return await response.json();
+  },
+
+  restore: async (backupData) => {
+    return await apiFetch('/api/patients/backup/restore', {
+      method: 'POST',
+      body: JSON.stringify({ backup: backupData })
+    });
   }
 };
 

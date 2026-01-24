@@ -431,6 +431,157 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     }
   }
 
+  async function handleBackup() {
+    try {
+      Swal.fire({
+        title: 'Creating Backup',
+        html: 'Please wait while we create a backup of all patient data...',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const backupData = await PatientsAPI.backup();
+      
+      // Download backup file
+      const backupJson = JSON.stringify(backupData, null, 2);
+      const blob = new Blob([backupJson], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `patient-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Backup Successful',
+        html: `<p>Backup created with ${backupData.totalRecords} patient records</p><p style="font-size: 0.9em; color: #666;">File downloaded: patient-backup-${new Date().toISOString().split('T')[0]}.json</p>`,
+        confirmButtonColor: '#10b981'
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Backup Failed',
+        text: error.message || 'Failed to create backup',
+        confirmButtonColor: '#e51d5e'
+      });
+    }
+  }
+
+  function handleRestore() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Validate file size (max 50MB)
+      if (file.size > 50 * 1024 * 1024) {
+        Swal.fire({
+          title: "File Too Large",
+          text: "Backup file must be less than 50MB",
+          icon: "error"
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const backupData = JSON.parse(event.target.result);
+
+          // Validate backup format
+          if (!backupData.patients || !Array.isArray(backupData.patients)) {
+            Swal.fire({
+              title: "Invalid Backup",
+              text: "The backup file format is invalid. Please use a valid patient backup file.",
+              icon: "error"
+            });
+            return;
+          }
+
+          // Show confirmation
+          const result = await Swal.fire({
+            title: 'Restore Backup',
+            html: `<p>This will restore <strong>${backupData.totalRecords}</strong> patient records.</p>
+                   <p style="color: #666; font-size: 0.9em; margin-top: 10px;">
+                     Existing patients (matched by email or fullName) will be updated.
+                   </p>
+                   <p style="color: #e51d5e; font-weight: bold; margin-top: 10px;">
+                     ⚠️ This action cannot be undone!
+                   </p>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Proceed with Restore',
+            cancelButtonColor: '#6b7280',
+            confirmButtonColor: '#e51d5e'
+          });
+
+          if (!result.isConfirmed) return;
+
+          // Show loading
+          Swal.fire({
+            title: 'Restoring Backup',
+            html: 'Please wait while we restore patient data...',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+
+          // Submit restore request
+          const response = await PatientsAPI.restore(backupData);
+
+          // Reload patients list
+          const updatedPatients = await PatientsAPI.list(filterType, searchTerm, showArchived);
+          setPatients(updatedPatients);
+
+          // Show results
+          let message = `<strong>Restore Completed!</strong><br>`;
+          message += `Restored: ${response.results.restored}<br>`;
+          message += `Updated: ${response.results.updated}<br>`;
+          message += `Skipped: ${response.results.skipped}`;
+
+          if (response.results.errors && response.results.errors.length > 0) {
+            message += `<br><br><strong style="color: #e51d5e;">Errors:</strong><br>`;
+            const errorMessages = response.results.errors.slice(0, 5).map(err => 
+              `Row ${err.row}: ${err.reason}`
+            ).join('<br>');
+            message += errorMessages;
+            if (response.results.errors.length > 5) {
+              message += `<br>... and ${response.results.errors.length - 5} more errors`;
+            }
+          }
+
+          Swal.fire({
+            title: 'Restore Summary',
+            html: message,
+            icon: response.results.errors.length > 0 ? 'warning' : 'success',
+            confirmButtonColor: '#10b981'
+          });
+        } catch (error) {
+          Swal.fire({
+            title: "Restore Failed",
+            text: error.message || "Failed to process backup restore",
+            icon: "error"
+          });
+        }
+      };
+
+      reader.readAsText(file);
+    };
+
+    input.click();
+  }
+
   function handleBulkUpload() {
     // Create file input element
     const input = document.createElement('input');
@@ -726,6 +877,12 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
             </button>
             <button className="patients-btn patients-btn-secondary" onClick={handleExport}>
               <FaFileExport /> Export
+            </button>
+            <button className="patients-btn patients-btn-secondary" onClick={handleBackup} title="Backup all patient data">
+              <FaFileExport /> Backup
+            </button>
+            <button className="patients-btn patients-btn-secondary" onClick={handleRestore} title="Restore from backup file">
+              <FaUpload /> Restore
             </button>
           </div>
         </div>
