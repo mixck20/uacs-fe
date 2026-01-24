@@ -785,11 +785,11 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
             <div className="patients-stat-label">Walk-ins</div>
           </div>
           <div className="patients-stat-card">
-            <div className="patients-stat-number">{patients.filter(p => p.patientType === 'Student').length}</div>
+            <div className="patients-stat-number">{patients.filter(p => p.patientType === 'student').length}</div>
             <div className="patients-stat-label">Students</div>
           </div>
           <div className="patients-stat-card">
-            <div className="patients-stat-number">{patients.filter(p => p.patientType === 'Employee').length}</div>
+            <div className="patients-stat-number">{patients.filter(p => p.patientType === 'employee').length}</div>
             <div className="patients-stat-label">Employees</div>
           </div>
         </div>
