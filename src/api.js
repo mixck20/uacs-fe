@@ -822,6 +822,25 @@ export const AdminAPI = {
       method: 'POST',
       body: JSON.stringify({ response })
     });
+  },
+
+  // System Backup/Restore
+  backupSystemData: async () => {
+    const response = await fetch(`${API_CONFIG.baseUrl}/api/admin/backup/export`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    if (!response.ok) throw new Error('Backup failed');
+    return await response.json();
+  },
+
+  restoreSystemData: async (backupData) => {
+    return await apiFetch('/api/admin/backup/restore', {
+      method: 'POST',
+      body: JSON.stringify({ backup: backupData })
+    });
   }
 };
 
