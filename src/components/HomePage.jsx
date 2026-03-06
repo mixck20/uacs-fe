@@ -89,18 +89,81 @@ const HomePage = () => {
 
           {loading ? (
             <div className="loading-text">Loading clinic schedule...</div>
-          ) : schedule?.staffSchedules && schedule.staffSchedules.length > 0 ? (
-            <div className="schedule-grid">
-              {schedule.staffSchedules.slice(0, 4).map((staff, index) => (
-                <div className="schedule-card" key={staff._id || index}>
-                  <div className="day-header">
-                    <FaClock className="schedule-icon" />
-                    <h3>{staff.name}</h3>
+          ) : schedule ? (
+            <div>
+              {/* Physicians */}
+              {schedule?.doctorSchedules?.filter(d => d.type === 'physician').length > 0 && (
+                <div style={{ marginBottom: '3rem' }}>
+                  <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '1.5rem', fontWeight: '600' }}>Physicians</h3>
+                  <div className="schedule-grid">
+                    {schedule.doctorSchedules
+                      .filter(d => d.type === 'physician')
+                      .slice(0, 3)
+                      .map((doctor, index) => (
+                        <div className="schedule-card" key={doctor._id || index}>
+                          <div className="day-header">
+                            <FaClock className="schedule-icon" />
+                            <h3>{doctor.name}</h3>
+                          </div>
+                          <p className="schedule-time">Regular Schedule</p>
+                          <p className="schedule-note">{doctor.regularSchedule || 'Not specified'}</p>
+                          <p className="schedule-time" style={{ marginTop: '0.75rem' }}>Medical Exam Schedule</p>
+                          <p className="schedule-note">{doctor.medicalExaminationSchedule || 'Not specified'}</p>
+                        </div>
+                      ))}
                   </div>
-                  <p className="schedule-time">{staff.dayOfDuty || 'Not specified'}</p>
-                  <p className="schedule-note">{staff.time || 'Not specified'}</p>
                 </div>
-              ))}
+              )}
+
+              {/* Dentists */}
+              {schedule?.doctorSchedules?.filter(d => d.type === 'dentist').length > 0 && (
+                <div style={{ marginBottom: '3rem' }}>
+                  <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '1.5rem', fontWeight: '600' }}>Dentists</h3>
+                  <div className="schedule-grid">
+                    {schedule.doctorSchedules
+                      .filter(d => d.type === 'dentist')
+                      .slice(0, 3)
+                      .map((doctor, index) => (
+                        <div className="schedule-card" key={doctor._id || index}>
+                          <div className="day-header">
+                            <FaClock className="schedule-icon" />
+                            <h3>{doctor.name}</h3>
+                          </div>
+                          <p className="schedule-time">Regular Schedule</p>
+                          <p className="schedule-note">{doctor.regularSchedule || 'Not specified'}</p>
+                          <p className="schedule-time" style={{ marginTop: '0.75rem' }}>Dental Exam Schedule</p>
+                          <p className="schedule-note">{doctor.medicalExaminationSchedule || 'Not specified'}</p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Clinical Staff */}
+              {schedule?.staffSchedules?.filter(s => s.role === 'nurse').length > 0 && (
+                <div style={{ marginBottom: '3rem' }}>
+                  <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '1.5rem', fontWeight: '600' }}>Clinical Staff</h3>
+                  <div className="schedule-grid">
+                    {schedule.staffSchedules
+                      .filter(s => s.role === 'nurse')
+                      .slice(0, 3)
+                      .map((staff, index) => (
+                        <div className="schedule-card" key={staff._id || index}>
+                          <div className="day-header">
+                            <FaClock className="schedule-icon" />
+                            <h3>{staff.name}</h3>
+                          </div>
+                          <p className="schedule-time">{staff.designation || 'Clinical Staff'}</p>
+                          <p className="schedule-note">{staff.schedule || staff.time || 'Not specified'}</p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {!schedule?.doctorSchedules?.length && !schedule?.staffSchedules?.length && (
+                <div className="loading-text">No schedule data available</div>
+              )}
             </div>
           ) : (
             <div className="loading-text">No schedule data available</div>
