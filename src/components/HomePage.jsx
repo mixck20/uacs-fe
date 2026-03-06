@@ -143,12 +143,11 @@ const HomePage = () => {
               )}
 
               {/* Clinical Staff */}
-              {schedule?.staffSchedules?.filter(s => s.role === 'nurse').length > 0 && (
+              {schedule?.staffSchedules?.length > 0 && (
                 <div style={{ marginBottom: '3rem' }}>
                   <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '1.5rem', fontWeight: '600' }}>Clinical Staff</h3>
                   <div className="schedule-grid">
                     {schedule.staffSchedules
-                      .filter(s => s.role === 'nurse')
                       .map((staff, index) => (
                         <div className="schedule-card" key={staff._id || index}>
                           <div className="day-header">
