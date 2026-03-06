@@ -824,24 +824,6 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
               </div>
               <div className="patient-card-body">
                 <h3 className="patient-name">{patient.fullName || patient.name}</h3>
-                <div className="patient-info-row">
-                  <span className="patient-label">Email:</span>
-                  <span className="patient-value">{patient.email}</span>
-                </div>
-                {(patient.userId?.department || patient.department) && (
-                  <div className="patient-info-row">
-                    <span className="patient-label">Department:</span>
-                    <span className="patient-value">{patient.userId?.department || patient.department}</span>
-                  </div>
-                )}
-                <div className="patient-info-row">
-                  <span className="patient-label">Gender:</span>
-                  <span className="patient-value">{patient.gender || 'N/A'}</span>
-                </div>
-                <div className="patient-info-row">
-                  <span className="patient-label">Visits:</span>
-                  <span className="patient-value">{patient.visits ? patient.visits.length : 0} records</span>
-                </div>
               </div>
               <div className="patient-card-actions">
                 <button 
