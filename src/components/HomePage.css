@@ -14,13 +14,14 @@
 /* Banner Section */
 .home-banner {
   background: linear-gradient(135deg, #e51d5e 0%, #ff4081 50%, #e51d5e 100%);
-  padding: 3rem 2rem;
+  padding: 4rem 2rem;
   position: relative;
   overflow: hidden;
   color: white;
-  min-height: 300px;
+  min-height: 280px;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .home-banner::before {
@@ -59,57 +60,25 @@
   margin: 0 auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-}
-
-.banner-left {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  flex: 1;
-}
-
-.banner-logo-container {
-  width: 120px;
-  height: 120px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  backdrop-filter: blur(8px);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  animation: glowPulse 3s ease-in-out infinite;
-  flex-shrink: 0;
-}
-
-.banner-logo {
-  width: 90%;
-  height: 90%;
-  object-fit: contain;
+  text-align: center;
 }
 
 .banner-text h1 {
-  font-size: 3.5rem;
+  font-size: 4rem;
   font-weight: 800;
-  letter-spacing: 4px;
-  margin-bottom: 0.5rem;
+  letter-spacing: 6px;
+  margin-bottom: 0.75rem;
   animation: glowPulse 3s ease-in-out infinite;
   text-transform: uppercase;
 }
 
 .banner-subtitle {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 500;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
   opacity: 0.95;
   animation: fadeSlideUp 0.8s ease forwards 0.2s;
-}
-
-.banner-description {
-  font-size: 1rem;
-  opacity: 0.9;
-  animation: fadeSlideUp 0.8s ease forwards 0.4s;
 }
 
 .banner-accent {
@@ -197,14 +166,9 @@
   padding: 0 2rem;
 }
 
-.services-section,
 .schedule-section,
 .contacts-section {
   padding: 4rem 2rem;
-}
-
-.services-section {
-  background-color: white;
 }
 
 .schedule-section {
@@ -230,56 +194,6 @@
   margin-bottom: 3rem;
 }
 
-/* Services Grid */
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-}
-
-.service-card {
-  background: white;
-  padding: 2rem;
-  border-radius: 16px;
-  text-align: center;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  animation: fadeIn 0.6s ease-out;
-}
-
-.service-card:hover {
-  transform: translateY(-8px);
-  border-color: #e51d5e;
-  box-shadow: 0 12px 30px rgba(229, 29, 94, 0.15);
-}
-
-.service-icon {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #e51d5e 0%, #ff4081 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1.5rem;
-  font-size: 2rem;
-  color: white;
-  animation: glowPulse 3s ease-in-out infinite;
-}
-
-.service-card h3 {
-  font-size: 1.3rem;
-  color: #1e293b;
-  margin-bottom: 0.75rem;
-}
-
-.service-card p {
-  color: #64748b;
-  line-height: 1.6;
-  font-size: 0.95rem;
-}
-
 /* Schedule Grid */
 .schedule-grid {
   display: grid;
@@ -292,14 +206,14 @@
   padding: 2rem;
   border-radius: 16px;
   border-left: 4px solid #e51d5e;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   animation: fadeIn 0.6s ease-out;
 }
 
 .schedule-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(229, 29, 94, 0.15);
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 12px 28px rgba(229, 29, 94, 0.18);
 }
 
 .day-header {
@@ -345,7 +259,7 @@
   padding: 2rem;
   border-radius: 16px;
   text-align: center;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   border: 2px solid #e5e7eb;
   animation: fadeIn 0.6s ease-out;
 }
@@ -353,8 +267,8 @@
 .contact-card:hover {
   background: white;
   border-color: #e51d5e;
-  box-shadow: 0 8px 25px rgba(229, 29, 94, 0.12);
-  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(229, 29, 94, 0.18);
+  transform: scale(1.05) translateY(-2px);
 }
 
 .contact-icon {
@@ -389,87 +303,31 @@
   font-size: 0.9rem;
 }
 
-/* CTA Section */
-.cta-section {
-  background: linear-gradient(135deg, #e51d5e 0%, #ff4081 100%);
-  padding: 4rem 2rem;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.cta-section::before {
-  content: '';
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  top: -50%;
-  left: -50%;
-  background:
-    radial-gradient(circle at 30% 40%, rgba(255,255,255,0.1) 0%, transparent 50%),
-    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.08) 0%, transparent 40%);
-  animation: shiftGradient 15s ease-in-out infinite alternate;
-  z-index: 0;
-}
-
-.cta-section .section-container {
-  position: relative;
-  z-index: 2;
-}
-
-.cta-section h2 {
-  font-size: 2rem;
-  color: white;
-  margin-bottom: 0.75rem;
-  font-weight: 700;
-}
-
-.cta-section p {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.95);
-  margin-bottom: 2rem;
-}
-
-.cta-button {
-  background: white;
-  color: #e51d5e;
-  padding: 1rem 2.5rem;
-  font-size: 1.05rem;
-  font-weight: 700;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-.cta-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  background: #f0f0f0;
-}
-
-.cta-button:active {
-  transform: translateY(-1px);
+/* Placeholder Styles */
+.placeholder {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+  height: 1.2em;
+  border-radius: 4px;
+  display: inline-block;
+  min-width: 100px;
 }
 
 /* Responsive Design */
 @media (max-width: 1024px) {
   .banner-text h1 {
-    font-size: 2.5rem;
+    font-size: 3rem;
   }
 
   .banner-subtitle {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
 
   .section-title {
     font-size: 2rem;
   }
 
-  .services-grid,
   .schedule-grid,
   .contacts-grid {
     gap: 1.5rem;
@@ -478,8 +336,8 @@
 
 @media (max-width: 768px) {
   .home-banner {
-    padding: 2rem;
-    min-height: 250px;
+    padding: 3rem 2rem;
+    min-height: 220px;
   }
 
   .banner-content {
@@ -487,30 +345,15 @@
     text-align: center;
   }
 
-  .banner-left {
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .banner-logo-container {
-    width: 100px;
-    height: 100px;
-  }
-
   .banner-text h1 {
-    font-size: 2rem;
-    letter-spacing: 2px;
+    font-size: 2.5rem;
+    letter-spacing: 3px;
   }
 
   .banner-subtitle {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 
-  .banner-description {
-    font-size: 0.9rem;
-  }
-
-  .services-section,
   .schedule-section,
   .contacts-section {
     padding: 3rem 1.5rem;
@@ -525,16 +368,9 @@
     margin-bottom: 2rem;
   }
 
-  .service-card,
   .schedule-card,
   .contact-card {
     padding: 1.5rem;
-  }
-
-  .service-icon {
-    width: 70px;
-    height: 70px;
-    font-size: 1.5rem;
   }
 
   .contact-icon {
@@ -542,50 +378,22 @@
     height: 60px;
     font-size: 1.5rem;
   }
-
-  .cta-section {
-    padding: 3rem 1.5rem;
-  }
-
-  .cta-section h2 {
-    font-size: 1.5rem;
-  }
-
-  .cta-section p {
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .cta-button {
-    padding: 0.875rem 2rem;
-    font-size: 0.95rem;
-  }
 }
 
 @media (max-width: 480px) {
   .home-banner {
-    padding: 1.5rem;
-    min-height: 220px;
-  }
-
-  .banner-logo-container {
-    width: 80px;
-    height: 80px;
+    padding: 2rem;
+    min-height: 200px;
   }
 
   .banner-text h1 {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
 
   .banner-subtitle {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
-  .banner-description {
-    font-size: 0.8rem;
-  }
-
-  .services-section,
   .schedule-section,
   .contacts-section {
     padding: 2rem 1rem;
@@ -595,39 +403,20 @@
     font-size: 1.5rem;
   }
 
-  .services-grid,
   .schedule-grid,
   .contacts-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
 
-  .service-card,
   .schedule-card,
   .contact-card {
     padding: 1.25rem;
   }
 
-  .service-icon {
+  .contact-icon {
     width: 60px;
     height: 60px;
     font-size: 1.25rem;
-  }
-
-  .service-card h3 {
-    font-size: 1.1rem;
-  }
-
-  .cta-section h2 {
-    font-size: 1.25rem;
-  }
-
-  .cta-section p {
-    font-size: 0.9rem;
-  }
-
-  .cta-button {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
   }
 }
