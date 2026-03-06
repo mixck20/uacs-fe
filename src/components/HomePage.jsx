@@ -103,7 +103,6 @@ const HomePage = () => {
                   <div className="schedule-grid">
                     {schedule.doctorSchedules
                       .filter(d => d.type === 'physician')
-                      .slice(0, 3)
                       .map((doctor, index) => (
                         <div className="schedule-card" key={doctor._id || index}>
                           <div className="day-header">
@@ -127,7 +126,6 @@ const HomePage = () => {
                   <div className="schedule-grid">
                     {schedule.doctorSchedules
                       .filter(d => d.type === 'dentist')
-                      .slice(0, 3)
                       .map((doctor, index) => (
                         <div className="schedule-card" key={doctor._id || index}>
                           <div className="day-header">
@@ -151,7 +149,6 @@ const HomePage = () => {
                   <div className="schedule-grid">
                     {schedule.staffSchedules
                       .filter(s => s.role === 'nurse')
-                      .slice(0, 3)
                       .map((staff, index) => (
                         <div className="schedule-card" key={staff._id || index}>
                           <div className="day-header">
