@@ -72,6 +72,13 @@ const Login = ({ onLogin }) => {
   return (
     <div className="login-container">
       <div className="login-left">
+        <button
+          className="home-nav-btn"
+          onClick={() => navigate('/')}
+          title="Back to Home"
+        >
+          ← Home
+        </button>
         <h1 className="uacs-logo">UACS</h1>
         <p className="uacs-tagline">University of the Assumption Clinic System</p>
       </div>

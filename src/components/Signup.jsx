@@ -226,6 +226,13 @@ const Signup = () => {
     <div className="signup-bg">
       <div className="signup-container">
         <div className="signup-left">
+          <button
+            className="home-nav-btn signup-home-btn"
+            onClick={() => navigate('/')}
+            title="Back to Home"
+          >
+            ← Home
+          </button>
           <h1 className="uacs-logo">UACS</h1>
           <p className="uacs-tagline">University of the Assumption Clinic System</p>
         </div>

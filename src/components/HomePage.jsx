@@ -17,11 +17,21 @@ const HomePage = () => {
 
   const fetchSchedule = async () => {
     try {
-      const response = await axios.get(`${API_URL}/schedule`);
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/schedule`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
       setSchedule(response.data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching schedule:', error);
+      // Try fetching without auth as fallback
+      try {
+        const fallbackResponse = await axios.get(`${API_URL}/schedule`);
+        setSchedule(fallbackResponse.data);
+      } catch (fallbackError) {
+        console.error('Fallback fetch also failed:', fallbackError);
+      }
       setLoading(false);
     }
   };
@@ -128,8 +138,8 @@ const HomePage = () => {
                 <FaMapMarkerAlt />
               </div>
               <h3>Location</h3>
-              <p>University of the Assumption</p>
-              <p className="contact-detail">Makati, Metro Manila</p>
+              <p>Del Pilar, San Fernando, Pampanga</p>
+              <p className="contact-detail">University of the Assumption</p>
             </div>
 
             <div className="contact-card">

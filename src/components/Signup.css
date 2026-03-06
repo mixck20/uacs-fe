@@ -45,13 +45,45 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: 
-    linear-gradient(120deg, 
-      rgba(255,255,255,0.1) 0%, 
+  background:
+    linear-gradient(120deg,
+      rgba(255,255,255,0.1) 0%,
       transparent 50%,
       rgba(255,255,255,0.1) 100%);
   animation: shimmer 8s linear infinite;
   z-index: -1;
+}
+
+.signup-home-btn {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  padding: 0.5rem 1.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.signup-home-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.signup-home-btn:active {
+  transform: translateY(0);
 }
 
 .signup-right {
