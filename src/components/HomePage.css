@@ -11,17 +11,18 @@
   color: #1e293b;
 }
 
-/* Banner Section */
+/* Banner Section - Exact Copy of Login Left Banner */
 .home-banner {
-  background: linear-gradient(135deg, #e51d5e 0%, #ff4081 50%, #e51d5e 100%);
+  background: linear-gradient(150deg, #e51d5e 0%, #ff4081 50%, #e51d5e 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 4rem 2rem;
   position: relative;
   overflow: hidden;
-  color: white;
-  min-height: 280px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  z-index: 0;
+  min-height: 400px;
 }
 
 .home-banner::before {
@@ -36,7 +37,7 @@
     radial-gradient(circle at 70% 60%, rgba(255,255,255,0.08) 0%, transparent 40%),
     radial-gradient(circle at center, rgba(255,64,129,0.1) 0%, transparent 60%);
   animation: shiftGradient 15s ease-in-out infinite alternate;
-  z-index: 0;
+  z-index: -2;
 }
 
 .home-banner::after {
@@ -49,46 +50,388 @@
       transparent 50%,
       rgba(255,255,255,0.1) 100%);
   animation: shimmer 8s linear infinite;
+  z-index: -1;
+}
+
+.uacs-logo {
+  font-size: 6.5rem;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 8px;
+  position: relative;
+  animation: glowPulse 3s ease-in-out infinite;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
   z-index: 1;
 }
 
-.banner-content {
+.uacs-tagline {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 1px;
+  opacity: 0;
+  animation: fadeSlideUp 0.8s ease forwards 0.5s;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  padding: 0 1rem;
+  text-align: center;
+  z-index: 1;
+  margin-bottom: 2rem;
+}
+
+.home-login-btn {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  margin-top: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  backdrop-filter: blur(8px);
+  z-index: 1;
   position: relative;
-  z-index: 2;
+}
+
+.home-login-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.home-login-btn:active {
+  transform: translateY(0);
+}
+
+/* Animations */
+@keyframes shiftGradient {
+  0% {
+    transform: rotate(-10deg) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: rotate(0deg) scale(1.2);
+    opacity: 0.9;
+  }
+  100% {
+    transform: rotate(10deg) scale(1);
+    opacity: 0.7;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.5;
+    transform: translateX(-100%) skewX(-15deg);
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.5;
+    transform: translateX(100%) skewX(-15deg);
+  }
+}
+
+@keyframes glowPulse {
+  0% {
+    text-shadow: 0 0 20px rgba(255,255,255,0.3),
+                 0 0 40px rgba(255,64,129,0.3);
+  }
+  50% {
+    text-shadow: 0 0 30px rgba(255,255,255,0.5),
+                 0 0 60px rgba(255,64,129,0.5);
+  }
+  100% {
+    text-shadow: 0 0 20px rgba(255,255,255,0.3),
+                 0 0 40px rgba(255,64,129,0.3);
+  }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Section Styles */
+.section-container {
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0 2rem;
+}
+
+.schedule-section,
+.contacts-section {
+  padding: 4rem 2rem;
+}
+
+.schedule-section {
+  background-color: #f8f8fc;
+}
+
+.contacts-section {
+  background-color: white;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #e51d5e;
+  margin-bottom: 0.5rem;
   text-align: center;
 }
 
-.banner-text h1 {
-  font-size: 4rem;
-  font-weight: 800;
-  letter-spacing: 6px;
-  margin-bottom: 0.75rem;
-  animation: glowPulse 3s ease-in-out infinite;
-  text-transform: uppercase;
+.section-subtitle {
+  font-size: 1.1rem;
+  color: #64748b;
+  text-align: center;
+  margin-bottom: 3rem;
 }
 
-.banner-subtitle {
-  font-size: 1.4rem;
-  font-weight: 500;
-  margin-bottom: 0;
-  opacity: 0.95;
-  animation: fadeSlideUp 0.8s ease forwards 0.2s;
+.loading-text {
+  text-align: center;
+  color: #64748b;
+  font-size: 1.1rem;
+  padding: 2rem;
 }
 
-.banner-accent {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, transparent 70%);
+/* Schedule Grid */
+.schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.schedule-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  border-left: 4px solid #e51d5e;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: fadeIn 0.6s ease-out;
+}
+
+.schedule-card:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 12px 28px rgba(229, 29, 94, 0.18);
+}
+
+.day-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.schedule-icon {
+  color: #e51d5e;
+  font-size: 1.5rem;
+}
+
+.schedule-card h3 {
+  font-size: 1.1rem;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.schedule-time {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #e51d5e;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.schedule-note {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Contacts Grid */
+.contacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+}
+
+.contact-card {
+  background: #f8f8fc;
+  padding: 2rem;
+  border-radius: 16px;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 2px solid #e5e7eb;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.contact-card:hover {
+  background: white;
+  border-color: #e51d5e;
+  box-shadow: 0 12px 28px rgba(229, 29, 94, 0.18);
+  transform: scale(1.05) translateY(-2px);
+}
+
+.contact-icon {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #e51d5e 0%, #ff4081 100%);
   border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+  font-size: 1.75rem;
+  color: white;
+}
+
+.contact-card h3 {
+  font-size: 1.2rem;
+  color: #1e293b;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.contact-card p {
+  margin: 0.35rem 0;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.contact-detail {
+  color: #64748b !important;
+  font-weight: 400 !important;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .uacs-logo {
+    font-size: 5rem;
+    letter-spacing: 6px;
+  }
+
+  .uacs-tagline {
+    font-size: 1.2rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .schedule-grid,
+  .contacts-grid {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-banner {
+    padding: 3rem 2rem;
+    min-height: 350px;
+  }
+
+  .uacs-logo {
+    font-size: 3.5rem;
+    letter-spacing: 4px;
+  }
+
+  .uacs-tagline {
+    font-size: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .schedule-section,
+  .contacts-section {
+    padding: 3rem 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+  }
+
+  .section-subtitle {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .schedule-card,
+  .contact-card {
+    padding: 1.5rem;
+  }
+
+  .contact-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-banner {
+    padding: 2rem;
+    min-height: 300px;
+  }
+
+  .uacs-logo {
+    font-size: 2.5rem;
+    letter-spacing: 3px;
+  }
+
+  .uacs-tagline {
+    font-size: 0.875rem;
+  }
+
+  .schedule-section,
+  .contacts-section {
+    padding: 2rem 1rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .schedule-grid,
+  .contacts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .schedule-card,
+  .contact-card {
+    padding: 1.25rem;
+  }
+
+  .contact-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.25rem;
+  }
 }
 
 /* Animations */
