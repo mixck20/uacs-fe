@@ -8,6 +8,7 @@ import SignupSuccess from "./components/SignupSuccess";
 import VerifyEmail from "./components/VerifyEmail";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
+import HomePage from "./components/HomePage";
 import ClinicDashboard from "./components/ClinicDashboard";
 import UserDashboard from "./components/UserDashboard";
 import UserAppointment from "./components/UserAppointment";
@@ -301,9 +302,14 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={
+          isLoggedIn ?
+            <Navigate to={userRole === 'admin' ? '/admin' : '/dashboard'} /> :
+            <HomePage />
+        } />
         <Route path="/login" element={
-          isLoggedIn ? 
-            <Navigate to="/" /> : 
+          isLoggedIn ?
+            <Navigate to="/" /> :
             <Login onLogin={handleLoginSuccess} />
         } />
         <Route path="/signup" element={
