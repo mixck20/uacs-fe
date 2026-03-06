@@ -145,7 +145,7 @@ const HomePage = () => {
               {/* Clinical Staff */}
               {schedule?.staffSchedules?.length > 0 && (
                 <div style={{ marginBottom: '3rem' }}>
-                  <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '1.5rem', fontWeight: '600' }}>Clinical Staff</h3>
+                  <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '1.5rem', fontWeight: '600' }}>University Nurses</h3>
                   <div className="schedule-grid">
                     {schedule.staffSchedules
                       .map((staff, index) => (
