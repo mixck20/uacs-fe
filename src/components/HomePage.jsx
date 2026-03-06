@@ -21,16 +21,21 @@ const HomePage = () => {
       const response = await axios.get(`${API_URL}/schedule`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       });
+      console.log('Schedule fetched successfully:', response.data);
       setSchedule(response.data);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching schedule:', error);
+      console.error('Error fetching schedule with auth:', error);
       // Try fetching without auth as fallback
       try {
+        console.log('Trying to fetch schedule without auth...');
         const fallbackResponse = await axios.get(`${API_URL}/schedule`);
+        console.log('Schedule fetched without auth:', fallbackResponse.data);
         setSchedule(fallbackResponse.data);
       } catch (fallbackError) {
         console.error('Fallback fetch also failed:', fallbackError);
+        // Set empty schedule to show "No data" message
+        setSchedule({ doctorSchedules: [], staffSchedules: [] });
       }
       setLoading(false);
     }
