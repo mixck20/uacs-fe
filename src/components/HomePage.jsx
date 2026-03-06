@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
-import { FaClock, FaPhone, FaMapMarkerAlt, FaEnvelope } from "react-icons/fa";
+import { FaClock, FaPhone, FaMapMarkerAlt, FaEnvelope, FaHeartbeat } from "react-icons/fa";
 import axios from "axios";
 
 const API_URL = 'https://uacs-be.vercel.app/api';
@@ -30,6 +30,15 @@ const HomePage = () => {
     navigate('/login');
   };
 
+  const loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.";
+
+  const services = [
+    { icon: FaHeartbeat, title: "Service One" },
+    { icon: FaHeartbeat, title: "Service Two" },
+    { icon: FaHeartbeat, title: "Service Three" },
+    { icon: FaHeartbeat, title: "Service Four" }
+  ];
+
   return (
     <div className="home-page">
       {/* Banner - Exact copy of Login Banner Left Side */}
@@ -38,6 +47,29 @@ const HomePage = () => {
         <p className="uacs-tagline">University of the Assumption Clinic System</p>
         <button className="home-login-btn" onClick={handleLoginClick}>Login</button>
       </div>
+
+      {/* Services Section */}
+      <section className="services-section">
+        <div className="section-container">
+          <h2 className="section-title">Our Services</h2>
+          <p className="section-subtitle">Healthcare services available at our clinic</p>
+
+          <div className="services-grid">
+            {services.map((service, index) => {
+              const Icon = service.icon;
+              return (
+                <div className="service-card" key={index} style={{ animationDelay: `${index * 0.1}s` }}>
+                  <div className="service-icon">
+                    <Icon />
+                  </div>
+                  <h3>{service.title}</h3>
+                  <p>{loremIpsum}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
       {/* Schedule Section */}
       <section className="schedule-section">
