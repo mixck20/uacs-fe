@@ -22,17 +22,7 @@ index-KrV8vE8u.js:60 API Error: Error: Failed to fetch patients
     at async Object.list (index-KrV8vE8u.js:60:23488)
 kt @ index-KrV8vE8u.js:60Understand this error
 index-KrV8vE8u.js:653 Error: Failed to fetch patients
-    at kt (index-KrV8vE8u.js:60:22021)
-    at async Object.list (index-KrV8vE8u.js:60:23488)
-(anonymous) @ index-KrV8vE8u.js:653Understand this error
-uacs-be.vercel.app/api/patients?filter=all&search=Depa:1  Failed to load resource: the server responded with a status of 500 ()Understand this error
-index-KrV8vE8u.js:60 API Error: Error: Failed to fetch patients
-    at kt (index-KrV8vE8u.js:60:22021)
-    at async Object.list (index-KrV8vE8u.js:60:23488)
-kt @ index-KrV8vE8u.js:60Understand this error
-index-KrV8vE8u.js:653 Error: Failed to fetch patients
-    at kt (index-KrV8vE8u.js:60:22021)
-    at async Object.list (index-KrV8vE8u.js:60:23488)import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import ClinicNavbar from './ClinicNavbar';
