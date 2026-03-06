@@ -142,20 +142,46 @@ const HomePage = () => {
                 </div>
               )}
 
-              {/* Clinical Staff */}
-              {schedule?.staffSchedules?.length > 0 && (
+              {/* University Physicians */}
+              {schedule?.staffSchedules?.filter(s => s.role === 'physician').length > 0 && (
                 <div style={{ marginBottom: '3rem' }}>
-                  <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '1.5rem', fontWeight: '600' }}>University Nurses</h3>
+                  <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '1.5rem', fontWeight: '600' }}>University Physicians</h3>
                   <div className="schedule-grid">
                     {schedule.staffSchedules
+                      .filter(s => s.role === 'physician')
                       .map((staff, index) => (
                         <div className="schedule-card" key={staff._id || index}>
                           <div className="day-header">
                             <FaClock className="schedule-icon" />
                             <h3>{staff.name}</h3>
                           </div>
-                          <p className="schedule-time">{staff.designation || 'Clinical Staff'}</p>
-                          <p className="schedule-note">{staff.schedule || staff.time || 'Not specified'}</p>
+                          <p className="schedule-time">Day of Duty</p>
+                          <p className="schedule-note">{staff.dayOfDuty || 'Not specified'}</p>
+                          <p className="schedule-time" style={{ marginTop: '0.75rem' }}>Time</p>
+                          <p className="schedule-note">{staff.time || 'Not specified'}</p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* University Nurses */}
+              {schedule?.staffSchedules?.filter(s => s.role === 'nurse').length > 0 && (
+                <div style={{ marginBottom: '3rem' }}>
+                  <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '1.5rem', fontWeight: '600' }}>University Nurses</h3>
+                  <div className="schedule-grid">
+                    {schedule.staffSchedules
+                      .filter(s => s.role === 'nurse')
+                      .map((staff, index) => (
+                        <div className="schedule-card" key={staff._id || index}>
+                          <div className="day-header">
+                            <FaClock className="schedule-icon" />
+                            <h3>{staff.name}</h3>
+                          </div>
+                          <p className="schedule-time">Designation</p>
+                          <p className="schedule-note">{staff.designation || 'Not specified'}</p>
+                          <p className="schedule-time" style={{ marginTop: '0.75rem' }}>Schedule</p>
+                          <p className="schedule-note">{staff.schedule || 'Not specified'}</p>
                         </div>
                       ))}
                   </div>
