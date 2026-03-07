@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ClinicNavbar from "./ClinicNavbar";
 import "./Patients.css";
-import { FaEnvelope, FaSearch, FaPlus, FaFileExport, FaUpload, FaTimes, FaUser, FaPhone, FaMapMarkerAlt, FaAllergies, FaNotesMedical, FaEdit, FaTrash, FaUserCheck, FaUserClock, FaFilter, FaEye, FaFilePdf, FaFileExcel, FaArchive, FaUndo, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaEnvelope, FaSearch, FaPlus, FaFileExport, FaUpload, FaTimes, FaUser, FaPhone, FaMapMarkerAlt, FaAllergies, FaNotesMedical, FaEdit, FaTrash, FaUserCheck, FaUserClock, FaFilter, FaEye, FaFilePdf, FaFileExcel, FaArchive, FaUndo, FaChevronLeft, FaChevronRight, FaHeartbeat } from "react-icons/fa";
 import { PatientsAPI } from "../api";
 import Swal from "sweetalert2";
 import jsPDF from "jspdf";
@@ -1456,6 +1456,46 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                     </div>
                   </div>
                 </div>
+
+                {selectedPatient.visits && selectedPatient.visits.length > 0 && (
+                  <div className="patient-details-section">
+                    <h3><FaHeartbeat /> Recent Visits & Vital Signs</h3>
+                    {selectedPatient.visits.slice(0, 3).map((visit, index) => (
+                      <div key={index} className="visit-record" style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '8px', borderLeft: '4px solid #e51d5e' }}>
+                        <div style={{ marginBottom: '0.75rem', fontWeight: '600', color: '#1e293b' }}>
+                          {visit.date ? new Date(visit.date).toLocaleDateString() : 'Date N/A'}
+                          {visit.physician && <span style={{ marginLeft: '1rem', color: '#64748b' }}>• Physician: {visit.physician}</span>}
+                        </div>
+                        {visit.vitalSigns && Object.keys(visit.vitalSigns).length > 0 ? (
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem', fontSize: '0.9rem' }}>
+                            {visit.vitalSigns.bloodPressure && (
+                              <div><span style={{ color: '#64748b' }}>BP:</span> <strong>{visit.vitalSigns.bloodPressure}</strong></div>
+                            )}
+                            {visit.vitalSigns.temperature && (
+                              <div><span style={{ color: '#64748b' }}>Temp:</span> <strong>{visit.vitalSigns.temperature}°</strong></div>
+                            )}
+                            {visit.vitalSigns.heartRate && (
+                              <div><span style={{ color: '#64748b' }}>HR:</span> <strong>{visit.vitalSigns.heartRate}</strong></div>
+                            )}
+                            {visit.vitalSigns.weight && (
+                              <div><span style={{ color: '#64748b' }}>Weight:</span> <strong>{visit.vitalSigns.weight}</strong></div>
+                            )}
+                            {visit.vitalSigns.height && (
+                              <div><span style={{ color: '#64748b' }}>Height:</span> <strong>{visit.vitalSigns.height}</strong></div>
+                            )}
+                          </div>
+                        ) : (
+                          <p style={{ color: '#94a3b8', fontSize: '0.9rem', margin: 0 }}>No vital signs recorded</p>
+                        )}
+                        {visit.diagnosis && (
+                          <div style={{ marginTop: '0.75rem', fontSize: '0.9rem' }}>
+                            <span style={{ color: '#64748b' }}>Diagnosis:</span> <span style={{ color: '#1e293b' }}>{visit.diagnosis}</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {selectedPatient.notes && (
                   <div className="patient-details-notes">
