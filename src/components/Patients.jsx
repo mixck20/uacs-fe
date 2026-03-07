@@ -726,13 +726,6 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
       });
     });
   }
-      } else if (result.isDenied) {
-        handleExportToCSV();
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        handleExportToPDF();
-      }
-    });
-  }
 
   function handleArchivePatient(patient) {
     setPatientToArchive(patient);
