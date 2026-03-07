@@ -124,6 +124,26 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
   const currentRecords = filteredRecords.slice(indexOfFirstRecord, indexOfLastRecord);
   const totalPages = Math.ceil(filteredRecords.length / recordsPerPage);
 
+  // Helper function to determine time period
+  const getTimePeriod = (dateString) => {
+    const recordDate = new Date(dateString);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    weekAgo.setHours(0, 0, 0, 0);
+    
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+    
+    if (recordDate >= today) return 'Today';
+    if (recordDate >= weekAgo) return 'This Week';
+    if (recordDate >= monthStart) return 'This Month';
+    return 'Earlier';
+  };
+
   // Export to CSV
   const exportToCSV = () => {
     if (filteredRecords.length === 0) {
@@ -136,9 +156,10 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
       return;
     }
 
-    const headers = ['Date', 'Medication', 'Quantity', 'Patient Name', 'Student ID', 'Dispensed By', 'Reason', 'Notes'];
+    const headers = ['Date', 'Period', 'Medication', 'Quantity', 'Patient Name', 'Student ID', 'Dispensed By', 'Reason', 'Notes'];
     const csvData = filteredRecords.map(record => [
-      new Date(record.dispensedAt).toLocaleString(),
+      new Date(record.dispensedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + new Date(record.dispensedAt).toLocaleTimeString(),
+      getTimePeriod(record.dispensedAt),
       record.itemName || 'N/A',
       record.quantity,
       record.patientName || 'N/A',
