@@ -109,6 +109,11 @@
   color: white;
 }
 
+.stat-card.month .stat-icon {
+  background: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
+  color: white;
+}
+
 .stat-card.patients .stat-icon {
   background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
   color: white;
@@ -133,7 +138,7 @@
   line-height: 1;
 }
 
-.stat-date {
+.stat-month-year {
   font-size: 0.75rem;
   color: #94a3b8;
   font-weight: 400;

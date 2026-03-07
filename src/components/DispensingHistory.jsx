@@ -45,8 +45,13 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
       weekAgo.setDate(weekAgo.getDate() - 7);
       weekAgo.setHours(0, 0, 0, 0);
       
+      const monthStart = new Date();
+      monthStart.setDate(1);
+      monthStart.setHours(0, 0, 0, 0);
+      
       const todayDispensed = records.filter(r => new Date(r.dispensedAt) >= today).length;
       const weekDispensed = records.filter(r => new Date(r.dispensedAt) >= weekAgo).length;
+      const monthDispensed = records.filter(r => new Date(r.dispensedAt) >= monthStart).length;
       const uniquePatients = new Set(records.map(r => r.patientId)).size;
       
       setDispensingRecords(records);
@@ -56,6 +61,7 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
         totalDispensed: records.length,
         todayDispensed,
         weekDispensed,
+        monthDispensed,
         uniquePatients
       });
     } catch (error) {
@@ -200,7 +206,6 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
               <div className="stat-info">
                 <span className="stat-label">Total Dispensed</span>
                 <span className="stat-value">{stats.totalDispensed || 0}</span>
-                <span className="stat-date">{new Date().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</span>
               </div>
             </div>
             <div className="stat-card today">
@@ -210,7 +215,6 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
               <div className="stat-info">
                 <span className="stat-label">Today</span>
                 <span className="stat-value">{stats.todayDispensed || 0}</span>
-                <span className="stat-date">{new Date().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</span>
               </div>
             </div>
             <div className="stat-card week">
@@ -220,7 +224,16 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
               <div className="stat-info">
                 <span className="stat-label">This Week</span>
                 <span className="stat-value">{stats.weekDispensed || 0}</span>
-                <span className="stat-date">{new Date().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</span>
+              </div>
+            </div>
+            <div className="stat-card month">
+              <div className="stat-icon">
+                <FaCalendarAlt />
+              </div>
+              <div className="stat-info">
+                <span className="stat-label">This Month</span>
+                <span className="stat-value">{stats.monthDispensed || 0}</span>
+                <span className="stat-month-year">{new Date().toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</span>
               </div>
             </div>
             <div className="stat-card patients">
@@ -230,7 +243,6 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
               <div className="stat-info">
                 <span className="stat-label">Patients</span>
                 <span className="stat-value">{stats.uniquePatients || 0}</span>
-                <span className="stat-date">{new Date().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</span>
               </div>
             </div>
           </div>
