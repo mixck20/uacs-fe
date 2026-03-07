@@ -225,7 +225,7 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
                 <FaUser />
               </div>
               <div className="stat-info">
-                <span className="stat-label">Unique Patients</span>
+                <span className="stat-label">Patients</span>
                 <span className="stat-value">{stats.uniquePatients || 0}</span>
               </div>
             </div>
@@ -326,7 +326,7 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
                     <tr key={index}>
                       <td>
                         <div className="date-cell">
-                          {new Date(record.dispensedAt).toLocaleDateString()}
+                          {new Date(record.dispensedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                           <span className="time">{new Date(record.dispensedAt).toLocaleTimeString()}</span>
                         </div>
                       </td>
