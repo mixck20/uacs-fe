@@ -77,6 +77,29 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     setCurrentPage(1);
   }, [searchTerm, filterType, showArchived]);
 
+  // Helper function to filter patients by date range
+  const getPatientsByDateRange = (dateRange) => {
+    const today = new Date();
+    let startDate, endDate;
+    
+    if (dateRange === 'today') {
+      startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    } else if (dateRange === 'week') {
+      const day = today.getDay();
+      const diff = today.getDate() - day;
+      startDate = new Date(today.getFullYear(), today.getMonth(), diff);
+      endDate = new Date(today.getFullYear(), today.getMonth(), diff + 7);
+    } else {
+      return filteredPatients;
+    }
+    
+    return filteredPatients.filter(patient => {
+      const patientDate = new Date(patient.createdAt);
+      return patientDate >= startDate && patientDate < endDate;
+    });
+  };
+
   useEffect(() => {
     // Load patients with current filter and archived status
     PatientsAPI.list(filterType, searchTerm, showArchived).then(setPatients).catch(err => {
@@ -206,9 +229,9 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     }
   }
 
-  async function handleExportToExcel() {
+  async function handleExportToExcel(dateRange = 'all') {
     try {
-      const dataToExport = filteredPatients.map((patient, index) => ({
+      const dataToExport = getPatientsByDateRange(dateRange).map((patient, index) => ({
         'surname': patient.surname || '',
         'firstName': patient.firstName || '',
         'middleName': patient.middleName || '',
@@ -230,6 +253,11 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         'emergencyCel': patient.emergencyContact?.phone || '',
       }));
 
+      if (dataToExport.length === 0) {
+        Swal.fire('No Data', 'No patients found for the selected period', 'warning');
+        return;
+      }
+
       const worksheet = XLSX.utils.json_to_sheet(dataToExport);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Patients");
@@ -241,12 +269,13 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
       }));
       worksheet['!cols'] = colWidths;
 
-      const fileName = `Patients_List_${new Date().toISOString().split('T')[0]}.xlsx`;
+      const dateLabel = dateRange === 'today' ? 'today' : dateRange === 'week' ? 'week' : 'all';
+      const fileName = `Patients_${dateLabel}_${new Date().toISOString().split('T')[0]}.xlsx`;
       XLSX.writeFile(workbook, fileName);
 
       Swal.fire({
         title: "Export Successful!",
-        text: `${filteredPatients.length} patients exported to Excel`,
+        text: `${dataToExport.length} patients exported to Excel`,
         icon: "success",
         timer: 2000,
         showConfirmButton: false
@@ -256,8 +285,15 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     }
   }
 
-  async function handleExportToPDF() {
+  async function handleExportToPDF(dateRange = 'all') {
     try {
+      const dataToExport = getPatientsByDateRange(dateRange);
+      
+      if (dataToExport.length === 0) {
+        Swal.fire('No Data', 'No patients found for the selected period', 'warning');
+        return;
+      }
+
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
@@ -288,19 +324,20 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
       yPos += 5;
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
-      doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, yPos, { align: "center" });
+      const dateLabel = dateRange === 'today' ? '(Today)' : dateRange === 'week' ? '(This Week)' : '';
+      doc.text(`Generated: ${new Date().toLocaleString()} ${dateLabel}`, pageWidth / 2, yPos, { align: "center" });
       yPos += 10;
 
       // Summary
       doc.setFontSize(10);
       doc.setFont("helvetica", "bold");
-      doc.text(`Total Patients: ${filteredPatients.length}`, 20, yPos);
+      doc.text(`Total Patients: ${dataToExport.length}`, 20, yPos);
       yPos += 6;
-      const registered = filteredPatients.filter(p => p.isRegisteredUser).length;
+      const registered = dataToExport.filter(p => p.isRegisteredUser).length;
       doc.setFont("helvetica", "normal");
       doc.text(`Registered Users: ${registered}`, 20, yPos);
       yPos += 6;
-      doc.text(`Walk-ins: ${filteredPatients.length - registered}`, 20, yPos);
+      doc.text(`Walk-ins: ${dataToExport.length - registered}`, 20, yPos);
       yPos += 10;
 
       doc.setDrawColor(229, 29, 94);
@@ -308,7 +345,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
       yPos += 10;
 
       // Patient List
-      filteredPatients.forEach((patient, index) => {
+      dataToExport.forEach((patient, index) => {
         // Check if we need a new page
         if (yPos > pageHeight - 40) {
           doc.addPage();
@@ -370,12 +407,13 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         );
       }
 
-      const fileName = `Patients_List_${new Date().toISOString().split('T')[0]}.pdf`;
+      const dateLabelForFile = dateRange === 'today' ? 'today' : dateRange === 'week' ? 'week' : 'all';
+      const fileName = `Patients_${dateLabelForFile}_${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(fileName);
 
       Swal.fire({
         title: "Export Successful!",
-        text: `${filteredPatients.length} patients exported to PDF`,
+        text: `${dataToExport.length} patients exported to PDF`,
         icon: "success",
         timer: 2000,
         showConfirmButton: false
@@ -385,9 +423,9 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     }
   }
 
-  async function handleExportToCSV() {
+  async function handleExportToCSV(dateRange = 'all') {
     try {
-      const dataToExport = filteredPatients.map((patient, index) => ({
+      const dataToExport = getPatientsByDateRange(dateRange).map((patient, index) => ({
         'surname': patient.surname || '',
         'firstName': patient.firstName || '',
         'middleName': patient.middleName || '',
@@ -409,6 +447,11 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         'emergencyCel': patient.emergencyContact?.phone || '',
       }));
 
+      if (dataToExport.length === 0) {
+        Swal.fire('No Data', 'No patients found for the selected period', 'warning');
+        return;
+      }
+
       // Convert to CSV format
       const headers = Object.keys(dataToExport[0] || {});
       const csvContent = [
@@ -428,7 +471,8 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
-      link.setAttribute('download', `Patients_List_${new Date().toISOString().split('T')[0]}.csv`);
+      const dateLabel = dateRange === 'today' ? 'today' : dateRange === 'week' ? 'week' : 'all';
+      link.setAttribute('download', `Patients_${dateLabel}_${new Date().toISOString().split('T')[0]}.csv`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
@@ -436,7 +480,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
 
       Swal.fire({
         title: "Export Successful!",
-        text: `${filteredPatients.length} patients exported to CSV`,
+        text: `${dataToExport.length} patients exported to CSV`,
         icon: "success",
         timer: 2000,
         showConfirmButton: false
@@ -629,22 +673,59 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
   }
 
   function handleExport() {
+    // First, ask for date range
     Swal.fire({
       title: "Export Patients",
-      text: "Choose export format:",
+      html: `
+        <div style="text-align: left;">
+          <p style="margin-bottom: 1rem; color: #333;">Choose the date range for export:</p>
+        </div>
+      `,
       icon: "question",
-      showCancelButton: true,
       showDenyButton: true,
-      confirmButtonText: '<i class="fa fa-file-excel"></i> Export to Excel',
-      denyButtonText: '<i class="fa fa-file-csv"></i> Export to CSV',
-      cancelButtonText: '<i class="fa fa-file-pdf"></i> Export to PDF',
-      confirmButtonColor: "#10b981",
-      denyButtonColor: "#3b82f6",
-      cancelButtonColor: "#e51d5e",
-      reverseButtons: false
+      showCancelButton: true,
+      confirmButtonText: 'This Day',
+      denyButtonText: 'This Week',
+      cancelButtonText: 'All Data',
+      confirmButtonColor: '#e51d5e',
+      denyButtonColor: '#3b82f6',
+      cancelButtonColor: '#6b7280'
     }).then((result) => {
+      let selectedDateRange = 'all';
+      
       if (result.isConfirmed) {
-        handleExportToExcel();
+        selectedDateRange = 'today';
+      } else if (result.isDenied) {
+        selectedDateRange = 'week';
+      } else if (result.dismiss !== Swal.DismissReason.cancel) {
+        return; // User cancelled
+      }
+      
+      // Then ask for format
+      Swal.fire({
+        title: "Export Format",
+        text: "Choose export format:",
+        icon: "question",
+        showCancelButton: true,
+        showDenyButton: true,
+        confirmButtonText: 'Excel',
+        denyButtonText: 'CSV',
+        cancelButtonText: 'PDF',
+        confirmButtonColor: "#10b981",
+        denyButtonColor: "#3b82f6",
+        cancelButtonColor: "#e51d5e",
+        reverseButtons: false
+      }).then((formatResult) => {
+        if (formatResult.isConfirmed) {
+          handleExportToExcel(selectedDateRange);
+        } else if (formatResult.isDenied) {
+          handleExportToCSV(selectedDateRange);
+        } else if (formatResult.dismiss === Swal.DismissReason.cancel) {
+          handleExportToPDF(selectedDateRange);
+        }
+      });
+    });
+  }
       } else if (result.isDenied) {
         handleExportToCSV();
       } else if (result.dismiss === Swal.DismissReason.cancel) {

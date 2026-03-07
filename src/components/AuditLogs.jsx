@@ -60,13 +60,59 @@ function AuditLogs() {
     setPagination(prev => ({ ...prev, page: 1 }));
   };
 
-  const handleExport = async () => {
+  const handleExport = async (dateRange = 'all') => {
     try {
-      await AdminAPI.exportAuditLogs(filters);
+      const today = new Date();
+      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+      
+      let exportFilters = { ...filters };
+      
+      if (dateRange === 'today') {
+        exportFilters.startDate = startOfToday.toISOString().split('T')[0];
+        exportFilters.endDate = endOfToday.toISOString().split('T')[0];
+      } else if (dateRange === 'week') {
+        const day = today.getDay();
+        const diff = today.getDate() - day;
+        const startOfWeek = new Date(today.getFullYear(), today.getMonth(), diff);
+        const endOfWeek = new Date(today.getFullYear(), today.getMonth(), diff + 7);
+        exportFilters.startDate = startOfWeek.toISOString().split('T')[0];
+        exportFilters.endDate = endOfWeek.toISOString().split('T')[0];
+      }
+      
+      await AdminAPI.exportAuditLogs(exportFilters);
       Swal.fire('Success', 'Audit logs exported successfully', 'success');
     } catch (error) {
       Swal.fire('Error', error.message || 'Failed to export audit logs', 'error');
     }
+  };
+
+  const showExportOptions = () => {
+    Swal.fire({
+      title: 'Export Audit Logs',
+      html: `
+        <div style="text-align: left;">
+          <p style="margin-bottom: 1rem; color: #333;">Choose the date range for export:</p>
+        </div>
+      `,
+      icon: 'question',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'This Day',
+      denyButtonText: 'This Week',
+      cancelButtonText: 'All Data',
+      confirmButtonColor: '#e51d5e',
+      denyButtonColor: '#3b82f6',
+      cancelButtonColor: '#6b7280'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleExport('today');
+      } else if (result.isDenied) {
+        handleExport('week');
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        handleExport('all');
+      }
+    });
   };
 
   const clearFilters = () => {
@@ -93,7 +139,7 @@ function AuditLogs() {
       <div className="audit-logs">
         <div className="page-header">
           <h1>Audit Logs</h1>
-          <button className="btn-export" onClick={handleExport}>
+          <button className="btn-export" onClick={showExportOptions}>
             <FaFileDownload /> Export CSV
           </button>
         </div>

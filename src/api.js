@@ -768,10 +768,10 @@ export const AdminAPI = {
     return await apiFetch('/api/admin/analytics');
   },
 
-  exportAnalytics: async () => {
+  exportAnalytics: async (dateRange = 'all') => {
     try {
       const token = getAuthToken();
-      const response = await fetch(`${API_CONFIG.baseUrl}/api/admin/analytics/export`, {
+      const response = await fetch(`${API_CONFIG.baseUrl}/api/admin/analytics/export?dateRange=${dateRange}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -786,7 +786,8 @@ export const AdminAPI = {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `analytics-report-${new Date().toISOString().split('T')[0]}.csv`;
+      const dateLabel = dateRange === 'today' ? 'today' : dateRange === 'week' ? 'week' : 'all';
+      a.download = `analytics-report-${dateLabel}-${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);

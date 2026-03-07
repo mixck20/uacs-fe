@@ -50,10 +50,10 @@ function AdminDashboard() {
     }
   };
 
-  const handleExportAnalytics = async () => {
+  const handleExportAnalytics = async (dateRange = 'all') => {
     try {
       setExporting(true);
-      await AdminAPI.exportAnalytics();
+      await AdminAPI.exportAnalytics(dateRange);
       Swal.fire({
         icon: 'success',
         title: 'Export Successful',
@@ -70,6 +70,34 @@ function AdminDashboard() {
     } finally {
       setExporting(false);
     }
+  };
+
+  const showExportOptions = () => {
+    Swal.fire({
+      title: 'Export Analytics Report',
+      html: `
+        <div style="text-align: left;">
+          <p style="margin-bottom: 1rem; color: #333;">Choose the date range for your report:</p>
+        </div>
+      `,
+      icon: 'question',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'This Day',
+      denyButtonText: 'This Week',
+      cancelButtonText: 'All Data',
+      confirmButtonColor: '#e51d5e',
+      denyButtonColor: '#3b82f6',
+      cancelButtonColor: '#6b7280'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleExportAnalytics('today');
+      } else if (result.isDenied) {
+        handleExportAnalytics('week');
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        handleExportAnalytics('all');
+      }
+    });
   };
 
   if (loading) {
@@ -99,7 +127,7 @@ function AdminDashboard() {
           <h1>Admin Dashboard</h1>
           <button 
             className="btn-export" 
-            onClick={handleExportAnalytics}
+            onClick={showExportOptions}
             disabled={exporting}
           >
             <FaFileDownload /> {exporting ? 'Exporting...' : 'Export Report'}

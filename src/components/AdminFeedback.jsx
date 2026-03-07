@@ -11,6 +11,7 @@ function AdminFeedback() {
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [exportDateRange, setExportDateRange] = useState('all');
 
   useEffect(() => {
     fetchFeedback();
@@ -30,11 +31,57 @@ function AdminFeedback() {
     }
   };
 
-  const handleExportFeedback = async () => {
+  // Helper function to get date range
+  const getDateRange = (rangeType) => {
+    const today = new Date();
+    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    
+    let startDate, endDate;
+    
+    switch(rangeType) {
+      case 'today':
+        startDate = startOfToday;
+        endDate = endOfToday;
+        break;
+      case 'week':
+        // Start from Sunday of current week
+        const day = today.getDay();
+        const diff = today.getDate() - day;
+        startDate = new Date(today.getFullYear(), today.getMonth(), diff);
+        endDate = new Date(today.getFullYear(), today.getMonth(), diff + 7);
+        break;
+      default: // 'all'
+        startDate = new Date(1970, 0, 1);
+        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    }
+    
+    return { startDate, endDate };
+  };
+
+  // Filter feedback by date range
+  const getFilteredFeedbackByDate = (rangeType) => {
+    if (rangeType === 'all') return feedbackList;
+    
+    const { startDate, endDate } = getDateRange(rangeType);
+    return feedbackList.filter(feedback => {
+      const feedbackDate = new Date(feedback.createdAt);
+      return feedbackDate >= startDate && feedbackDate < endDate;
+    });
+  };
+
+  const handleExportFeedback = async (dateRange) => {
     try {
-      // Create CSV from current feedback data
+      const dataToExport = getFilteredFeedbackByDate(dateRange);
+      
+      if (dataToExport.length === 0) {
+        Swal.fire('No Data', `No feedback found for the selected period`, 'warning');
+        return;
+      }
+      
+      // Create CSV from filtered feedback data
       const csvHeader = 'Date,User Name,User Email,Type,Status,Subject,Message,Rating\n';
-      const csvRows = feedbackList.map(feedback => {
+      const csvRows = dataToExport.map(feedback => {
         const date = new Date(feedback.createdAt);
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -58,7 +105,9 @@ function AdminFeedback() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `feedback-${new Date().toISOString().split('T')[0]}.csv`;
+      
+      const dateLabel = dateRange === 'today' ? 'today' : dateRange === 'week' ? 'week' : 'all';
+      a.download = `feedback-${dateLabel}-${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -67,9 +116,10 @@ function AdminFeedback() {
       Swal.fire({
         icon: 'success',
         title: 'Export Successful',
-        text: 'Feedback list has been downloaded',
+        text: `${dataToExport.length} feedback records exported`,
         confirmButtonColor: '#e51d5e'
       });
+      setExportDateRange('all');
     } catch (error) {
       Swal.fire({
         icon: 'error',
@@ -78,6 +128,34 @@ function AdminFeedback() {
         confirmButtonColor: '#e51d5e'
       });
     }
+  };
+
+  const showExportOptions = () => {
+    Swal.fire({
+      title: 'Export Feedback',
+      html: `
+        <div style="text-align: left;">
+          <p style="margin-bottom: 1rem; color: #333;">Choose the date range for export:</p>
+        </div>
+      `,
+      icon: 'question',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'This Day',
+      denyButtonText: 'This Week',
+      cancelButtonText: 'All Data',
+      confirmButtonColor: '#e51d5e',
+      denyButtonColor: '#3b82f6',
+      cancelButtonColor: '#6b7280'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleExportFeedback('today');
+      } else if (result.isDenied) {
+        handleExportFeedback('week');
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        handleExportFeedback('all');
+      }
+    });
   };
 
   const handleUpdateStatus = async (id, newStatus) => {
@@ -120,7 +198,7 @@ function AdminFeedback() {
       <div className="admin-feedback">
         <div className="page-header">
           <h1>User Feedback</h1>
-          <button className="btn-export" onClick={handleExportFeedback}>
+          <button className="btn-export" onClick={showExportOptions}>
             <FaFileDownload /> Export CSV
           </button>
         </div>
