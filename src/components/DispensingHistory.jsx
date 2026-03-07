@@ -183,7 +183,7 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
             <h1 className="dispensing-title">
               Dispensing History & Reports
             </h1>
-            <p className="dispensing-subtitle">Complete medication distribution records</p>
+            <p className="dispensing-subtitle">Complete medication distribution records - {new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long' })}</p>
           </div>
           <button className="export-btn csv-export-btn" onClick={exportToCSV}>
             <FaFileExcel /> Export to CSV
