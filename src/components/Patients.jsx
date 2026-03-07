@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ClinicNavbar from "./ClinicNavbar";
 import "./Patients.css";
-import { FaEnvelope, FaSearch, FaPlus, FaFileExport, FaUpload, FaTimes, FaUser, FaPhone, FaMapMarkerAlt, FaAllergies, FaNotesMedical, FaEdit, FaTrash, FaUserCheck, FaUserClock, FaFilter, FaEye, FaFilePdf, FaFileExcel, FaArchive, FaUndo } from "react-icons/fa";
+import { FaEnvelope, FaSearch, FaPlus, FaFileExport, FaUpload, FaTimes, FaUser, FaPhone, FaMapMarkerAlt, FaAllergies, FaNotesMedical, FaEdit, FaTrash, FaUserCheck, FaUserClock, FaFilter, FaEye, FaFilePdf, FaFileExcel, FaArchive, FaUndo, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { PatientsAPI } from "../api";
 import Swal from "sweetalert2";
 import jsPDF from "jspdf";
@@ -13,6 +13,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [filterType, setFilterType] = useState('all'); // 'all', 'registered', 'walkins'
   const [showArchived, setShowArchived] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1); // Pagination
   const [isSubmitting, setIsSubmitting] = useState(false); // Prevent double submit
   const [showArchiveModal, setShowArchiveModal] = useState(false);
   const [patientToArchive, setPatientToArchive] = useState(null);
@@ -51,6 +52,9 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
+  // Pagination
+  const ITEMS_PER_PAGE = 10;
+  
   const filteredPatients = patients.filter(p => {
     const searchLower = searchTerm.toLowerCase();
     return (
@@ -61,6 +65,17 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
       (p.userId?.yearLevel || p.yearLevel || '').toString().toLowerCase().includes(searchLower)
     );
   });
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredPatients.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedPatients = filteredPatients.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search or filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterType, showArchived]);
 
   useEffect(() => {
     // Load patients with current filter and archived status
@@ -796,7 +811,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
 
         {/* Patients Grid */}
         <div className="patients-grid">
-          {filteredPatients.map((patient) => (
+          {paginatedPatients.map((patient) => (
             <div className="patient-card" key={patient._id || patient.id}>
               <div className="patient-card-header">
                 <div className="patient-avatar">
@@ -857,6 +872,34 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
         {filteredPatients.length === 0 && (
           <div className="patients-empty">
             <p>No patients found matching "{searchTerm}"</p>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {filteredPatients.length > 0 && totalPages > 1 && (
+          <div className="pagination-controls">
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(prev => prev - 1)}
+              disabled={currentPage === 1}
+              title="Previous page"
+            >
+              <FaChevronLeft /> Previous
+            </button>
+            <div className="pagination-info">
+              Page <span className="current-page">{currentPage}</span> of <span className="total-pages">{totalPages}</span>
+              {filteredPatients.length > 0 && (
+                <span className="record-count"> ({startIndex + 1} - {Math.min(endIndex, filteredPatients.length)} of {filteredPatients.length})</span>
+              )}
+            </div>
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              disabled={currentPage === totalPages}
+              title="Next page"
+            >
+              Next <FaChevronRight />
+            </button>
           </div>
         )}
 
