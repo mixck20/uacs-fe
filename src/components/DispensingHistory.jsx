@@ -183,7 +183,7 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
             <h1 className="dispensing-title">
               Dispensing History & Reports
             </h1>
-            <p className="dispensing-subtitle">Complete medication distribution records - {new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long' })}</p>
+            <p className="dispensing-subtitle">Complete medication distribution records</p>
           </div>
           <button className="export-btn csv-export-btn" onClick={exportToCSV}>
             <FaFileExcel /> Export to CSV
@@ -200,6 +200,7 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
               <div className="stat-info">
                 <span className="stat-label">Total Dispensed</span>
                 <span className="stat-value">{stats.totalDispensed || 0}</span>
+                <span className="stat-date">{new Date().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</span>
               </div>
             </div>
             <div className="stat-card today">
@@ -209,6 +210,7 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
               <div className="stat-info">
                 <span className="stat-label">Today</span>
                 <span className="stat-value">{stats.todayDispensed || 0}</span>
+                <span className="stat-date">{new Date().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</span>
               </div>
             </div>
             <div className="stat-card week">
@@ -218,6 +220,7 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
               <div className="stat-info">
                 <span className="stat-label">This Week</span>
                 <span className="stat-value">{stats.weekDispensed || 0}</span>
+                <span className="stat-date">{new Date().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</span>
               </div>
             </div>
             <div className="stat-card patients">
@@ -227,6 +230,7 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
               <div className="stat-info">
                 <span className="stat-label">Patients</span>
                 <span className="stat-value">{stats.uniquePatients || 0}</span>
+                <span className="stat-date">{new Date().toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</span>
               </div>
             </div>
           </div>
