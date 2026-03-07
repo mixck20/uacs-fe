@@ -145,11 +145,66 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
   };
 
   // Export to CSV
-  const exportToCSV = () => {
-    if (filteredRecords.length === 0) {
+  const exportToCSV = async () => {
+    // Show period selection dialog
+    const { value: selectedPeriod } = await Swal.fire({
+      title: 'Select Period to Export',
+      input: 'select',
+      inputOptions: {
+        'today': 'Today',
+        'week': 'This Week',
+        'month': 'This Month',
+        'all': 'All Records'
+      },
+      inputPlaceholder: 'Choose a period...',
+      showCancelButton: true,
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Please select a period!';
+        }
+      }
+    });
+
+    if (!selectedPeriod) return; // User cancelled
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    weekAgo.setHours(0, 0, 0, 0);
+    
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+
+    // Filter records based on selected period
+    let recordsToExport = [];
+    let periodLabel = '';
+
+    switch (selectedPeriod) {
+      case 'today':
+        recordsToExport = dispensingRecords.filter(r => new Date(r.dispensedAt) >= today);
+        periodLabel = 'Today';
+        break;
+      case 'week':
+        recordsToExport = dispensingRecords.filter(r => new Date(r.dispensedAt) >= weekAgo);
+        periodLabel = 'This Week';
+        break;
+      case 'month':
+        recordsToExport = dispensingRecords.filter(r => new Date(r.dispensedAt) >= monthStart);
+        periodLabel = 'This Month';
+        break;
+      case 'all':
+        recordsToExport = dispensingRecords;
+        periodLabel = 'All Records';
+        break;
+    }
+
+    if (recordsToExport.length === 0) {
       Swal.fire({
         title: 'No Data',
-        text: 'No records to export',
+        text: `No records found for ${periodLabel}`,
         icon: 'warning',
         confirmButtonColor: '#e51d5e'
       });
@@ -157,7 +212,7 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
     }
 
     const headers = ['Date', 'Period', 'Medication', 'Quantity', 'Patient Name', 'Student ID', 'Dispensed By', 'Reason', 'Notes'];
-    const csvData = filteredRecords.map(record => [
+    const csvData = recordsToExport.map(record => [
       new Date(record.dispensedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) + ' ' + new Date(record.dispensedAt).toLocaleTimeString(),
       getTimePeriod(record.dispensedAt),
       record.itemName || 'N/A',
@@ -178,7 +233,7 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `dispensing-history-${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `dispensing-history-${periodLabel.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -186,7 +241,7 @@ function DispensingHistory({ setActivePage, onLogout, user }) {
 
     Swal.fire({
       title: 'Success!',
-      text: `Exported ${filteredRecords.length} records to CSV`,
+      text: `Exported ${recordsToExport.length} records for ${periodLabel}`,
       icon: 'success',
       confirmButtonColor: '#4CAF50'
     });
