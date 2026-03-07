@@ -1571,6 +1571,11 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                           ) : (
                             <p style={{ color: '#94a3b8', fontSize: '0.9rem', margin: 0 }}>No vital signs recorded</p>
                           )}
+                          {visit.complaint && (
+                            <div style={{ marginTop: '0.75rem', fontSize: '0.9rem' }}>
+                              <span style={{ color: '#64748b' }}>Chief Complaint:</span> <span style={{ color: '#1e293b' }}>{visit.complaint}</span>
+                            </div>
+                          )}
                           {visit.diagnosis && (
                             <div style={{ marginTop: '0.75rem', fontSize: '0.9rem' }}>
                               <span style={{ color: '#64748b' }}>Diagnosis:</span> <span style={{ color: '#1e293b' }}>{visit.diagnosis}</span>

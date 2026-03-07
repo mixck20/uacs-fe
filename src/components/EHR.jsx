@@ -30,7 +30,8 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     weight: "",
     bloodPressure: "",
     lmp: "",
-    // Diagnosis & Treatment
+    // Chief Complaint & Diagnosis & Treatment
+    complaint: "",
     diagnosis: "",
     treatment: "",
     notes: "",
@@ -173,10 +174,11 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
 
     if (
       !newRecord.date ||
+      !newRecord.complaint ||
       !newRecord.diagnosis ||
       !newRecord.treatment
     ) {
-      alert("Please fill in Date, Diagnosis, and Treatment fields.");
+      alert("Please fill in Date, Chief Complaint, Diagnosis, and Treatment fields.");
       return;
     }
 
@@ -262,6 +264,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
         weight: "",
         bloodPressure: "",
         lmp: "",
+        complaint: "",
         diagnosis: "",
         treatment: "",
         notes: "",
@@ -448,6 +451,21 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
         }
 
         yPos += 2;
+
+        // Chief Complaint
+        doc.setFont("helvetica", "bold");
+        doc.text("CHIEF COMPLAINT:", 25, yPos);
+        yPos += 5;
+        doc.setFont("helvetica", "normal");
+        
+        if (visit.complaint) {
+          const complaintLines = doc.splitTextToSize(visit.complaint, pageWidth - 60);
+          doc.text(complaintLines, 30, yPos);
+          yPos += complaintLines.length * 5 + 2;
+        } else {
+          doc.text("Not specified", 30, yPos);
+          yPos += 7;
+        }
 
         // Diagnosis
         doc.setFont("helvetica", "bold");
@@ -1133,6 +1151,17 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
 
               <div className="form-section">
                 <h3 className="form-section-title">Clinical Assessment</h3>
+                <div className="form-group">
+                  <label>CHIEF COMPLAINT <span className="required">*</span></label>
+                  <textarea
+                    name="complaint"
+                    placeholder="Enter chief complaint..."
+                    value={newRecord.complaint}
+                    onChange={handleRecordChange}
+                    rows="2"
+                    required
+                  />
+                </div>
                 <div className="form-group">
                   <label>DIAGNOSIS <span className="required">*</span></label>
                   <textarea

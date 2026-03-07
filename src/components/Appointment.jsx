@@ -36,6 +36,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [showHealthRecordModal, setShowHealthRecordModal] = useState(false);
   const [healthRecordForm, setHealthRecordForm] = useState({
+    complaint: '',
     diagnosis: '',
     treatment: '',
     prescriptions: [],
@@ -52,18 +53,21 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
   const [visitTemplates] = useState([
     {
       name: 'General Checkup',
+      complaint: 'Routine checkup',
       diagnosis: 'Routine health checkup',
       treatment: 'General wellness assessment',
       prescriptions: []
     },
     {
       name: 'Vaccination',
+      complaint: 'Immunization required',
       diagnosis: 'Immunization',
       treatment: 'Vaccine administration',
       prescriptions: []
     },
     {
       name: 'Consultation',
+      complaint: 'Medical issue',
       diagnosis: 'Medical consultation',
       treatment: 'Advised treatment plan',
       prescriptions: []
@@ -717,6 +721,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
   const openHealthRecordModal = (appointment) => {
     setSelectedAppointmentForRecord(appointment);
     setHealthRecordForm({
+      complaint: '',
       diagnosis: '',
       treatment: '',
       prescriptions: [],
@@ -736,6 +741,7 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
   const applyTemplate = (template) => {
     setHealthRecordForm(prev => ({
       ...prev,
+      complaint: template.complaint || '',
       diagnosis: template.diagnosis,
       treatment: template.treatment,
       prescriptions: template.prescriptions
@@ -792,6 +798,10 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
     if (!selectedAppointmentForRecord) return;
 
     // Validation
+    if (!healthRecordForm.complaint.trim()) {
+      Swal.fire('Error', 'Complaint is required', 'error');
+      return;
+    }
     if (!healthRecordForm.diagnosis.trim()) {
       Swal.fire('Error', 'Diagnosis is required', 'error');
       return;
@@ -1505,6 +1515,18 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               </div>
 
               <div className="health-record-form">
+                {/* Complaint */}
+                <div className="form-group">
+                  <label>Chief Complaint *</label>
+                  <input
+                    type="text"
+                    value={healthRecordForm.complaint}
+                    onChange={(e) => handleHealthRecordChange('complaint', e.target.value)}
+                    placeholder="Enter chief complaint..."
+                    required
+                  />
+                </div>
+
                 {/* Diagnosis */}
                 <div className="form-group">
                   <label>Diagnosis *</label>
