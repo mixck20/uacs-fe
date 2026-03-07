@@ -1573,7 +1573,7 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                           )}
                           {visit.complaint && (
                             <div style={{ marginTop: '0.75rem', fontSize: '0.9rem' }}>
-                              <span style={{ color: '#64748b' }}>Chief Complaint:</span> <span style={{ color: '#1e293b' }}>{visit.complaint}</span>
+                              <span style={{ color: '#64748b' }}>Complaint:</span> <span style={{ color: '#1e293b' }}>{visit.complaint}</span>
                             </div>
                           )}
                           {visit.diagnosis && (

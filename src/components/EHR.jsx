@@ -178,7 +178,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
       !newRecord.diagnosis ||
       !newRecord.treatment
     ) {
-      alert("Please fill in Date, Chief Complaint, Diagnosis, and Treatment fields.");
+      alert("Please fill in Date, Complaint, Diagnosis, and Treatment fields.");
       return;
     }
 
@@ -452,9 +452,9 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
 
         yPos += 2;
 
-        // Chief Complaint
+        // Complaint
         doc.setFont("helvetica", "bold");
-        doc.text("CHIEF COMPLAINT:", 25, yPos);
+        doc.text("COMPLAINT:", 25, yPos);
         yPos += 5;
         doc.setFont("helvetica", "normal");
         
@@ -1152,10 +1152,10 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
               <div className="form-section">
                 <h3 className="form-section-title">Clinical Assessment</h3>
                 <div className="form-group">
-                  <label>CHIEF COMPLAINT <span className="required">*</span></label>
+                  <label>COMPLAINT <span className="required">*</span></label>
                   <textarea
                     name="complaint"
-                    placeholder="Enter chief complaint..."
+                    placeholder="Enter complaint..."
                     value={newRecord.complaint}
                     onChange={handleRecordChange}
                     rows="2"

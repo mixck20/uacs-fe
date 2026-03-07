@@ -1517,12 +1517,12 @@ function Appointment({ setActivePage, activePage, sidebarOpen, setSidebarOpen, p
               <div className="health-record-form">
                 {/* Complaint */}
                 <div className="form-group">
-                  <label>Chief Complaint *</label>
+                  <label>Complaint *</label>
                   <input
                     type="text"
                     value={healthRecordForm.complaint}
                     onChange={(e) => handleHealthRecordChange('complaint', e.target.value)}
-                    placeholder="Enter chief complaint..."
+                    placeholder="Enter complaint..."
                     required
                   />
                 </div>
