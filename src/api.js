@@ -594,22 +594,6 @@ export const CertificateAPI = {
       method: 'POST',
       body: JSON.stringify({ rejectionReason })
     });
-  },
-
-  // User: Upload receipt image for certificate
-  uploadReceiptImage: async (id, receiptImage) => {
-    return await apiFetch(`/api/certificates/${id}/upload-receipt`, {
-      method: 'POST',
-      body: JSON.stringify({ receiptImage })
-    });
-  },
-
-  // Clinic: Confirm receipt image
-  confirmReceiptImage: async (id) => {
-    return await apiFetch(`/api/certificates/${id}/confirm-receipt`, {
-      method: 'POST',
-      body: JSON.stringify({})
-    });
   }
 };
 

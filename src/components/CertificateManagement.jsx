@@ -13,8 +13,7 @@ import {
   FaCheckCircle,
   FaTimesCircle,
   FaUser,
-  FaCalendar,
-  FaImage
+  FaCalendar
 } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 
@@ -25,8 +24,6 @@ const CertificateManagement = ({ setActivePage, activePage, onLogout, user }) =>
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCertificate, setSelectedCertificate] = useState(null);
   const [showIssueModal, setShowIssueModal] = useState(false);
-  const [showReceiptModal, setShowReceiptModal] = useState(false);
-  const [selectedReceiptCert, setSelectedReceiptCert] = useState(null);
   const [issueForm, setIssueForm] = useState({
     diagnosis: '',
     validFrom: new Date().toISOString().split('T')[0],
@@ -105,23 +102,6 @@ const CertificateManagement = ({ setActivePage, activePage, onLogout, user }) =>
     } catch (error) {
       Swal.fire('Error', 'Failed to download certificate', 'error');
     }
-  };
-
-  const handleConfirmReceipt = async (cert) => {
-    try {
-      await CertificateAPI.confirmReceiptImage(cert._id);
-      Swal.fire('Success', 'Receipt image confirmed successfully', 'success');
-      setShowReceiptModal(false);
-      setSelectedReceiptCert(null);
-      loadCertificates();
-    } catch (error) {
-      Swal.fire('Error', 'Failed to confirm receipt image', 'error');
-    }
-  };
-
-  const handleViewReceipt = (cert) => {
-    setSelectedReceiptCert(cert);
-    setShowReceiptModal(true);
   };
 
   const filteredCertificates = certificates
@@ -327,14 +307,6 @@ const CertificateManagement = ({ setActivePage, activePage, onLogout, user }) =>
                       <FaDownload /> Download PDF
                     </button>
                   )}
-                  {cert.status === 'issued' && cert.receiptImage && !cert.receiptConfirmedAt && (
-                    <button
-                      className="action-btn confirm-receipt-btn"
-                      onClick={() => handleViewReceipt(cert)}
-                    >
-                      <FaImage /> Confirm Receipt
-                    </button>
-                  )}
                 </div>
               </div>
             ))
@@ -432,63 +404,6 @@ const CertificateManagement = ({ setActivePage, activePage, onLogout, user }) =>
                     </button>
                   </div>
                 </form>
-              </div>
-            </div>
-          </div>
-        {/* Receipt Image Confirmation Modal */}
-        {showReceiptModal && selectedReceiptCert && (
-          <div className="certificate-modal">
-            <div className="receipt-modal-content">
-              <div className="modal-header">
-                <h2>Medical Certificate Receipt</h2>
-                <button
-                  className="close-btn"
-                  onClick={() => {
-                    setShowReceiptModal(false);
-                    setSelectedReceiptCert(null);
-                  }}
-                >
-                  <FaTimes />
-                </button>
-              </div>
-
-              <div className="receipt-modal-body">
-                <div className="receipt-info">
-                  <h3>Patient Information</h3>
-                  <p><strong>Name:</strong> {selectedReceiptCert.patientId?.fullName || 'N/A'}</p>
-                  <p><strong>Student ID:</strong> {selectedReceiptCert.patientId?.studentId || 'N/A'}</p>
-                  <p><strong>Purpose:</strong> {selectedReceiptCert.purpose}</p>
-                  <p><strong>Uploaded:</strong> {new Date(selectedReceiptCert.receiptUploadedAt).toLocaleDateString()}</p>
-                </div>
-
-                {selectedReceiptCert.receiptImage && (
-                  <div className="receipt-image-container">
-                    <h3>Receipt Image</h3>
-                    <img 
-                      src={selectedReceiptCert.receiptImage} 
-                      alt="Receipt" 
-                      className="receipt-image"
-                    />
-                  </div>
-                )}
-
-                <div className="modal-actions">
-                  <button
-                    className="action-btn approve-btn"
-                    onClick={() => handleConfirmReceipt(selectedReceiptCert)}
-                  >
-                    <FaCheck /> Confirm Receipt
-                  </button>
-                  <button
-                    className="action-btn cancel-btn"
-                    onClick={() => {
-                      setShowReceiptModal(false);
-                      setSelectedReceiptCert(null);
-                    }}
-                  >
-                    Cancel
-                  </button>
-                </div>
               </div>
             </div>
           </div>
