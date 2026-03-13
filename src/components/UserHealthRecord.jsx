@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaFileAlt, FaShare, FaLock, FaCalendar, FaCapsules, FaNotesMedical, FaHeartbeat, FaUser, FaStethoscope, FaAllergies, FaTint, FaFilePdf, FaFileExcel, FaCertificate, FaPhone, FaClipboardList, FaEye, FaTimes, FaCheckCircle, FaBan, FaExclamationTriangle } from "react-icons/fa";
+import { FaFileAlt, FaShare, FaLock, FaCalendar, FaCapsules, FaNotesMedical, FaHeartbeat, FaUser, FaStethoscope, FaAllergies, FaTint, FaFilePdf, FaFileExcel, FaCertificate, FaPhone, FaClipboardList, FaEye, FaTimes, FaCheckCircle, FaBan, FaExclamationTriangle, FaUpload, FaImage } from "react-icons/fa";
 import UserPortalLayout from "./UserPortalLayout";
 import { PatientsAPI, CertificateAPI } from "../api";
 import Swal from "sweetalert2";
@@ -26,6 +26,7 @@ const UserHealthRecord = ({ user, onLogout }) => {
   const [myCertificates, setMyCertificates] = useState([]);
   const [showCertPreview, setShowCertPreview] = useState(false);
   const [selectedCertForView, setSelectedCertForView] = useState(null);
+  const [uploadingCertId, setUploadingCertId] = useState(null);
 
   useEffect(() => {
     loadHealthRecords();
@@ -73,6 +74,62 @@ const UserHealthRecord = ({ user, onLogout }) => {
   const closeCertPreview = () => {
     setShowCertPreview(false);
     setSelectedCertForView(null);
+  };
+
+  // Upload receipt image for issued certificate
+  const handleUploadReceiptImage = async (certId) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        Swal.fire({
+          title: 'File Too Large',
+          text: 'Please select an image smaller than 5MB',
+          icon: 'error'
+        });
+        return;
+      }
+
+      try {
+        setUploadingCertId(certId);
+        
+        // Convert file to base64
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const base64Image = reader.result;
+          
+          try {
+            await CertificateAPI.uploadReceiptImage(certId, base64Image);
+            await loadMyCertificates();
+            
+            Swal.fire({
+              title: 'Receipt Uploaded!',
+              text: 'Your receipt image has been uploaded successfully. The clinic will review and confirm it shortly.',
+              icon: 'success'
+            });
+          } catch (error) {
+            console.error('Error uploading receipt:', error);
+            Swal.fire({
+              title: 'Upload Failed',
+              text: error.message || 'Failed to upload receipt image',
+              icon: 'error'
+            });
+          } finally {
+            setUploadingCertId(null);
+          }
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        setUploadingCertId(null);
+        console.error('Error:', error);
+      }
+    };
+    input.click();
   };
 
   // Export to PDF
@@ -778,13 +835,24 @@ const UserHealthRecord = ({ user, onLogout }) => {
                             <FaExclamationTriangle /> Waiting for clinic approval
                           </span>
                         )}
-                        {cert.status?.toLowerCase() === 'issued' && (
+                        {cert.status?.toLowerCase() === 'issued' && !cert.receiptImage && (
                           <button 
-                            className="cert-action-btn view-btn"
-                            onClick={() => handleViewCertificate(cert)}
+                            className="cert-action-btn upload-btn"
+                            onClick={() => handleUploadReceiptImage(cert._id)}
+                            disabled={uploadingCertId === cert._id}
                           >
-                            <FaEye /> View Certificate
+                            <FaUpload /> {uploadingCertId === cert._id ? 'Uploading...' : 'Upload Receipt'}
                           </button>
+                        )}
+                        {cert.status?.toLowerCase() === 'issued' && cert.receiptImage && !cert.receiptConfirmedAt && (
+                          <span className="receipt-uploaded-message">
+                            <FaImage /> Receipt Uploaded - Awaiting Confirmation
+                          </span>
+                        )}
+                        {cert.receiptConfirmedAt && (
+                          <span className="receipt-confirmed-message">
+                            <FaCheckCircle /> Receipt Confirmed on {new Date(cert.receiptConfirmedAt).toLocaleDateString()}
+                          </span>
                         )}
                       </div>
                     </div>

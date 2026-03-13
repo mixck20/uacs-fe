@@ -121,11 +121,13 @@ const UserDashboard = ({ user, onLogout }) => {
           <div className="dashboard-card">
             <div className="card-header">
               <h2><FaCalendar /> Upcoming Appointments</h2>
-              <Link to="/appointments" className="view-all">View All</Link>
+              {upcomingAppointments.length > 2 && (
+                <Link to="/appointments" className="view-all">View All ({upcomingAppointments.length})</Link>
+              )}
             </div>
             <div className="card-content">
               {upcomingAppointments.length > 0 ? (
-                upcomingAppointments.map(apt => (
+                upcomingAppointments.slice(0, 2).map(apt => (
                   <div key={apt._id} className="appointment-item">
                     <div className="appointment-info">
                       <div className="appointment-date">{formatDate(new Date(apt.date))} at {formatTime12Hour(apt.time)}</div>
@@ -152,11 +154,13 @@ const UserDashboard = ({ user, onLogout }) => {
           <div className="dashboard-card">
             <div className="card-header">
               <h2><FaHistory /> Recent Visits</h2>
-              <Link to="/records" className="view-all">View All</Link>
+              {dashboardData?.recentVisits?.length > 2 && (
+                <Link to="/records" className="view-all">View All ({dashboardData.recentVisits.length})</Link>
+              )}
             </div>
             <div className="card-content">
               {dashboardData?.recentVisits?.length > 0 ? (
-                dashboardData.recentVisits.map((visit, index) => (
+                dashboardData.recentVisits.slice(0, 2).map((visit, index) => (
                   <div key={index} className="medical-record-item">
                     <div className="record-date">{formatDate(new Date(visit.date))}</div>
                     <div className="record-details">
@@ -182,11 +186,13 @@ const UserDashboard = ({ user, onLogout }) => {
           <div className="dashboard-card">
             <div className="card-header">
               <h2><FaFileMedical /> Medical Certificates</h2>
-              <Link to="/certificates" className="view-all">View All</Link>
+              {dashboardData?.certificates?.length > 2 && (
+                <Link to="/records" className="view-all">View All ({dashboardData.certificates.length})</Link>
+              )}
             </div>
             <div className="card-content">
               {dashboardData?.certificates?.length > 0 ? (
-                dashboardData.certificates.map(cert => (
+                dashboardData.certificates.slice(0, 2).map(cert => (
                   <div key={cert._id} className="certificate-item">
                     <div className="certificate-info">
                       <div className="certificate-purpose">{cert.purpose}</div>

@@ -344,6 +344,15 @@
   background: #2563eb;
 }
 
+.confirm-receipt-btn {
+  background: #8b5cf6;
+  color: white;
+}
+
+.confirm-receipt-btn:hover {
+  background: #7c3aed;
+}
+
 .cancel-btn {
   background: #6b7280;
   color: white;
@@ -494,6 +503,58 @@
 .empty-state p {
   font-size: 1.125rem;
   margin: 0;
+}
+
+/* Receipt Modal */
+.receipt-modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.receipt-modal-body {
+  padding: 1.5rem;
+}
+
+.receipt-info {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.receipt-info h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+.receipt-info p {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.receipt-image-container {
+  margin-bottom: 1.5rem;
+}
+
+.receipt-image-container h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+.receipt-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  max-height: 400px;
+  object-fit: contain;
 }
 
 /* Responsive */

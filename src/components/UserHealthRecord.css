@@ -1114,6 +1114,39 @@
   transform: translateY(-1px);
 }
 
+.cert-action-btn.upload-btn {
+  background: #e51d5e;
+  color: white;
+}
+
+.cert-action-btn.upload-btn:hover:not(:disabled) {
+  background: #ff4081;
+  transform: translateY(-1px);
+}
+
+.cert-action-btn.upload-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.receipt-uploaded-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #2563eb;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.receipt-confirmed-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #10b981;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
 /* Certificate Preview Modal */
 .cert-preview-modal-overlay {
   position: fixed;
