@@ -11,6 +11,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showMedicalHistoryForm, setShowMedicalHistoryForm] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [activeTab, setActiveTab] = useState('history'); // 'history' or 'certificates'
   const [certificates, setCertificates] = useState([]);
@@ -35,24 +36,26 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     diagnosis: "",
     treatment: "",
     notes: "",
-    // Medical History
-    medicalHistory: {
-      heartLungProblem: "",
-      heartLungProblemNotes: "",
-      seizureHistory: "",
-      seizureHistoryNotes: "",
-      syncopeHistory: "",
-      syncopeHistoryNotes: "",
-      physicalInjuries: "",
-      physicalInjuriesNotes: "",
-      fractureHistory: "",
-      fractureHistoryNotes: "",
-      scoliosis: "",
-      takingMedicines: "",
-      takingMedicinesNotes: "",
-      othersCheckbox: false,
-      othersNotes: ""
-    }
+  });
+
+  // Medical History form state (separate)
+  const [medicalHistoryForm, setMedicalHistoryForm] = useState({
+    date: "",
+    heartLungProblem: "",
+    heartLungProblemNotes: "",
+    seizureHistory: "",
+    seizureHistoryNotes: "",
+    syncopeHistory: "",
+    syncopeHistoryNotes: "",
+    physicalInjuries: "",
+    physicalInjuriesNotes: "",
+    fractureHistory: "",
+    fractureHistoryNotes: "",
+    scoliosis: "",
+    takingMedicines: "",
+    takingMedicinesNotes: "",
+    othersCheckbox: false,
+    othersNotes: ""
   });
 
   // Prescription state
@@ -149,14 +152,17 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     setNewRecord({ ...newRecord, [name]: value });
   }
 
-  // --- Handle medical history checkbox update ---
+  // --- Handle medical history form change ---
+  function handleMedicalHistoryFormChange(e) {
+    const { name, value } = e.target;
+    setMedicalHistoryForm({ ...medicalHistoryForm, [name]: value });
+  }
+
+  // --- Handle medical history field update ---
   function handleMedicalHistoryChange(field, value) {
-    setNewRecord({
-      ...newRecord,
-      medicalHistory: {
-        ...newRecord.medicalHistory,
-        [field]: value
-      }
+    setMedicalHistoryForm({
+      ...medicalHistoryForm,
+      [field]: value
     });
   }
 
@@ -297,28 +303,106 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
         diagnosis: "",
         treatment: "",
         notes: "",
-        medicalHistory: {
-          heartLungProblem: "",
-          heartLungProblemNotes: "",
-          seizureHistory: "",
-          seizureHistoryNotes: "",
-          syncopeHistory: "",
-          syncopeHistoryNotes: "",
-          physicalInjuries: "",
-          physicalInjuriesNotes: "",
-          fractureHistory: "",
-          fractureHistoryNotes: "",
-          scoliosis: "",
-          takingMedicines: "",
-          takingMedicinesNotes: "",
-          othersCheckbox: false,
-          othersNotes: ""
-        }
       });
       setPrescriptions([]);
       setShowForm(false);
     } catch (err) {
       alert(err.message || 'Failed to add record');
+    }
+  }
+
+  // --- Add Medical History only ---
+  async function handleAddMedicalHistory() {
+    if (!selectedPatient) return;
+
+    if (!medicalHistoryForm.date) {
+      alert("Please select a date for the medical history record.");
+      return;
+    }
+
+    // Check if at least one field is filled
+    const hasAtLeastOne = 
+      medicalHistoryForm.heartLungProblem ||
+      medicalHistoryForm.seizureHistory ||
+      medicalHistoryForm.syncopeHistory ||
+      medicalHistoryForm.physicalInjuries ||
+      medicalHistoryForm.fractureHistory ||
+      medicalHistoryForm.scoliosis ||
+      medicalHistoryForm.takingMedicines ||
+      medicalHistoryForm.othersCheckbox;
+
+    if (!hasAtLeastOne) {
+      alert("Please fill in at least one medical history field.");
+      return;
+    }
+
+    try {
+      // Create visit with only medical history
+      const recordData = {
+        date: medicalHistoryForm.date,
+        medicalHistory: {
+          heartLungProblem: medicalHistoryForm.heartLungProblem,
+          heartLungProblemNotes: medicalHistoryForm.heartLungProblemNotes,
+          seizureHistory: medicalHistoryForm.seizureHistory,
+          seizureHistoryNotes: medicalHistoryForm.seizureHistoryNotes,
+          syncopeHistory: medicalHistoryForm.syncopeHistory,
+          syncopeHistoryNotes: medicalHistoryForm.syncopeHistoryNotes,
+          physicalInjuries: medicalHistoryForm.physicalInjuries,
+          physicalInjuriesNotes: medicalHistoryForm.physicalInjuriesNotes,
+          fractureHistory: medicalHistoryForm.fractureHistory,
+          fractureHistoryNotes: medicalHistoryForm.fractureHistoryNotes,
+          scoliosis: medicalHistoryForm.scoliosis,
+          takingMedicines: medicalHistoryForm.takingMedicines,
+          takingMedicinesNotes: medicalHistoryForm.takingMedicinesNotes,
+          othersCheckbox: medicalHistoryForm.othersCheckbox,
+          othersNotes: medicalHistoryForm.othersNotes
+        }
+      };
+
+      const data = await PatientsAPI.addVisit(selectedPatient._id || selectedPatient.id, recordData);
+      
+      await Swal.fire({
+        title: 'Success!',
+        text: 'Medical history record added successfully',
+        icon: 'success',
+        confirmButtonColor: '#4CAF50'
+      });
+      
+      // Update visits from backend response
+      setSelectedPatient({
+        ...selectedPatient,
+        visits: data.patient.visits || []
+      });
+
+      // Optionally update patients array
+      setPatients(patients.map(p =>
+        (p._id || p.id) === (selectedPatient._id || selectedPatient.id) ?
+          { ...p, visits: data.patient.visits || [] } :
+          p
+      ));
+
+      // Reset medical history form
+      setMedicalHistoryForm({
+        date: "",
+        heartLungProblem: "",
+        heartLungProblemNotes: "",
+        seizureHistory: "",
+        seizureHistoryNotes: "",
+        syncopeHistory: "",
+        syncopeHistoryNotes: "",
+        physicalInjuries: "",
+        physicalInjuriesNotes: "",
+        fractureHistory: "",
+        fractureHistoryNotes: "",
+        scoliosis: "",
+        takingMedicines: "",
+        takingMedicinesNotes: "",
+        othersCheckbox: false,
+        othersNotes: ""
+      });
+      setShowMedicalHistoryForm(false);
+    } catch (err) {
+      alert(err.message || 'Failed to add medical history');
     }
   }
 
@@ -837,6 +921,9 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                     <button className="ehr-btn add-btn" onClick={() => setShowForm(true)}>
                       <FaPlus /> Add Record
                     </button>
+                    <button className="ehr-btn add-btn" style={{ backgroundColor: '#8b5cf6', borderColor: '#8b5cf6' }} onClick={() => setShowMedicalHistoryForm(true)}>
+                      <FaPlus /> Add Medical History
+                    </button>
                     <button className="ehr-btn export-btn pdf-export-btn" onClick={handleExportPDF}>
                       <FaFileExport /> Export PDF
                     </button>
@@ -1243,275 +1330,6 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
               </div>
 
               <div className="form-section">
-                <h3 className="form-section-title">Medical History</h3>
-                
-                {/* Heart/Lung Problem */}
-                <div className="medical-history-item">
-                  <label className="history-item-label">Heart/Lung Problem</label>
-                  <div className="checkbox-group">
-                    <label className="checkbox-container">
-                      <input
-                        type="radio"
-                        name="heartLungProblem"
-                        value="yes"
-                        checked={newRecord.medicalHistory.heartLungProblem === "yes"}
-                        onChange={() => handleMedicalHistoryChange('heartLungProblem', 'yes')}
-                      />
-                      <span className="checkbox-label">Yes</span>
-                    </label>
-                    <label className="checkbox-container">
-                      <input
-                        type="radio"
-                        name="heartLungProblem"
-                        value="no"
-                        checked={newRecord.medicalHistory.heartLungProblem === "no"}
-                        onChange={() => handleMedicalHistoryChange('heartLungProblem', 'no')}
-                      />
-                      <span className="checkbox-label">No</span>
-                    </label>
-                  </div>
-                  {newRecord.medicalHistory.heartLungProblem === "yes" && (
-                    <input
-                      type="text"
-                      placeholder="Please specify..."
-                      value={newRecord.medicalHistory.heartLungProblemNotes}
-                      onChange={(e) => handleMedicalHistoryChange('heartLungProblemNotes', e.target.value)}
-                      className="specify-input"
-                    />
-                  )}
-                </div>
-
-                {/* Seizure History */}
-                <div className="medical-history-item">
-                  <label className="history-item-label">History of Seizure</label>
-                  <div className="checkbox-group">
-                    <label className="checkbox-container">
-                      <input
-                        type="radio"
-                        name="seizureHistory"
-                        value="yes"
-                        checked={newRecord.medicalHistory.seizureHistory === "yes"}
-                        onChange={() => handleMedicalHistoryChange('seizureHistory', 'yes')}
-                      />
-                      <span className="checkbox-label">Yes</span>
-                    </label>
-                    <label className="checkbox-container">
-                      <input
-                        type="radio"
-                        name="seizureHistory"
-                        value="no"
-                        checked={newRecord.medicalHistory.seizureHistory === "no"}
-                        onChange={() => handleMedicalHistoryChange('seizureHistory', 'no')}
-                      />
-                      <span className="checkbox-label">No</span>
-                    </label>
-                  </div>
-                  {newRecord.medicalHistory.seizureHistory === "yes" && (
-                    <input
-                      type="text"
-                      placeholder="Please specify..."
-                      value={newRecord.medicalHistory.seizureHistoryNotes}
-                      onChange={(e) => handleMedicalHistoryChange('seizureHistoryNotes', e.target.value)}
-                      className="specify-input"
-                    />
-                  )}
-                </div>
-
-                {/* Syncope History */}
-                <div className="medical-history-item">
-                  <label className="history-item-label">History of Syncope</label>
-                  <div className="checkbox-group">
-                    <label className="checkbox-container">
-                      <input
-                        type="radio"
-                        name="syncopeHistory"
-                        value="yes"
-                        checked={newRecord.medicalHistory.syncopeHistory === "yes"}
-                        onChange={() => handleMedicalHistoryChange('syncopeHistory', 'yes')}
-                      />
-                      <span className="checkbox-label">Yes</span>
-                    </label>
-                    <label className="checkbox-container">
-                      <input
-                        type="radio"
-                        name="syncopeHistory"
-                        value="no"
-                        checked={newRecord.medicalHistory.syncopeHistory === "no"}
-                        onChange={() => handleMedicalHistoryChange('syncopeHistory', 'no')}
-                      />
-                      <span className="checkbox-label">No</span>
-                    </label>
-                  </div>
-                  {newRecord.medicalHistory.syncopeHistory === "yes" && (
-                    <input
-                      type="text"
-                      placeholder="Please specify..."
-                      value={newRecord.medicalHistory.syncopeHistoryNotes}
-                      onChange={(e) => handleMedicalHistoryChange('syncopeHistoryNotes', e.target.value)}
-                      className="specify-input"
-                    />
-                  )}
-                </div>
-
-                {/* Physical Injuries */}
-                <div className="medical-history-item">
-                  <label className="history-item-label">Any Physical Injuries</label>
-                  <div className="checkbox-group">
-                    <label className="checkbox-container">
-                      <input
-                        type="radio"
-                        name="physicalInjuries"
-                        value="yes"
-                        checked={newRecord.medicalHistory.physicalInjuries === "yes"}
-                        onChange={() => handleMedicalHistoryChange('physicalInjuries', 'yes')}
-                      />
-                      <span className="checkbox-label">Yes</span>
-                    </label>
-                    <label className="checkbox-container">
-                      <input
-                        type="radio"
-                        name="physicalInjuries"
-                        value="no"
-                        checked={newRecord.medicalHistory.physicalInjuries === "no"}
-                        onChange={() => handleMedicalHistoryChange('physicalInjuries', 'no')}
-                      />
-                      <span className="checkbox-label">No</span>
-                    </label>
-                  </div>
-                  {newRecord.medicalHistory.physicalInjuries === "yes" && (
-                    <input
-                      type="text"
-                      placeholder="Please specify..."
-                      value={newRecord.medicalHistory.physicalInjuriesNotes}
-                      onChange={(e) => handleMedicalHistoryChange('physicalInjuriesNotes', e.target.value)}
-                      className="specify-input"
-                    />
-                  )}
-                </div>
-
-                {/* Fracture History */}
-                <div className="medical-history-item">
-                  <label className="history-item-label">History of Fracture</label>
-                  <div className="checkbox-group">
-                    <label className="checkbox-container">
-                      <input
-                        type="radio"
-                        name="fractureHistory"
-                        value="yes"
-                        checked={newRecord.medicalHistory.fractureHistory === "yes"}
-                        onChange={() => handleMedicalHistoryChange('fractureHistory', 'yes')}
-                      />
-                      <span className="checkbox-label">Yes</span>
-                    </label>
-                    <label className="checkbox-container">
-                      <input
-                        type="radio"
-                        name="fractureHistory"
-                        value="no"
-                        checked={newRecord.medicalHistory.fractureHistory === "no"}
-                        onChange={() => handleMedicalHistoryChange('fractureHistory', 'no')}
-                      />
-                      <span className="checkbox-label">No</span>
-                    </label>
-                  </div>
-                  {newRecord.medicalHistory.fractureHistory === "yes" && (
-                    <input
-                      type="text"
-                      placeholder="Please specify..."
-                      value={newRecord.medicalHistory.fractureHistoryNotes}
-                      onChange={(e) => handleMedicalHistoryChange('fractureHistoryNotes', e.target.value)}
-                      className="specify-input"
-                    />
-                  )}
-                </div>
-
-                {/* Scoliosis */}
-                <div className="medical-history-item">
-                  <label className="history-item-label">Scoliosis</label>
-                  <div className="checkbox-group">
-                    <label className="checkbox-container">
-                      <input
-                        type="radio"
-                        name="scoliosis"
-                        value="yes"
-                        checked={newRecord.medicalHistory.scoliosis === "yes"}
-                        onChange={() => handleMedicalHistoryChange('scoliosis', 'yes')}
-                      />
-                      <span className="checkbox-label">Yes</span>
-                    </label>
-                    <label className="checkbox-container">
-                      <input
-                        type="radio"
-                        name="scoliosis"
-                        value="no"
-                        checked={newRecord.medicalHistory.scoliosis === "no"}
-                        onChange={() => handleMedicalHistoryChange('scoliosis', 'no')}
-                      />
-                      <span className="checkbox-label">No</span>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Taking Medicines */}
-                <div className="medical-history-item">
-                  <label className="history-item-label">Are you taking any medicines?</label>
-                  <div className="checkbox-group">
-                    <label className="checkbox-container">
-                      <input
-                        type="radio"
-                        name="takingMedicines"
-                        value="yes"
-                        checked={newRecord.medicalHistory.takingMedicines === "yes"}
-                        onChange={() => handleMedicalHistoryChange('takingMedicines', 'yes')}
-                      />
-                      <span className="checkbox-label">Yes</span>
-                    </label>
-                    <label className="checkbox-container">
-                      <input
-                        type="radio"
-                        name="takingMedicines"
-                        value="no"
-                        checked={newRecord.medicalHistory.takingMedicines === "no"}
-                        onChange={() => handleMedicalHistoryChange('takingMedicines', 'no')}
-                      />
-                      <span className="checkbox-label">No</span>
-                    </label>
-                  </div>
-                  {newRecord.medicalHistory.takingMedicines === "yes" && (
-                    <input
-                      type="text"
-                      placeholder="Please specify..."
-                      value={newRecord.medicalHistory.takingMedicinesNotes}
-                      onChange={(e) => handleMedicalHistoryChange('takingMedicinesNotes', e.target.value)}
-                      className="specify-input"
-                    />
-                  )}
-                </div>
-
-                {/* Others */}
-                <div className="medical-history-item">
-                  <label className="checkbox-container others-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={newRecord.medicalHistory.othersCheckbox}
-                      onChange={(e) => handleMedicalHistoryChange('othersCheckbox', e.target.checked)}
-                    />
-                    <span className="checkbox-label">Others:</span>
-                  </label>
-                  {newRecord.medicalHistory.othersCheckbox && (
-                    <input
-                      type="text"
-                      placeholder="Please specify..."
-                      value={newRecord.medicalHistory.othersNotes}
-                      onChange={(e) => handleMedicalHistoryChange('othersNotes', e.target.value)}
-                      className="specify-input"
-                      style={{ marginTop: '10px' }}
-                    />
-                  )}
-                </div>
-              </div>
-
-              <div className="form-section">
                 <div className="prescription-section-header">
                   <h3 className="form-section-title"><FaPills /> Prescriptions</h3>
                   <button type="button" className="add-prescription-btn" onClick={handleAddPrescription}>
@@ -1626,6 +1444,312 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                 </button>
                 <button className="ehr-btn save-btn" onClick={handleAddRecord}>
                   Save Record
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Medical History Modal */}
+        {showMedicalHistoryForm && (
+          <div className="ehr-modal">
+            <div className="ehr-modal-content">
+              <div className="modal-header">
+                <h2>Add Medical History</h2>
+                <button className="close-modal-btn" onClick={() => setShowMedicalHistoryForm(false)}>
+                  <FaTimes />
+                </button>
+              </div>
+
+              <div className="form-section">
+                <h3 className="form-section-title">Medical History Entry Date</h3>
+                <div className="form-group">
+                  <label>Date <span className="required">*</span></label>
+                  <input
+                    type="date"
+                    name="date"
+                    value={medicalHistoryForm.date}
+                    onChange={handleMedicalHistoryFormChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-section">
+                <h3 className="form-section-title">Medical History</h3>
+                
+                {/* Heart/Lung Problem */}
+                <div className="medical-history-item">
+                  <label className="history-item-label">Heart/Lung Problem</label>
+                  <div className="checkbox-group">
+                    <label className="checkbox-container">
+                      <input
+                        type="radio"
+                        name="heartLungProblem"
+                        value="yes"
+                        checked={medicalHistoryForm.heartLungProblem === "yes"}
+                        onChange={() => handleMedicalHistoryChange('heartLungProblem', 'yes')}
+                      />
+                      <span className="checkbox-label">Yes</span>
+                    </label>
+                    <label className="checkbox-container">
+                      <input
+                        type="radio"
+                        name="heartLungProblem"
+                        value="no"
+                        checked={medicalHistoryForm.heartLungProblem === "no"}
+                        onChange={() => handleMedicalHistoryChange('heartLungProblem', 'no')}
+                      />
+                      <span className="checkbox-label">No</span>
+                    </label>
+                  </div>
+                  {medicalHistoryForm.heartLungProblem === "yes" && (
+                    <input
+                      type="text"
+                      placeholder="Please specify..."
+                      value={medicalHistoryForm.heartLungProblemNotes}
+                      onChange={(e) => handleMedicalHistoryChange('heartLungProblemNotes', e.target.value)}
+                      className="specify-input"
+                    />
+                  )}
+                </div>
+
+                {/* Seizure History */}
+                <div className="medical-history-item">
+                  <label className="history-item-label">History of Seizure</label>
+                  <div className="checkbox-group">
+                    <label className="checkbox-container">
+                      <input
+                        type="radio"
+                        name="seizureHistory"
+                        value="yes"
+                        checked={medicalHistoryForm.seizureHistory === "yes"}
+                        onChange={() => handleMedicalHistoryChange('seizureHistory', 'yes')}
+                      />
+                      <span className="checkbox-label">Yes</span>
+                    </label>
+                    <label className="checkbox-container">
+                      <input
+                        type="radio"
+                        name="seizureHistory"
+                        value="no"
+                        checked={medicalHistoryForm.seizureHistory === "no"}
+                        onChange={() => handleMedicalHistoryChange('seizureHistory', 'no')}
+                      />
+                      <span className="checkbox-label">No</span>
+                    </label>
+                  </div>
+                  {medicalHistoryForm.seizureHistory === "yes" && (
+                    <input
+                      type="text"
+                      placeholder="Please specify..."
+                      value={medicalHistoryForm.seizureHistoryNotes}
+                      onChange={(e) => handleMedicalHistoryChange('seizureHistoryNotes', e.target.value)}
+                      className="specify-input"
+                    />
+                  )}
+                </div>
+
+                {/* Syncope History */}
+                <div className="medical-history-item">
+                  <label className="history-item-label">History of Syncope</label>
+                  <div className="checkbox-group">
+                    <label className="checkbox-container">
+                      <input
+                        type="radio"
+                        name="syncopeHistory"
+                        value="yes"
+                        checked={medicalHistoryForm.syncopeHistory === "yes"}
+                        onChange={() => handleMedicalHistoryChange('syncopeHistory', 'yes')}
+                      />
+                      <span className="checkbox-label">Yes</span>
+                    </label>
+                    <label className="checkbox-container">
+                      <input
+                        type="radio"
+                        name="syncopeHistory"
+                        value="no"
+                        checked={medicalHistoryForm.syncopeHistory === "no"}
+                        onChange={() => handleMedicalHistoryChange('syncopeHistory', 'no')}
+                      />
+                      <span className="checkbox-label">No</span>
+                    </label>
+                  </div>
+                  {medicalHistoryForm.syncopeHistory === "yes" && (
+                    <input
+                      type="text"
+                      placeholder="Please specify..."
+                      value={medicalHistoryForm.syncopeHistoryNotes}
+                      onChange={(e) => handleMedicalHistoryChange('syncopeHistoryNotes', e.target.value)}
+                      className="specify-input"
+                    />
+                  )}
+                </div>
+
+                {/* Physical Injuries */}
+                <div className="medical-history-item">
+                  <label className="history-item-label">Any Physical Injuries</label>
+                  <div className="checkbox-group">
+                    <label className="checkbox-container">
+                      <input
+                        type="radio"
+                        name="physicalInjuries"
+                        value="yes"
+                        checked={medicalHistoryForm.physicalInjuries === "yes"}
+                        onChange={() => handleMedicalHistoryChange('physicalInjuries', 'yes')}
+                      />
+                      <span className="checkbox-label">Yes</span>
+                    </label>
+                    <label className="checkbox-container">
+                      <input
+                        type="radio"
+                        name="physicalInjuries"
+                        value="no"
+                        checked={medicalHistoryForm.physicalInjuries === "no"}
+                        onChange={() => handleMedicalHistoryChange('physicalInjuries', 'no')}
+                      />
+                      <span className="checkbox-label">No</span>
+                    </label>
+                  </div>
+                  {medicalHistoryForm.physicalInjuries === "yes" && (
+                    <input
+                      type="text"
+                      placeholder="Please specify..."
+                      value={medicalHistoryForm.physicalInjuriesNotes}
+                      onChange={(e) => handleMedicalHistoryChange('physicalInjuriesNotes', e.target.value)}
+                      className="specify-input"
+                    />
+                  )}
+                </div>
+
+                {/* Fracture History */}
+                <div className="medical-history-item">
+                  <label className="history-item-label">History of Fracture</label>
+                  <div className="checkbox-group">
+                    <label className="checkbox-container">
+                      <input
+                        type="radio"
+                        name="fractureHistory"
+                        value="yes"
+                        checked={medicalHistoryForm.fractureHistory === "yes"}
+                        onChange={() => handleMedicalHistoryChange('fractureHistory', 'yes')}
+                      />
+                      <span className="checkbox-label">Yes</span>
+                    </label>
+                    <label className="checkbox-container">
+                      <input
+                        type="radio"
+                        name="fractureHistory"
+                        value="no"
+                        checked={medicalHistoryForm.fractureHistory === "no"}
+                        onChange={() => handleMedicalHistoryChange('fractureHistory', 'no')}
+                      />
+                      <span className="checkbox-label">No</span>
+                    </label>
+                  </div>
+                  {medicalHistoryForm.fractureHistory === "yes" && (
+                    <input
+                      type="text"
+                      placeholder="Please specify..."
+                      value={medicalHistoryForm.fractureHistoryNotes}
+                      onChange={(e) => handleMedicalHistoryChange('fractureHistoryNotes', e.target.value)}
+                      className="specify-input"
+                    />
+                  )}
+                </div>
+
+                {/* Scoliosis */}
+                <div className="medical-history-item">
+                  <label className="history-item-label">Scoliosis</label>
+                  <div className="checkbox-group">
+                    <label className="checkbox-container">
+                      <input
+                        type="radio"
+                        name="scoliosis"
+                        value="yes"
+                        checked={medicalHistoryForm.scoliosis === "yes"}
+                        onChange={() => handleMedicalHistoryChange('scoliosis', 'yes')}
+                      />
+                      <span className="checkbox-label">Yes</span>
+                    </label>
+                    <label className="checkbox-container">
+                      <input
+                        type="radio"
+                        name="scoliosis"
+                        value="no"
+                        checked={medicalHistoryForm.scoliosis === "no"}
+                        onChange={() => handleMedicalHistoryChange('scoliosis', 'no')}
+                      />
+                      <span className="checkbox-label">No</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Taking Medicines */}
+                <div className="medical-history-item">
+                  <label className="history-item-label">Are you taking any medicines?</label>
+                  <div className="checkbox-group">
+                    <label className="checkbox-container">
+                      <input
+                        type="radio"
+                        name="takingMedicines"
+                        value="yes"
+                        checked={medicalHistoryForm.takingMedicines === "yes"}
+                        onChange={() => handleMedicalHistoryChange('takingMedicines', 'yes')}
+                      />
+                      <span className="checkbox-label">Yes</span>
+                    </label>
+                    <label className="checkbox-container">
+                      <input
+                        type="radio"
+                        name="takingMedicines"
+                        value="no"
+                        checked={medicalHistoryForm.takingMedicines === "no"}
+                        onChange={() => handleMedicalHistoryChange('takingMedicines', 'no')}
+                      />
+                      <span className="checkbox-label">No</span>
+                    </label>
+                  </div>
+                  {medicalHistoryForm.takingMedicines === "yes" && (
+                    <input
+                      type="text"
+                      placeholder="Please specify..."
+                      value={medicalHistoryForm.takingMedicinesNotes}
+                      onChange={(e) => handleMedicalHistoryChange('takingMedicinesNotes', e.target.value)}
+                      className="specify-input"
+                    />
+                  )}
+                </div>
+
+                {/* Others */}
+                <div className="medical-history-item">
+                  <label className="checkbox-container others-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={medicalHistoryForm.othersCheckbox}
+                      onChange={(e) => handleMedicalHistoryChange('othersCheckbox', e.target.checked)}
+                    />
+                    <span className="checkbox-label">Others:</span>
+                  </label>
+                  {medicalHistoryForm.othersCheckbox && (
+                    <input
+                      type="text"
+                      placeholder="Please specify..."
+                      value={medicalHistoryForm.othersNotes}
+                      onChange={(e) => handleMedicalHistoryChange('othersNotes', e.target.value)}
+                      className="specify-input"
+                      style={{ marginTop: '10px' }}
+                    />
+                  )}
+                </div>
+              </div>
+
+              <div className="ehr-modal-actions">
+                <button className="ehr-btn cancel-btn" onClick={() => setShowMedicalHistoryForm(false)}>
+                  Cancel
+                </button>
+                <button className="ehr-btn save-btn" onClick={handleAddMedicalHistory}>
+                  Save Medical History
                 </button>
               </div>
             </div>
