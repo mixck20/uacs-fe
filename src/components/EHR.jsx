@@ -40,7 +40,6 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
 
   // Medical History form state (separate)
   const [medicalHistoryForm, setMedicalHistoryForm] = useState({
-    date: "",
     heartLungProblem: "",
     heartLungProblemNotes: "",
     seizureHistory: "",
@@ -315,11 +314,6 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
   async function handleAddMedicalHistory() {
     if (!selectedPatient) return;
 
-    if (!medicalHistoryForm.date) {
-      alert("Please select a date for the medical history record.");
-      return;
-    }
-
     // Check if at least one field is filled
     const hasAtLeastOne = 
       medicalHistoryForm.heartLungProblem ||
@@ -337,9 +331,9 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
     }
 
     try {
-      // Create visit with only medical history
-      const recordData = {
-        date: medicalHistoryForm.date,
+      // Update patient profile with medical history
+      const updatedPatient = {
+        ...selectedPatient,
         medicalHistory: {
           heartLungProblem: medicalHistoryForm.heartLungProblem,
           heartLungProblemNotes: medicalHistoryForm.heartLungProblemNotes,
@@ -355,35 +349,32 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
           takingMedicines: medicalHistoryForm.takingMedicines,
           takingMedicinesNotes: medicalHistoryForm.takingMedicinesNotes,
           othersCheckbox: medicalHistoryForm.othersCheckbox,
-          othersNotes: medicalHistoryForm.othersNotes
+          othersNotes: medicalHistoryForm.othersNotes,
+          lastUpdatedAt: new Date().toISOString()
         }
       };
 
-      const data = await PatientsAPI.addVisit(selectedPatient._id || selectedPatient.id, recordData);
+      const data = await PatientsAPI.update(selectedPatient._id || selectedPatient.id, updatedPatient);
       
       await Swal.fire({
         title: 'Success!',
-        text: 'Medical history record added successfully',
+        text: 'Medical history updated successfully',
         icon: 'success',
         confirmButtonColor: '#4CAF50'
       });
       
-      // Update visits from backend response
-      setSelectedPatient({
-        ...selectedPatient,
-        visits: data.patient.visits || []
-      });
+      // Update selected patient with new data
+      setSelectedPatient(data || updatedPatient);
 
-      // Optionally update patients array
+      // Update patients array
       setPatients(patients.map(p =>
         (p._id || p.id) === (selectedPatient._id || selectedPatient.id) ?
-          { ...p, visits: data.patient.visits || [] } :
+          (data || updatedPatient) :
           p
       ));
 
       // Reset medical history form
       setMedicalHistoryForm({
-        date: "",
         heartLungProblem: "",
         heartLungProblemNotes: "",
         seizureHistory: "",
@@ -402,7 +393,7 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
       });
       setShowMedicalHistoryForm(false);
     } catch (err) {
-      alert(err.message || 'Failed to add medical history');
+      alert(err.message || 'Failed to update medical history');
     }
   }
 
@@ -1459,20 +1450,6 @@ function EHR({ setActivePage, activePage, sidebarOpen, setSidebarOpen, onLogout,
                 <button className="close-modal-btn" onClick={() => setShowMedicalHistoryForm(false)}>
                   <FaTimes />
                 </button>
-              </div>
-
-              <div className="form-section">
-                <h3 className="form-section-title">Medical History Entry Date</h3>
-                <div className="form-group">
-                  <label>Date <span className="required">*</span></label>
-                  <input
-                    type="date"
-                    name="date"
-                    value={medicalHistoryForm.date}
-                    onChange={handleMedicalHistoryFormChange}
-                    required
-                  />
-                </div>
               </div>
 
               <div className="form-section">
