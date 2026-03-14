@@ -1513,22 +1513,94 @@ const Patients = ({ setActivePage, activePage, patients, setPatients, sidebarOpe
                       </span>
                     </div>
                     <div className="patient-details-row">
-                      <span className="detail-label">Medical History:</span>
-                      <span className="detail-value">
-                        {Array.isArray(selectedPatient.medicalHistory) && selectedPatient.medicalHistory.length > 0
-                          ? selectedPatient.medicalHistory.join(', ')
-                          : 'None recorded'}
-                      </span>
-                    </div>
-                    <div className="patient-details-row">
                       <span className="detail-label">Current Medications:</span>
                       <span className="detail-value">
                         {Array.isArray(selectedPatient.medications) && selectedPatient.medications.length > 0
-                          ? selectedPatient.medications.join(', ')
+                          ? selectedPatient.medications.map(m => `${m.name}${m.dosage ? ` (${m.dosage})` : ''}`).join(', ')
                           : 'None'}
                       </span>
                     </div>
                   </div>
+
+                  {selectedPatient.medicalHistory && Object.keys(selectedPatient.medicalHistory).length > 0 && (
+                    <div className="patient-details-section">
+                      <h3><FaNotesMedical /> Medical History</h3>
+                      {selectedPatient.medicalHistory.heartLungProblem && (
+                        <div className="patient-details-row">
+                          <span className="detail-label">Heart/Lung Problem:</span>
+                          <span className="detail-value">
+                            {selectedPatient.medicalHistory.heartLungProblem}
+                            {selectedPatient.medicalHistory.heartLungProblemNotes && ` - ${selectedPatient.medicalHistory.heartLungProblemNotes}`}
+                          </span>
+                        </div>
+                      )}
+                      {selectedPatient.medicalHistory.seizureHistory && (
+                        <div className="patient-details-row">
+                          <span className="detail-label">History of Seizure:</span>
+                          <span className="detail-value">
+                            {selectedPatient.medicalHistory.seizureHistory}
+                            {selectedPatient.medicalHistory.seizureHistoryNotes && ` - ${selectedPatient.medicalHistory.seizureHistoryNotes}`}
+                          </span>
+                        </div>
+                      )}
+                      {selectedPatient.medicalHistory.syncopeHistory && (
+                        <div className="patient-details-row">
+                          <span className="detail-label">History of Syncope:</span>
+                          <span className="detail-value">
+                            {selectedPatient.medicalHistory.syncopeHistory}
+                            {selectedPatient.medicalHistory.syncopeHistoryNotes && ` - ${selectedPatient.medicalHistory.syncopeHistoryNotes}`}
+                          </span>
+                        </div>
+                      )}
+                      {selectedPatient.medicalHistory.physicalInjuries && (
+                        <div className="patient-details-row">
+                          <span className="detail-label">Physical Injuries:</span>
+                          <span className="detail-value">
+                            {selectedPatient.medicalHistory.physicalInjuries}
+                            {selectedPatient.medicalHistory.physicalInjuriesNotes && ` - ${selectedPatient.medicalHistory.physicalInjuriesNotes}`}
+                          </span>
+                        </div>
+                      )}
+                      {selectedPatient.medicalHistory.fractureHistory && (
+                        <div className="patient-details-row">
+                          <span className="detail-label">History of Fracture:</span>
+                          <span className="detail-value">
+                            {selectedPatient.medicalHistory.fractureHistory}
+                            {selectedPatient.medicalHistory.fractureHistoryNotes && ` - ${selectedPatient.medicalHistory.fractureHistoryNotes}`}
+                          </span>
+                        </div>
+                      )}
+                      {selectedPatient.medicalHistory.scoliosis && (
+                        <div className="patient-details-row">
+                          <span className="detail-label">Scoliosis:</span>
+                          <span className="detail-value">{selectedPatient.medicalHistory.scoliosis}</span>
+                        </div>
+                      )}
+                      {selectedPatient.medicalHistory.takingMedicines && (
+                        <div className="patient-details-row">
+                          <span className="detail-label">Taking Medicines:</span>
+                          <span className="detail-value">
+                            {selectedPatient.medicalHistory.takingMedicines}
+                            {selectedPatient.medicalHistory.takingMedicinesNotes && ` - ${selectedPatient.medicalHistory.takingMedicinesNotes}`}
+                          </span>
+                        </div>
+                      )}
+                      {selectedPatient.medicalHistory.othersCheckbox && (
+                        <div className="patient-details-row">
+                          <span className="detail-label">Others:</span>
+                          <span className="detail-value">{selectedPatient.medicalHistory.othersNotes}</span>
+                        </div>
+                      )}
+                      {selectedPatient.medicalHistory.lastUpdatedAt && (
+                        <div className="patient-details-row" style={{ marginTop: '1rem', borderTop: '1px solid #e2e8f0', paddingTop: '0.5rem' }}>
+                          <span className="detail-label" style={{ fontSize: '0.85rem', color: '#64748b' }}>Last Updated:</span>
+                          <span className="detail-value" style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                            {new Date(selectedPatient.medicalHistory.lastUpdatedAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {selectedPatient.visits && selectedPatient.visits.length > 0 && (
