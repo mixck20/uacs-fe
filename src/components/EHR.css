@@ -713,6 +713,100 @@
   min-height: 80px;
 }
 
+/* Medical History Styles */
+.medical-history-item {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.medical-history-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.history-item-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #475569;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.checkbox-group {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.checkbox-container input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #e51d5e;
+  border: 2px solid #e2e8f0;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.checkbox-container input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #e51d5e;
+  border: 2px solid #e2e8f0;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.checkbox-container input[type="checkbox"]:hover,
+.checkbox-container input[type="radio"]:hover {
+  border-color: #e51d5e;
+}
+
+.checkbox-container input[type="checkbox"]:checked,
+.checkbox-container input[type="radio"]:checked {
+  background-color: #e51d5e;
+  border-color: #e51d5e;
+}
+
+.checkbox-label {
+  cursor: pointer;
+}
+
+.specify-input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 10px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: #fff;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.specify-input:focus {
+  border-color: #e51d5e;
+  box-shadow: 0 0 0 3px rgba(229, 29, 94, 0.1);
+  outline: none;
+}
+
+.others-checkbox {
+  margin-bottom: 10px;
+}
+
 /* Hide modal scrollbars while preserving scroll behavior */
 .ehr-modal-content::-webkit-scrollbar { width: 6px; }
 .ehr-modal-content::-webkit-scrollbar-thumb { 
