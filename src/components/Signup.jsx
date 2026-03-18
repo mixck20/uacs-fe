@@ -480,18 +480,6 @@ const Signup = () => {
                 </div>
               )}
 
-              <div className="signup-row-checkbox">
-                <label className="signup-checkbox-label">
-                  <input
-                    type="checkbox"
-                    name="emailUpdates"
-                    checked={form.emailUpdates}
-                    onChange={handleChange}
-                    className="signup-checkbox"
-                  />
-                  I would like to receive email updates and notifications from the School Clinic.
-                </label>
-              </div>
               <button type="submit" className="signup-btn" disabled={submitting}>
                 {submitting ? "Creating account..." : "Create Account"}
               </button>

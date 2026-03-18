@@ -22,3 +22,16 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Windows system files
+$Recycle.Bin/
+$WINDOWS.~BT/
+.GamingRoot
+System Volume Information/
+Recovery/
+hiberfil.sys
+pagefile.sys
+swapfile.sys
+*.tmp
+DumpStack.log*
+bootTel.dat
